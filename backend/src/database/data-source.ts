@@ -4,7 +4,7 @@ import * as path from 'path';
 
 // Load env variables from the root .env file
 
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 
 export const AppDataSource = new DataSource({
   type: 'mysql',
@@ -15,7 +15,11 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: false,
   logging: process.env.NODE_ENV === 'development',
-  entities: [path.resolve(__dirname, '../**/*.entity{.ts,.js}')],
-  migrations: [path.resolve(__dirname, 'migrations/*{.ts,.js}')],
+  entities: [
+    path.resolve(process.cwd(), 'dist/**/*.entity.js'),
+  ],
+  migrations: [
+    path.resolve(process.cwd(), 'dist/database/migrations/*.js'),
+  ],
   subscribers: [],
 });
