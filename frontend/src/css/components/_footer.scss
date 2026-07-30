@@ -1,0 +1,31 @@
+.site-footer {
+  border-top: 4px solid var(--green);
+  background: #e1e3e4;
+  padding: 52px 5%;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1.3fr;
+  gap: 48px;
+}
+.site-footer h2 {
+  font:
+    800 24px Montserrat,
+    sans-serif;
+  color: var(--green);
+  margin: 0 0 12px;
+}
+.site-footer h3 {
+  color: var(--green);
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+.site-footer p {
+  margin: 0;
+  line-height: 1.6;
+}
+.site-footer a {
+  display: block;
+  margin-bottom: 4px;
+}
+.site-footer__copyright {
+  align-self: start;
+}

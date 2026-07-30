@@ -6,7 +6,7 @@
 
     <nav class="site-header__nav" aria-label="Main navigation">
       <RouterLink to="/home">Home</RouterLink>
-      <RouterLink to="/promotions">Promotion</RouterLink>
+      <RouterLink to="/promotions">Promotions</RouterLink>
       <RouterLink to="/courses">Courses</RouterLink>
       <RouterLink to="/resources">Resources</RouterLink>
       <RouterLink to="/about-us">About us</RouterLink>

@@ -1,0 +1,25 @@
+.content-card {
+  background: #fff;
+  border: 1px solid #e1e3e4;
+  border-radius: 16px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.14);
+  margin: auto;
+  max-width: 640px;
+  padding: 48px;
+}
+.content-card--center {
+  text-align: center;
+}
+.content-card .q-icon {
+  color: var(--green);
+  font-size: 48px;
+}
+.content-card h2,
+.resource-card h2 {
+  color: var(--red);
+  font-size: 24px;
+}
+.content-card p {
+  line-height: 1.7;
+  margin-bottom: 28px;
+}

@@ -1,0 +1,18 @@
+.resource-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+}
+.resource-card {
+  border: 1px solid #e1e3e4;
+  border-radius: 12px;
+  padding: 32px;
+}
+.resource-card .q-icon {
+  color: var(--green);
+  font-size: 44px;
+}
+.resource-card p,
+.about-grid p {
+  line-height: 1.7;
+}

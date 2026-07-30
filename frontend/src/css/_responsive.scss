@@ -1,0 +1,148 @@
+@media (max-width: 700px) {
+  .site-header {
+    height: 91px;
+    padding: 10px 16px;
+  }
+  .site-header__nav {
+    display: none;
+  }
+  .site-header__menu {
+    display: block;
+  }
+  .section {
+    padding: 48px 16px;
+  }
+  .section-heading {
+    margin-bottom: 24px;
+  }
+  .section-heading h2 {
+    font-size: 24px;
+  }
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 48px 16px;
+    gap: 24px;
+  }
+  .hero__image-frame {
+    height: 269px;
+    order: 0;
+  }
+  .hero__copy {
+    order: 1;
+  }
+  .hero__copy h1 {
+    font-size: 34px;
+  }
+  .hero__copy p {
+    font-size: 16px;
+  }
+  .hero .app-button {
+    width: 100%;
+    min-height: 80px;
+  }
+  .benefits__grid,
+  .courses-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .benefit-card {
+    text-align: center;
+    padding: 25px;
+  }
+  .benefit-card .q-icon {
+    display: grid;
+    margin: auto;
+  }
+  .benefit-card h3 {
+    font-size: 18px;
+  }
+  .course-card__content {
+    min-height: 248px;
+  }
+  .gallery {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .gallery__image {
+    order: -1;
+  }
+  .quiz {
+    padding: 48px 16px;
+  }
+  .quiz h2,
+  .cta h2 {
+    font-size: 28px;
+  }
+  .enrollment__steps {
+    display: grid;
+    gap: 24px;
+  }
+  .enrollment__steps:before {
+    display: none;
+  }
+  .enrollment__steps article {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    text-align: left;
+    column-gap: 24px;
+  }
+  .enrollment__steps span {
+    grid-row: span 2;
+  }
+  .enrollment__steps h3 {
+    margin: 0;
+  }
+  .enrollment__steps p {
+    grid-column: 2;
+  }
+  .branches__list {
+    grid-template-columns: 1fr;
+  }
+  .branches__maps {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .branches__map iframe {
+    height: 300px;
+  }
+  .cta {
+    padding: 48px 16px;
+  }
+  .cta .app-button {
+    width: 100%;
+    min-height: 72px;
+  }
+  .site-footer {
+    grid-template-columns: 1fr;
+    padding: 48px 16px;
+    gap: 28px;
+  }
+  .site-footer__copyright {
+    font-size: 13px;
+  }
+  .page-hero {
+    padding: 64px 16px;
+  }
+  .page-hero h1 {
+    font-size: 32px;
+  }
+  .page-hero > p:last-child {
+    font-size: 16px;
+  }
+  .resource-grid,
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+  .content-card {
+    padding: 32px 20px;
+  }
+  .app-button {
+    font-size: 16px;
+  }
+  .gallery__stats {
+    flex-direction: column;
+  }
+}
+
+
