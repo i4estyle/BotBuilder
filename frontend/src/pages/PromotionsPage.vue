@@ -12,25 +12,27 @@
 
       <section class="promotion-list" aria-labelledby="promotion-list-title">
         <h2 id="promotion-list-title">โปรโมชั่นและกิจกรรม</h2>
+      </section>
 
-        <div class="promotion-grid">
-          <article v-for="promotion in promotions" :key="promotion.title" class="promotion-card">
+      <section v-for="promotion in promotions" :key="promotion.title" class="promotion-course">
+        <div class="promotion-course__inner">
+          <div class="promotion-course__image">
             <img :src="promotion.image" :alt="promotion.title" />
-            <div class="promotion-card__content">
-              <span>{{ promotion.label }}</span>
-              <h3>{{ promotion.title }}</h3>
-              <p>{{ promotion.description }}</p>
-              <ul v-if="promotion.details" class="promotion-card__details">
-                <li v-for="detail in promotion.details" :key="detail">{{ detail }}</li>
-              </ul>
-              <p v-if="promotion.price" class="promotion-card__price">{{ promotion.price }}</p>
-              <p v-if="promotion.note" class="promotion-card__note">{{ promotion.note }}</p>
-              <a :href="promotion.contactUrl" class="promotion-card__contact">
-                สอบถามรายละเอียด
-                <q-icon name="arrow_forward" />
-              </a>
-            </div>
-          </article>
+          </div>
+          <div class="promotion-course__content">
+            <span>{{ promotion.label }}</span>
+            <h3>{{ promotion.title }}</h3>
+            <p v-for="(line, i) in promotion.description" :key="i">{{ line }}</p>
+            <ul v-if="promotion.details" class="promotion-course__details">
+              <li v-for="detail in promotion.details" :key="detail">{{ detail }}</li>
+            </ul>
+            <p v-if="promotion.likeUrl" class="promotion-course__like">
+              {{ promotion.likeText }}
+              <a :href="promotion.likeUrl" target="_blank" rel="noopener">{{ promotion.likeLabel }}</a>
+            </p>
+            <p v-if="promotion.price" class="promotion-course__price">{{ promotion.price }}</p>
+            <p v-if="promotion.note" class="promotion-course__note">{{ promotion.note }}</p>
+          </div>
         </div>
       </section>
 
@@ -39,9 +41,13 @@
           <p>พร้อมเริ่มต้นการเรียนรู้กับเรา?</p>
           <h2>สอบถามโปรโมชั่นและรอบเรียนได้เลย</h2>
         </div>
-        <a href="tel:0824595665" class="promotion-cta__button">
-          <q-icon name="phone" />
-          082-459-5665
+        <a href="https://www.facebook.com/BotBuilderThailand/" target="_blank" class="promotion-cta__button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+            <path
+              d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.89h2.78l-.44 2.91h-2.34V22c4.78-.76 8.44-4.92 8.44-9.94Z"
+            />
+          </svg>
+          BotBuilderThailand
         </a>
       </section>
     </main>
@@ -53,268 +59,87 @@
 <script setup lang="ts">
 import SiteFooter from '@/components/landing/SiteFooter.vue';
 import SiteHeader from '@/components/landing/SiteHeader.vue';
-import happyPlayTimeImage from '@/assets/landing/happyplaytime.png';
 import promotionImage from '@/assets/landing/promotions.png';
+import happyPlayTimeImage from '@/assets/landing/happyplaytime.png';
+import exploringSpaceImage from '@/assets/landing/exploringspace.png';
 import takeawayMicrobitImage from '@/assets/landing/takeaway.png';
 import takeawayPythonImage from '@/assets/landing/takegreen.png';
-
-const phone = '082-459-5665';
-const contactUrl = `tel:${phone.replace(/-/g, '')}`;
 
 const promotions = [
   {
     image: promotionImage,
     label: 'PROMOTION',
-    title: 'โปรโมชั่นส่วนลดคอร์สเรียน',
-    description: 'สมัครเรียนยิ่งมาก ยิ่งคุ้ม',
+    title: 'Promotions สำหรับสมาชิกใหม่และนักสร้างมือเก๋า',
+    description: ['ลดทันทีเมื่อเริ่มหรือต่อคอร์ส'],
     details: ['1 คอร์ส ลด 5%', '2 คอร์ส ลด 10%', '3 คอร์ส ลด 15%'],
-    note: 'Like Page: BotBuilderThailand เพื่อรับสิทธิ์',
-    contactUrl,
+    note: 'เงื่อนไข: ขอสงวนการลดเป็นความต่อเนื่องของน้องแต่ละคน',
+    likeText: 'เมื่อกด Like เพจ',
+    likeUrl: 'https://www.facebook.com/BotBuilderThailand/',
+    likeLabel: 'BotBuilderThailand',
+  },
+  {
+    image: happyPlayTimeImage,
+    label: 'SPECIAL OFFER',
+    title: 'Happy Play Time Promotion',
+    description: [
+      'BotBuilder ขอชวนน้อง ๆ มาสนุกกับหุ่นยนต์แบบอิสระ ผ่านแบบหุ่นยนต์มากมายกว่า 100 แบบ ด้วย Package สุดคุ้มเพียง 1,650 บาท เข้ามาสร้างหุ่นยนต์อิสระได้ 4 ครั้ง',
+    ],
+    price: '1,650.- / 4 ครั้ง',
+    note: 'เหมาะสำหรับนักเรียนที่เคยเรียนมาแล้วเท่านั้น!',
+  },
+  {
+    image: exploringSpaceImage,
+    label: 'HOLIDAY CAMP',
+    title: 'ค่ายปิดเทอม: สำรวจอวกาศ',
+    description: [
+      'BotBuilder ขอชวนน้อง ๆ มาเข้าค่ายหุ่นยนต์ในเรื่องราวของการสำรวจอวกาศ',
+      'น้อง ๆ จะได้ออกแบบ สร้าง และเขียนโปรแกรมควบคุมหุ่นยนต์สำหรับภารกิจในห้วงลึกของจักรวาล ค่ายจัด 4 วันเต็ม สำหรับน้อง ๆ วัย 4-10 ขวบ รวมค่าอาหารกลางวันและเบรกประจำวันแล้ว',
+    ],
+    details: [
+      'ฐานปฏิบัติการส่งจรวด',
+      'ยานสำรวจอวกาศ',
+      'สถานีอวกาศ',
+      'ยานสำรวจดวงจันทร์',
+      'ยานนำร่อง',
+      'หุ่นยนต์ปฏิบัติการค้นหาและสำรวจ',
+      'Pathfinder',
+      'พร้อมภารกิจแบบช่วยเหลือกันเพื่อกลับสู่โลก',
+    ],
+    price: '6,900.- (ปกติ 9,900.-)',
   },
   {
     image: takeawayMicrobitImage,
     label: 'NEW COURSE',
     title: 'Robot Takeaway Course with Microbit',
-    description: 'หลักสูตรระยะสั้น 4 ชั่วโมง (รอบ 8.00-12.00 น. หรือ 13.00-18.00 น.)',
+    description: [
+      'หลักสูตรระยะสั้น 4 ชั่วโมง (รอบ 8.00-12.00 น. หรือ 13.00-18.00 น.)',
+      'น้องจะได้รับประสบการณ์สร้างหุ่นยนต์จากเริ่มต้น ผ่านตัวควบคุม Microbit พร้อมสั่งการด้วยภาษารูปภาพ หุ่นยนต์และโปรแกรมสามารถนำกลับไปเล่นและต่อยอดด้วยตนเองที่บ้านได้ หุ่นจะสามารถสั่งการผ่านโปรแกรมหรือสั่งการเคลื่อนที่ผ่านมือถือได้',
+    ],
     details: [
       'เด็กอายุ 6 ปีขึ้นไป ที่สนใจการสร้างหุ่นยนต์',
       'ต้องการเรียนการเขียนโปรแกรมควบคุมหุ่นยนต์เบื้องต้น',
       'ได้หุ่นยนต์เอาไปต่อยอดเล่นที่บ้านได้ (หุ่นมูลค่า 2,500.-)',
     ],
     price: 'ค่าใช้จ่าย: 3,990.-/คน',
-    contactUrl,
   },
   {
     image: takeawayPythonImage,
     label: 'NEW COURSE',
     title: 'Robot Takeaway Course with Python',
-    description: 'หลักสูตรระยะสั้น 4 ชั่วโมง (รอบ 8.00-12.00 น. หรือ 13.00-18.00 น.)',
+    description: [
+      'หลักสูตรระยะสั้น 4 ชั่วโมง (รอบ 8.00-12.00 น. หรือ 13.00-18.00 น.)',
+      'น้องจะได้รับประสบการณ์สร้างหุ่นยนต์จากเริ่มต้น ผ่านตัวควบคุม Microbit พร้อมสั่งการด้วยภาษา Python หุ่นยนต์และโปรแกรมสามารถนำกลับไปเล่นและต่อยอดด้วยตนเองที่บ้านได้ หุ่นจะสามารถสั่งการผ่านโปรแกรม Mycode ได้',
+    ],
     details: [
       'เด็กอายุ 10 ปีขึ้นไป ที่สนใจการสร้างหุ่นยนต์',
       'ต้องการเรียนการเขียนโปรแกรมควบคุมหุ่นยนต์เบื้องต้น',
       'ได้หุ่นยนต์เอาไปต่อยอดเล่นที่บ้านได้ (หุ่นมูลค่า 2,500.-)',
     ],
     price: 'ค่าใช้จ่าย: 3,990.-/คน',
-    contactUrl,
-  },
-  {
-    image: happyPlayTimeImage,
-    label: 'SPECIAL OFFER',
-    title: 'Happy Play Time Promotion',
-    description: '4 ครั้งต่อ 1 เดือน ราคาพิเศษ 1,650.-',
-    details: ['ราคาปกติ 2,000 บาท / 4 ครั้งภายใน 1 เดือน', 'เรียนครั้งละ 1.5 ชั่วโมง', 'เฉพาะนักเรียนปัจจุบัน'],
-    note: 'กรุณาจองล่วงหน้า',
-    contactUrl,
   },
 ];
 </script>
 
 <style scoped lang="scss">
-.promotions-hero {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e4f1e5 100%);
-  padding: 80px 5% 72px;
-  text-align: center;
-
-  &__eyebrow {
-    color: var(--red);
-    font: 700 14px Montserrat, sans-serif;
-    letter-spacing: 1.5px;
-    margin: 0 0 12px;
-  }
-
-  h1 {
-    color: var(--green);
-    font-size: clamp(36px, 5vw, 48px);
-    line-height: 1.25;
-    margin: 0;
-  }
-
-  &__line {
-    background: var(--red);
-    border-radius: 99px;
-    display: block;
-    height: 6px;
-    margin: 20px auto;
-    width: 96px;
-  }
-
-  > p:last-child {
-    font-size: 18px;
-    margin: 0;
-  }
-}
-
-.promotion-list {
-  margin: auto;
-  max-width: 1260px;
-  padding: 80px 5%;
-
-  > h2 {
-    color: var(--green);
-    font-size: 28px;
-    margin: 0 0 36px;
-    text-align: center;
-  }
-}
-
-.promotion-grid {
-  display: grid;
-  gap: 32px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.promotion-card {
-  background: #fff;
-  border: 1px solid #e1e3e4;
-  border-radius: 18px;
-  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.12);
-  overflow: hidden;
-  transition: transform 180ms ease, box-shadow 180ms ease;
-
-  &:hover {
-    box-shadow: 0 10px 20px rgba(0, 70, 12, 0.14);
-    transform: translateY(-5px);
-  }
-
-  img {
-    background: #eef3ef;
-    display: block;
-    height: 360px;
-    object-fit: contain;
-    width: 100%;
-  }
-
-  &__content {
-    padding: 24px 26px 28px;
-
-    > span {
-      color: var(--red);
-      font: 700 12px Montserrat, sans-serif;
-      letter-spacing: 1px;
-    }
-
-    h3 {
-      color: var(--green);
-      font-size: 22px;
-      line-height: 1.35;
-      margin: 8px 0;
-    }
-
-    p {
-      line-height: 1.65;
-      margin: 0 0 12px;
-    }
-  }
-
-  &__details {
-    line-height: 1.55;
-    margin: 0 0 14px;
-    padding-left: 20px;
-
-    li + li {
-      margin-top: 4px;
-    }
-  }
-
-  &__price {
-    color: var(--red);
-    font-size: 18px;
-    font-weight: 700;
-  }
-
-  &__note {
-    color: #677063;
-    font-size: 14px;
-    font-weight: 600;
-    font-style: italic;
-    margin-bottom: 18px !important;
-  }
-
-  &__contact {
-    align-items: center;
-    color: var(--green);
-    display: inline-flex;
-    font-weight: 700;
-    gap: 6px;
-    text-decoration: none;
-
-    &:hover {
-      color: var(--red);
-
-      .q-icon {
-        transform: translateX(3px);
-      }
-    }
-
-    .q-icon {
-      transition: transform 160ms ease;
-    }
-  }
-}
-
-.promotion-cta {
-  align-items: center;
-  background: var(--green);
-  color: #fff;
-  display: flex;
-  gap: 32px;
-  justify-content: space-between;
-  padding: 44px max(5%, calc((100% - 1160px) / 2));
-
-  p {
-    margin: 0 0 4px;
-  }
-
-  h2 {
-    font-size: 26px;
-    margin: 0;
-  }
-
-  &__button {
-    align-items: center;
-    background: #fff;
-    border-radius: 8px;
-    color: var(--green);
-    display: inline-flex;
-    flex: none;
-    font-weight: 800;
-    gap: 8px;
-    padding: 15px 22px;
-    text-decoration: none;
-  }
-}
-
-@media (max-width: 700px) {
-  .promotions-hero {
-    padding: 58px 16px;
-
-    > p:last-child {
-      font-size: 16px;
-    }
-  }
-
-  .promotion-list {
-    padding: 48px 16px;
-  }
-
-  .promotion-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .promotion-card img {
-    height: auto;
-    max-height: none;
-  }
-
-  .promotion-cta {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 20px;
-    padding: 40px 16px;
-
-    h2 {
-      font-size: 23px;
-    }
-  }
-}
+@use '@/css/pages/promotions';
 </style>
