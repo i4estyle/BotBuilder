@@ -73,29 +73,6 @@
   .cta h2 {
     font-size: 28px;
   }
-  .enrollment__steps {
-    display: grid;
-    gap: 24px;
-  }
-  .enrollment__steps:before {
-    display: none;
-  }
-  .enrollment__steps article {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 48px 1fr;
-    text-align: left;
-    column-gap: 24px;
-  }
-  .enrollment__steps span {
-    grid-row: span 2;
-  }
-  .enrollment__steps h3 {
-    margin: 0;
-  }
-  .enrollment__steps p {
-    grid-column: 2;
-  }
   .branches__list {
     grid-template-columns: 1fr;
   }

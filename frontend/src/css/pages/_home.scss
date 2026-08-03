@@ -241,51 +241,6 @@
   font-size: 13px;
   padding: 12px 24px;
 }
-.enrollment__steps {
-  display: flex;
-  max-width: 1000px;
-  margin: auto;
-  justify-content: space-between;
-  position: relative;
-}
-.enrollment__steps:before {
-  content: '';
-  position: absolute;
-  top: 24px;
-  left: 12%;
-  right: 12%;
-  height: 2px;
-  background: repeating-linear-gradient(90deg, #80bd83 0 8px, transparent 8px 14px);
-  animation: dashed-line 1.8s linear infinite;
-}
-.enrollment__steps article {
-  width: 30%;
-  text-align: center;
-  z-index: 1;
-}
-.enrollment__steps span {
-  background: var(--green);
-  color: #fff;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  margin: auto;
-  font-weight: 700;
-}
-.enrollment__steps h3 {
-  color: var(--red);
-  font:
-    700 16px Montserrat,
-    sans-serif;
-  margin: 18px 0 4px;
-}
-.enrollment__steps p {
-  font-size: 14px;
-  line-height: 1.5;
-  margin: 0;
-}
 .branches__maps {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -433,11 +388,6 @@
   }
   50% {
     transform: translateY(-10px);
-  }
-}
-@keyframes dashed-line {
-  to {
-    background-position: 20px 0;
   }
 }
 @keyframes dots-drift {

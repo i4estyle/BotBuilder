@@ -1,8 +1,8 @@
 <template>
-  <q-page ref="pageRoot" class="landing-page">
+  <q-page class="landing-page">
     <SiteHeader />
 
-    <main>
+    <main ref="pageRoot">
       <section class="hero" id="about">
         <div class="hero__image-frame"><img :src="heroImage" alt="เด็ก ๆ เรียนรู้ผ่าน LEGO" /></div>
         <div class="hero__copy" data-reveal>
@@ -35,7 +35,7 @@
       </section>
 
       <section class="section" id="courses">
-        <SectionHeading title="หลักสูตรของเรา" />
+        <SectionHeading title="รูปแบบกิจกรรม" />
         <div class="courses-grid">
           <CourseCard
             v-for="(course, index) in courses"
@@ -62,27 +62,40 @@
         <img :src="galleryImage" alt="ผลงานนักเรียน Bot Builder" class="gallery__image" />
       </section>
 
+      <section class="section activity-gallery" id="activity-gallery" data-reveal>
+        <SectionHeading title="รวมภาพกิจกรรมใน BotBuilder" />
+        <q-carousel
+          v-model="activitySlide"
+          class="activity-gallery__carousel"
+          height="380px"
+          arrows
+          navigation
+          swipeable
+          animated
+          infinite
+          control-color="white"
+        >
+          <q-carousel-slide
+            v-for="(photo, index) in activityPhotos"
+            :key="photo.src"
+            :name="index"
+            class="activity-gallery__slide"
+          >
+            <img
+              :src="photo.src"
+              :alt="photo.alt"
+              class="activity-gallery__image"
+              @click="openLightbox(index)"
+            />
+          </q-carousel-slide>
+        </q-carousel>
+      </section>
+
       <section class="quiz section" data-reveal>
         <q-icon name="quiz" class="quiz__icon" />
         <h2>ทดสอบความรู้หุ่นยนต์!</h2>
         <p>ลองทำแบบทดสอบสนุก ๆ เพื่อดูว่าคุณรู้จัก LEGO Spike Prime ดีแค่ไหน</p>
-        <AppButton>TAKE THE QUIZ →</AppButton>
-      </section>
-
-      <section class="section enrollment">
-        <SectionHeading title="ขั้นตอนการสมัครเรียน" />
-        <div class="enrollment__steps">
-          <article
-            v-for="(step, index) in steps"
-            :key="step.title"
-            data-reveal
-            :style="revealDelay(index)"
-          >
-            <span>{{ index + 1 }}</span>
-            <h3>{{ step.title }}</h3>
-            <p>{{ step.text }}</p>
-          </article>
-        </div>
+        <AppButton @click="quizOpen = true">TAKE THE QUIZ →</AppButton>
       </section>
 
       <section class="section branches">
@@ -143,6 +156,42 @@
     </main>
 
     <SiteFooter />
+
+    <QuizPanel v-model="quizOpen" />
+
+    <q-dialog v-model="lightboxOpen" transition-show="scale" transition-hide="scale">
+      <div class="lightbox">
+        <q-btn
+          flat
+          round
+          dense
+          icon="close"
+          class="lightbox__close"
+          aria-label="ปิด"
+          @click="lightboxOpen = false"
+        />
+        <q-carousel
+          v-model="lightboxSlide"
+          class="lightbox__carousel"
+          height="80vh"
+          arrows
+          navigation
+          swipeable
+          animated
+          infinite
+          control-color="white"
+        >
+          <q-carousel-slide
+            v-for="(photo, index) in activityPhotos"
+            :key="photo.src"
+            :name="index"
+            class="lightbox__slide"
+          >
+            <img :src="photo.src" :alt="photo.alt" class="lightbox__image" />
+          </q-carousel-slide>
+        </q-carousel>
+      </div>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -150,17 +199,42 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import AppButton from '@/components/landing/AppButton.vue';
 import CourseCard from '@/components/landing/CourseCard.vue';
+import QuizPanel from '@/components/landing/QuizPanel.vue';
 import SectionHeading from '@/components/landing/SectionHeading.vue';
 import SiteFooter from '@/components/landing/SiteFooter.vue';
 import SiteHeader from '@/components/landing/SiteHeader.vue';
 import heroImage from '@/assets/landing/hero.jpeg';
-import starterImage from '@/assets/landing/course-starter.jpeg';
-import explorerImage from '@/assets/landing/course-explorer.png';
-import masterImage from '@/assets/landing/course-master.jpeg';
+import starterImage from '@/assets/landing/gallery.jpeg';
+import explorerImage from '@/assets/landing/playlearn.png';
+import masterImage from '@/assets/landing/roboticcamp.png';
 import galleryImage from '@/assets/landing/gallery.jpeg';
+import promotionsPhoto from '@/assets/landing/promotions.png';
+import happyPlayTimePhoto from '@/assets/landing/happyplaytime.png';
+import exploringSpacePhoto from '@/assets/landing/exploringspace.png';
+import takeawayMicrobitPhoto from '@/assets/landing/takeaway.png';
+import takeawayPythonPhoto from '@/assets/landing/takegreen.png';
+import precompetePhoto from '@/assets/landing/precompete.png';
 
 const pageRoot = ref<HTMLElement | null>(null);
+const quizOpen = ref(false);
+const activitySlide = ref(0);
+const lightboxOpen = ref(false);
+const lightboxSlide = ref(0);
 let revealObserver: IntersectionObserver | undefined;
+
+const activityPhotos = [
+  { src: promotionsPhoto, alt: 'กิจกรรมโปรโมชั่นของ BotBuilder' },
+  { src: happyPlayTimePhoto, alt: 'กิจกรรม Happy Play Time' },
+  { src: exploringSpacePhoto, alt: 'ค่ายปิดเทอม: สำรวจอวกาศ' },
+  { src: takeawayMicrobitPhoto, alt: 'Robot Takeaway Course with Microbit' },
+  { src: takeawayPythonPhoto, alt: 'Robot Takeaway Course with Python' },
+  { src: precompetePhoto, alt: 'เตรียมความพร้อมสู่การแข่งขันหุ่นยนต์' },
+];
+
+const openLightbox = (index: number) => {
+  lightboxSlide.value = index;
+  lightboxOpen.value = true;
+};
 
 const revealDelay = (index: number) => ({ '--reveal-delay': `${index * 90}ms` });
 
@@ -205,30 +279,22 @@ const benefits = [
 const courses = [
   {
     image: starterImage,
-    title: 'Starter Coders',
-    age: 'Ages 7-9',
+    title: 'เล่น เรียน สร้าง',
     lessons: 12,
-    description: 'ปูพื้นฐานการประกอบหุ่นยนต์เบื้องต้นและการใช้ Block-based coding แบบง่าย',
+    description: 'มุ่งเน้นความหลากหลายของแบบหุ่นยนต์ ความคิดสร้างสรรค์ การเขียนโปรแกรมพื้นฐานและการนำเสนอผลงาน โดยมีความสอดคล้องกับอายุ ความสนใจและความสามารถของน้องแบ่งออกเป็น 3 ระดับ Beginner Intermediate และ Advance',
   },
   {
     image: explorerImage,
-    title: 'Explorer Bots',
-    age: 'Ages 10-12',
+    title: 'ค่ายหุ่นยนต์',
     lessons: 24,
-    description: 'เรียนรู้การใช้งานเซนเซอร์ การเขียนโปรแกรม และการออกแบบหุ่นยนต์อย่างสร้างสรรค์',
+    description: 'มุ่งเน้นกิจกรรมภารกิจ การวางแผนและการทำงานเป็นทีม ภารกิจจะเป็นเครื่องกำหนดรูปแบบของหุ่นยนต์ทำให้น้องๆ ต้องมีการออกแบบและสร้างขึ้นใหม่ ตามรูปแบบกิจกรรมในแต่ละครั้ง และสามารถจัดแบบนอกสนานที่เพื่อสร้างความแปลกใหม่',
   },
   {
     image: masterImage,
-    title: 'Master Engineers',
-    age: 'Ages 13-17',
+    title: 'เตรียมการแข่งขัน',
     lessons: 36,
-    description: 'ยกระดับไอเดียด้วยการสร้างหุ่นยนต์อัตโนมัติและแก้โจทย์ท้าทายจากโลกจริง',
+    description: 'มุ่งเน้นการออกแบบ สร้างและการหุ่นยนต์เพื่อการแข่งขันโดยเฉพาะ เน้นการคิดเพื่อแก้ไขปัญหาและการซ้อมเพื่อสร้างโอกาสชนะในการแข่งขัน โดยมีรายการแข่งขัน เช่น Lego FLL, World Robot Olympiad™ , Robot Battel และอื่นๆ',
   },
-];
-const steps = [
-  { title: 'Choose Course', text: 'เลือกคอร์สที่เหมาะกับช่วงวัยและความสนใจ' },
-  { title: 'Register', text: 'ลงทะเบียนและเลือกวันเวลาที่สะดวก' },
-  { title: 'Start Coding', text: 'เริ่มสนุกกับการสร้างสรรค์หุ่นยนต์ได้เลย' },
 ];
 const branches = [
   {

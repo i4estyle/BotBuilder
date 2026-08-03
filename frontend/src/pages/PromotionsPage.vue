@@ -14,7 +14,12 @@
         <h2 id="promotion-list-title">โปรโมชั่นและกิจกรรม</h2>
       </section>
 
-      <section v-for="promotion in promotions" :key="promotion.title" class="promotion-course">
+      <section
+        v-for="(promotion, index) in promotions"
+        :key="promotion.title"
+        class="promotion-course"
+        :class="{ 'promotion-course--alt': index % 2 === 1 }"
+      >
         <div class="promotion-course__inner">
           <div class="promotion-course__image">
             <img :src="promotion.image" :alt="promotion.title" />

@@ -127,6 +127,10 @@
     margin-bottom: 18px !important;
   }
 
+  &--alt {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e4f1e5 100%);
+  }
+
 }
 
 .promotion-cta {
@@ -159,8 +163,8 @@
     padding: 15px 22px;
     text-decoration: none;
 
-    .q-icon {
-      font-size: 20px;
+    svg {
+      flex: none;
     }
   }
 }
