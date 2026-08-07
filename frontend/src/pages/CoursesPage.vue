@@ -28,19 +28,19 @@ const courses = [
   {
     image: starterImage,
     title: 'Starter Coders',
-    lessons: 12,
+    badge: '12 บทเรียน',
     description: 'ปูพื้นฐานการประกอบหุ่นยนต์และการใช้ Block-based coding แบบง่าย',
   },
   {
     image: explorerImage,
     title: 'Explorer Bots',
-    lessons: 24,
+    badge: '24 บทเรียน',
     description: 'เรียนรู้การใช้งานเซนเซอร์ การเขียนโปรแกรม และการออกแบบหุ่นยนต์',
   },
   {
     image: masterImage,
     title: 'Master Engineers',
-    lessons: 36,
+    badge: '36 บทเรียน',
     description: 'ยกระดับไอเดียด้วยการสร้างหุ่นยนต์อัตโนมัติและแก้โจทย์จากโลกจริง',
   },
 ];

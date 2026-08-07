@@ -45,6 +45,10 @@
     grid-template-columns: 1fr;
     gap: 24px;
   }
+  .activities {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
   .benefit-card {
     text-align: center;
     padding: 25px;
@@ -73,12 +77,9 @@
   .cta h2 {
     font-size: 28px;
   }
-  .branches__list {
+  .branches__grid {
     grid-template-columns: 1fr;
-  }
-  .branches__maps {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 32px;
   }
   .branches__map iframe {
     height: 300px;
@@ -119,6 +120,10 @@
   }
   .gallery__stats {
     flex-direction: column;
+  }
+  .activity-gallery__columns {
+    grid-template-columns: 1fr;
+    gap: 40px;
   }
 }
 

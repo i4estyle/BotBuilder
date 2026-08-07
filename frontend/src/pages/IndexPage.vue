@@ -4,16 +4,43 @@
 
     <main ref="pageRoot">
       <section class="hero" id="about">
-        <div class="hero__image-frame"><img :src="heroImage" alt="เด็ก ๆ เรียนรู้ผ่าน LEGO" /></div>
+        <div class="hero__image-frame">
+          <div class="hero__image-inner">
+            <img :src="heroImage" alt="เด็ก ๆ เรียนรู้ผ่าน LEGO" />
+          </div>
+        </div>
         <div class="hero__copy" data-reveal>
           <h1><span>เล่นและเรียนรู้ผ่านการทำจริง</span>ด้วยตัวต่อ LEGO</h1>
           <p>
-            BotBuilder ประเทศไทยขอเสนอการเรียนรู้แบบลงมือปฏบัติจริงด้วยการบูรณาการ
+            BotBuilder ประเทศไทยขอเสนอการเรียนรู้แบบลงมือปฏิบัติจริงด้วยการบูรณาการ
             ผสานความรู้ทางวิทยาศาสตร์ คณิตศาสตร์และศิลปศาสตร์
             ผ่านการสร้างหุ่นยนต์และชุดอุปกรณ์ที่ออกแบบมาอย่างเหมาะสมสำหรับเด็กอายุ 3-16 ปี
             เพื่อเสริมทักษะ
           </p>
-          <AppButton>BOOK YOUR FREE TRIAL</AppButton>
+          <ul class="hero__skills">
+            <li>การคิดอย่างมีเหตุผล (Logical Thinking)</li>
+            <li>การวางแผนการทำงาน (Planning)</li>
+            <li>การวิเคราะห์และการแก้ไขปัญหา (Problem solving)</li>
+            <li>งานโครงการและการนำเสนอ (Project based and Project presentation)</li>
+          </ul>
+          <p class="hero__booking-note">
+            จองรอบเข้ามาสัมผัสประสบการณ์กับการสร้างหุ่นยนต์กว่า 100 แบบได้ที่ BotBuilder เท่านั้น
+            ผ่าน Line ID:
+            <a
+              href="https://line.me/R/ti/p/@botbuilderthailand"
+              target="_blank"
+              rel="noopener noreferrer"
+              >@botbuilderthailand</a
+            >
+          </p>
+          <div class="hero__actions">
+            <AppButton href="https://line.me/R/ti/p/@botbuilderthailand"
+              >จองรอบทดลองเรียนฟรี สาขาบางแสน</AppButton
+            >
+            <AppButton variant="outline" href="https://line.me/R/ti/p/@botbuilderthailand"
+              >จองรอบทดลองเรียนฟรี สาขาศรีราชา</AppButton
+            >
+          </div>
         </div>
       </section>
 
@@ -34,17 +61,9 @@
         </div>
       </section>
 
-      <section class="section" id="courses">
+      <section class="section" id="activity-formats">
         <SectionHeading title="รูปแบบกิจกรรม" />
-        <div class="courses-grid">
-          <CourseCard
-            v-for="(course, index) in courses"
-            :key="course.title"
-            v-bind="course"
-            data-reveal
-            :style="revealDelay(index)"
-          />
-        </div>
+        <ActivityFormats :items="activityFormats" />
       </section>
 
       <section class="gallery section section--muted" id="gallery">
@@ -59,36 +78,45 @@
             ><span><q-icon name="emoji_events" /> Skill Badges</span>
           </div>
         </div>
-        <img :src="galleryImage" alt="ผลงานนักเรียน Bot Builder" class="gallery__image" />
+        <img :src="certificate" alt="ผลงานนักเรียน Bot Builder" class="gallery__image" />
       </section>
 
       <section class="section activity-gallery" id="activity-gallery" data-reveal>
         <SectionHeading title="รวมภาพกิจกรรมใน BotBuilder" />
-        <q-carousel
-          v-model="activitySlide"
-          class="activity-gallery__carousel"
-          height="380px"
-          arrows
-          navigation
-          swipeable
-          animated
-          infinite
-          control-color="white"
-        >
-          <q-carousel-slide
-            v-for="(photo, index) in activityPhotos"
-            :key="photo.src"
-            :name="index"
-            class="activity-gallery__slide"
+        <div class="activity-gallery__columns">
+          <div
+            v-for="group in activityGroups"
+            :key="group.title"
+            class="activity-gallery__column"
           >
-            <img
-              :src="photo.src"
-              :alt="photo.alt"
-              class="activity-gallery__image"
-              @click="openLightbox(index)"
-            />
-          </q-carousel-slide>
-        </q-carousel>
+            <h3 class="activity-gallery__column-title">{{ group.title }}</h3>
+            <q-carousel
+              v-model="group.slide.value"
+              class="activity-gallery__carousel"
+              height="320px"
+              arrows
+              navigation
+              swipeable
+              animated
+              infinite
+              control-color="white"
+            >
+              <q-carousel-slide
+                v-for="(photo, index) in group.photos"
+                :key="photo.src"
+                :name="index"
+                class="activity-gallery__slide"
+              >
+                <img
+                  :src="photo.src"
+                  :alt="photo.alt"
+                  class="activity-gallery__image"
+                  @click="openLightbox(group.photos, index)"
+                />
+              </q-carousel-slide>
+            </q-carousel>
+          </div>
+        </div>
       </section>
 
       <section class="quiz section" data-reveal>
@@ -100,47 +128,42 @@
 
       <section class="section branches">
         <SectionHeading title="สาขาของเรา" />
-        <div class="branches__maps">
+        <div class="branches__grid">
           <div
             v-for="(branch, index) in branches"
-            :key="`${branch.name}-map`"
-            class="branches__map"
-            data-reveal
-            :style="revealDelay(index)"
-          >
-            <iframe
-              :src="branch.mapEmbedUrl"
-              :title="`แผนที่ ${branch.name}`"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              allowfullscreen
-            />
-          </div>
-        </div>
-        <div class="branches__list">
-          <article
-            v-for="(branch, index) in branches"
             :key="branch.name"
+            class="branch-block"
             data-reveal
             :style="revealDelay(index)"
           >
-            <q-icon name="location_on" />
-            <div class="branch-card__content">
-              <strong>{{ branch.name }}</strong>
-              <span class="branch-card__address">{{ branch.address }}</span>
-              <p>{{ branch.description }}</p>
-              <dl class="branch-card__hours">
-                <div v-for="hour in branch.hours" :key="hour.days">
-                  <dt>{{ hour.days }}</dt>
-                  <dd>{{ hour.time }}</dd>
-                </div>
-              </dl>
-              <a :href="`tel:${branch.phone.replace(/-/g, '')}`" class="branch-card__phone">
-                <q-icon name="phone" />
-                <span>ติดต่อด่วน {{ branch.phone }} ({{ branch.contactName }})</span>
-              </a>
+            <div class="branches__map">
+              <iframe
+                :src="branch.mapEmbedUrl"
+                :title="`แผนที่ ${branch.name}`"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen
+              />
             </div>
-          </article>
+            <article class="branch-card">
+              <q-icon name="location_on" />
+              <div class="branch-card__content">
+                <strong>{{ branch.name }}</strong>
+                <span class="branch-card__address">{{ branch.address }}</span>
+                <p>{{ branch.description }}</p>
+                <dl class="branch-card__hours">
+                  <div v-for="hour in branch.hours" :key="hour.days">
+                    <dt>{{ hour.days }}</dt>
+                    <dd>{{ hour.time }}</dd>
+                  </div>
+                </dl>
+                <a :href="`tel:${branch.phone.replace(/-/g, '')}`" class="branch-card__phone">
+                  <q-icon name="phone" />
+                  <span>ติดต่อด่วน {{ branch.phone }} ({{ branch.contactName }})</span>
+                </a>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -182,7 +205,7 @@
           control-color="white"
         >
           <q-carousel-slide
-            v-for="(photo, index) in activityPhotos"
+            v-for="(photo, index) in lightboxPhotos"
             :key="photo.src"
             :name="index"
             class="lightbox__slide"
@@ -197,17 +220,17 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue';
+import ActivityFormats from '@/components/landing/ActivityFormats.vue';
 import AppButton from '@/components/landing/AppButton.vue';
-import CourseCard from '@/components/landing/CourseCard.vue';
 import QuizPanel from '@/components/landing/QuizPanel.vue';
 import SectionHeading from '@/components/landing/SectionHeading.vue';
 import SiteFooter from '@/components/landing/SiteFooter.vue';
 import SiteHeader from '@/components/landing/SiteHeader.vue';
-import heroImage from '@/assets/landing/hero.jpeg';
-import starterImage from '@/assets/landing/gallery.jpeg';
-import explorerImage from '@/assets/landing/playlearn.png';
-import masterImage from '@/assets/landing/roboticcamp.png';
-import galleryImage from '@/assets/landing/gallery.jpeg';
+import heroImage from '@/assets/landing/intro.png';
+import starterImage from '@/assets/landing/playlearn.png';
+import explorerImage from '@/assets/landing/roboticcamp.png';
+import masterImage from '@/assets/landing/precompete.png';
+import certificate from '@/assets/landing/cretificate.jpg';
 import promotionsPhoto from '@/assets/landing/promotions.png';
 import happyPlayTimePhoto from '@/assets/landing/happyplaytime.png';
 import exploringSpacePhoto from '@/assets/landing/exploringspace.png';
@@ -217,21 +240,34 @@ import precompetePhoto from '@/assets/landing/precompete.png';
 
 const pageRoot = ref<HTMLElement | null>(null);
 const quizOpen = ref(false);
-const activitySlide = ref(0);
 const lightboxOpen = ref(false);
 const lightboxSlide = ref(0);
 let revealObserver: IntersectionObserver | undefined;
 
-const activityPhotos = [
+type ActivityPhoto = { src: string; alt: string };
+
+// TODO: ตรวจสอบการจัดหมวดหมู่รูปด้านล่าง — จัดตามชื่อ/บริบทเบื้องต้น รอผู้ใช้ยืนยัน
+const internalActivityPhotos: ActivityPhoto[] = [
   { src: promotionsPhoto, alt: 'กิจกรรมโปรโมชั่นของ BotBuilder' },
   { src: happyPlayTimePhoto, alt: 'กิจกรรม Happy Play Time' },
-  { src: exploringSpacePhoto, alt: 'ค่ายปิดเทอม: สำรวจอวกาศ' },
-  { src: takeawayMicrobitPhoto, alt: 'Robot Takeaway Course with Microbit' },
-  { src: takeawayPythonPhoto, alt: 'Robot Takeaway Course with Python' },
   { src: precompetePhoto, alt: 'เตรียมความพร้อมสู่การแข่งขันหุ่นยนต์' },
 ];
 
-const openLightbox = (index: number) => {
+const offsiteActivityPhotos: ActivityPhoto[] = [
+  { src: exploringSpacePhoto, alt: 'ค่ายปิดเทอม: สำรวจอวกาศ' },
+  { src: takeawayMicrobitPhoto, alt: 'Robot Takeaway Course with Microbit' },
+  { src: takeawayPythonPhoto, alt: 'Robot Takeaway Course with Python' },
+];
+
+const activityGroups = [
+  { title: 'กิจกรรมภายใน', photos: internalActivityPhotos, slide: ref(0) },
+  { title: 'กิจกรรมนอกสถานที่', photos: offsiteActivityPhotos, slide: ref(0) },
+];
+
+const lightboxPhotos = ref<ActivityPhoto[]>([]);
+
+const openLightbox = (photos: ActivityPhoto[], index: number) => {
+  lightboxPhotos.value = photos;
   lightboxSlide.value = index;
   lightboxOpen.value = true;
 };
@@ -276,23 +312,20 @@ const benefits = [
     text: 'เตรียมความพร้อมสู่ศตวรรษที่ 21 ด้วยทักษะการคิดเชิงวิพากษ์ และการแก้ไขปัญหาที่ซับซ้อน',
   },
 ];
-const courses = [
+const activityFormats = [
   {
     image: starterImage,
     title: 'เล่น เรียน สร้าง',
-    lessons: 12,
     description: 'มุ่งเน้นความหลากหลายของแบบหุ่นยนต์ ความคิดสร้างสรรค์ การเขียนโปรแกรมพื้นฐานและการนำเสนอผลงาน โดยมีความสอดคล้องกับอายุ ความสนใจและความสามารถของน้องแบ่งออกเป็น 3 ระดับ Beginner Intermediate และ Advance',
   },
   {
     image: explorerImage,
     title: 'ค่ายหุ่นยนต์',
-    lessons: 24,
     description: 'มุ่งเน้นกิจกรรมภารกิจ การวางแผนและการทำงานเป็นทีม ภารกิจจะเป็นเครื่องกำหนดรูปแบบของหุ่นยนต์ทำให้น้องๆ ต้องมีการออกแบบและสร้างขึ้นใหม่ ตามรูปแบบกิจกรรมในแต่ละครั้ง และสามารถจัดแบบนอกสนานที่เพื่อสร้างความแปลกใหม่',
   },
   {
     image: masterImage,
     title: 'เตรียมการแข่งขัน',
-    lessons: 36,
     description: 'มุ่งเน้นการออกแบบ สร้างและการหุ่นยนต์เพื่อการแข่งขันโดยเฉพาะ เน้นการคิดเพื่อแก้ไขปัญหาและการซ้อมเพื่อสร้างโอกาสชนะในการแข่งขัน โดยมีรายการแข่งขัน เช่น Lego FLL, World Robot Olympiad™ , Robot Battel และอื่นๆ',
   },
 ];
