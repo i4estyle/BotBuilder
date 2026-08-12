@@ -1,27 +1,27 @@
 <template>
   <footer class="site-footer">
     <div>
-      <h2>BOT BUILDER</h2>
-      <p>
-        ศูนย์การเรียนรู้หุ่นยนต์และนวัตกรรมสำหรับเด็ก
-        ที่เชื่อว่าการเรียนรู้ที่ดีที่สุดคือการสร้างสรรค์ด้วยมือของตัวเอง
-      </p>
+      <h2>{{ t('common.footer.brandTitle') }}</h2>
+      <p>{{ t('common.footer.brandText') }}</p>
     </div>
     <div>
-      <h3>QUICK LINKS</h3>
-      <RouterLink to="/courses">Courses</RouterLink>
-      <RouterLink to="/about-us">About Us</RouterLink>
-      <RouterLink to="/resources">Resources</RouterLink>
+      <h3>{{ t('common.footer.quickLinks') }}</h3>
+      <RouterLink to="/courses">{{ t('common.footer.courses') }}</RouterLink>
+      <RouterLink to="/about-us">{{ t('common.footer.aboutUs') }}</RouterLink>
+      <RouterLink to="/resources">{{ t('common.footer.resources') }}</RouterLink>
     </div>
     <div>
-      <h3>SUPPORT</h3>
-      <RouterLink to="/promotions">Promotion</RouterLink>
-      <a href="mailto:hello@botbuilder.co.th">Contact us</a>
+      <h3>{{ t('common.footer.support') }}</h3>
+      <RouterLink to="/promotions">{{ t('common.footer.promotion') }}</RouterLink>
+      <a href="mailto:hello@botbuilder.co.th">{{ t('common.footer.contactUs') }}</a>
     </div>
-    <p class="site-footer__copyright">© 2024 Bot Builder Academy. Built for future engineers.</p>
+    <p class="site-footer__copyright">{{ t('common.footer.copyright') }}</p>
   </footer>
 </template>
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 </script>

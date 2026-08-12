@@ -2,17 +2,19 @@
   <div class="activities">
     <div
       v-for="(item, index) in items"
-      :key="item.title"
-      class="activities__item"
+      :key="index"
+      class="activities__row"
+      :class="{ 'activities__row--reverse': index % 2 === 1 }"
       data-reveal
       :style="{ '--reveal-delay': `${index * 90}ms` }"
     >
       <div class="activities__media">
         <img :src="item.image" :alt="item.title" />
       </div>
-      <h3>{{ item.title }}</h3>
-      <p>{{ item.description }}</p>
-      <a href="#" class="activities__link">รายละเอียดเพิ่มเติม <q-icon name="arrow_forward" /></a>
+      <div class="activities__copy">
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.description }}</p>
+      </div>
     </div>
   </div>
 </template>

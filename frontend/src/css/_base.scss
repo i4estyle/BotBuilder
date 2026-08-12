@@ -57,6 +57,31 @@ body {
   border-bottom: 2px solid var(--green);
   padding-bottom: 6px;
 }
+.site-header__lang {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.site-header__lang-btn {
+  background: none;
+  border: 0;
+  padding: 4px 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #8a9089;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+.site-header__lang-btn:hover {
+  color: var(--green);
+}
+.site-header__lang-btn--active {
+  color: var(--green);
+}
+.site-header__lang-divider {
+  color: #d4d7d5;
+  font-size: 12px;
+}
 .site-header__menu {
   display: none;
 }

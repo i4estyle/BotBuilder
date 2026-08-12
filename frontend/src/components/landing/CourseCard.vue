@@ -7,13 +7,16 @@
     <div class="course-card__content">
       <h3>{{ title }}</h3>
       <p>{{ description }}</p>
-      <AppButton variant="red">ดูรายละเอียด</AppButton>
+      <AppButton variant="red">{{ t('courses.viewDetails') }}</AppButton>
     </div>
   </article>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import AppButton from './AppButton.vue';
 
 defineProps<{ image: string; title: string; description: string; badge?: string }>();
+
+const { t } = useI18n();
 </script>
