@@ -9,7 +9,7 @@ const thTH = {
     },
     langSwitch: {
       th: 'ไทย',
-      en: 'EN',
+      en: 'อังกฤษ',
     },
     footer: {
       brandTitle: 'BOT BUILDER',
@@ -133,7 +133,8 @@ const thTH = {
         {
           name: 'สาขาศรีราชา',
           address: 'ห้างอิออนศรีราชา ชั้น 3 (หน้าลิฟท์)',
-          description: 'สาขาที่ 2 ของ BotBuilder ประจำอำเภอศรีราชา ด้านข้างโรงเรียนอัสสัมชัญศรีราชา',
+          description:
+            'สาขาที่ 2 ของ BotBuilder ประจำอำเภอศรีราชา ด้านข้างโรงเรียนอัสสัมชัญศรีราชา',
           hours: [
             { days: 'อังคาร - ศุกร์', time: '14.30 - 19.00 น.' },
             { days: 'เสาร์ - อาทิตย์', time: '8.00 - 18.00 น.' },
@@ -350,7 +351,8 @@ const thTH = {
         options: ['Sound (สีม่วง)', 'Events (สีเหลือง)', 'Movement (สีชมพู)', 'Sensors (สีฟ้า)'],
       },
       {
-        question: 'ความแตกต่างระหว่างคำสั่งหมวดหมู่ "Motors" (สีน้ำเงิน) และ "Movement" (สีชมพู) คืออะไร?',
+        question:
+          'ความแตกต่างระหว่างคำสั่งหมวดหมู่ "Motors" (สีน้ำเงิน) และ "Movement" (สีชมพู) คืออะไร?',
         options: [
           'Motors ควบคุมความเร็ว / Movement ควบคุมทิศทาง',
           'Motors ใช้กับเซนเซอร์ / Movement ใช้กับมอเตอร์',
@@ -379,7 +381,12 @@ const thTH = {
       {
         question:
           'หากต้องการให้หุ่นยนต์วิ่งไปข้างหน้า จนกว่าจะเจอเส้นสีดำถึงจะหยุด ควรใช้คำสั่งใดร่วมกับ Color Sensor?',
-        options: ['Wait for 1 second', 'Wait until (Color is Black)', 'Repeat 10 times', 'Stop all'],
+        options: [
+          'Wait for 1 second',
+          'Wait until (Color is Black)',
+          'Repeat 10 times',
+          'Stop all',
+        ],
       },
       {
         question: 'มอเตอร์ที่มาในชุด LEGO SPIKE Prime มีทั้งหมดกี่ขนาด?',
@@ -396,7 +403,12 @@ const thTH = {
       },
       {
         question: 'การเขียนโปรแกรมสั่งงานหุ่นยนต์จากคำสั่งบนสุดลงมาล่างสุดตามลำดับ เรียกว่าอะไร?',
-        options: ['Debugging', 'Sequence (การทำงานตามลำดับ)', 'Loop (การวนซ้ำ)', 'Algorithm (อัลกอริทึม)'],
+        options: [
+          'Debugging',
+          'Sequence (การทำงานตามลำดับ)',
+          'Loop (การวนซ้ำ)',
+          'Algorithm (อัลกอริทึม)',
+        ],
       },
       {
         question: '"Debugging" (การดีบัก) หมายถึงอะไรในการสร้างและเขียนโปรแกรมหุ่นยนต์?',
@@ -418,11 +430,13 @@ const thTH = {
         ],
       },
       {
-        question: 'บล็อกคำสั่งสำหรับการคำนวณ (Operators) เช่น บวก ลบ คูณ หาร หรือสุ่มตัวเลข จะอยู่ในหมวดหมู่สีอะไร?',
+        question:
+          'บล็อกคำสั่งสำหรับการคำนวณ (Operators) เช่น บวก ลบ คูณ หาร หรือสุ่มตัวเลข จะอยู่ในหมวดหมู่สีอะไร?',
         options: ['สีเขียว', 'สีส้ม', 'สีเหลือง', 'สีฟ้า'],
       },
       {
-        question: 'ข้อใดคือเป้าหมายหลักของการใช้ "การวนซ้ำ" (Loop) เช่นคำสั่ง Repeat ในการเขียนโปรแกรม?',
+        question:
+          'ข้อใดคือเป้าหมายหลักของการใช้ "การวนซ้ำ" (Loop) เช่นคำสั่ง Repeat ในการเขียนโปรแกรม?',
         options: [
           'ทำให้หุ่นยนต์ทำงานได้เร็วขึ้นสองเท่า',
           'ลดความยาวของโค้ด และไม่ต้องเขียนคำสั่งเดิมซ้ำๆ หลายครั้ง',
@@ -431,6 +445,50 @@ const thTH = {
         ],
       },
     ],
+  },
+  admin: {
+    title: 'ระบบจัดการเนื้อหาเว็บไซต์',
+    subtitle: 'ปรับแก้ไขข้อมูลส่วนต่าง ๆ ได้แบบ realtime',
+    reset: 'คืนค่าเริ่มต้น',
+    viewportDesktop: 'เดสก์ท็อป',
+    viewportTablet: 'แท็บเล็ต',
+    viewportMobile: 'มือถือ',
+    sections: {
+      header: 'ส่วนหัวเว็บไซต์ (Header)',
+      hero: 'ส่วนต้อนรับหลัก (Hero)',
+      benefits: 'จุดเด่น (Benefits)',
+      activityFormats: 'รูปแบบกิจกรรม (Activity Formats)',
+      gallery: 'ผลงาน (Gallery)',
+      activityGallery: 'คลังภาพกิจกรรม (Activity Gallery)',
+      quiz: 'แบบทดสอบ (Quiz Teaser)',
+      branches: 'สาขาของเรา (Branches)',
+      cta: 'ส่วนลงทะเบียน (CTA)',
+      footer: 'ส่วนท้ายเว็บไซต์ (Footer)',
+    },
+    fields: {
+      logo: 'โลโก้เว็บไซต์',
+      heading: 'หัวข้อหลัก',
+      paragraph: 'ข้อความบรรยาย',
+      skills: 'ทักษะที่ได้รับ',
+      bookingNote: 'หมายเหตุการจอง',
+      ctaLabel: 'ปุ่มดำเนินการ',
+      ctaBangsaen: 'ข้อความปุ่มบางแสน',
+      ctaSriracha: 'ข้อความปุ่มศรีราชา',
+      addItem: 'เพิ่มรายการ',
+      removeItem: 'ลบรายการ',
+      title: 'ชื่อหัวข้อ',
+      description: 'รายละเอียด',
+      icon: 'ไอคอน',
+      image: 'รูปภาพ',
+      name: 'ชื่อสาขา',
+      address: 'ที่อยู่',
+      hours: 'เวลาทำการ',
+      phone: 'เบอร์โทรศัพท์',
+      contactName: 'ชื่อผู้ติดต่อ',
+      mapEmbedUrl: 'Google Maps Embed URL',
+      buttonText: 'ข้อความปุ่ม',
+      copyright: 'ข้อความลิขสิทธิ์',
+    },
   },
 };
 
@@ -569,7 +627,8 @@ const enUS: typeof thTH = {
         {
           name: 'Si Racha Branch',
           address: 'AEON Si Racha, 3rd Floor (in front of the elevator)',
-          description: "BotBuilder's second branch serving Si Racha district, next to Assumption College Si Racha.",
+          description:
+            "BotBuilder's second branch serving Si Racha district, next to Assumption College Si Racha.",
           hours: [
             { days: 'Tue - Fri', time: '2:30 PM - 7:00 PM' },
             { days: 'Sat - Sun', time: '8:00 AM - 6:00 PM' },
@@ -580,7 +639,7 @@ const enUS: typeof thTH = {
     cta: {
       heading: 'Ready to take the first step with us?',
       paragraph:
-        "Register today to get one free trial class, plus expert advice to help you choose the best course for your child.",
+        'Register today to get one free trial class, plus expert advice to help you choose the best course for your child.',
       button: 'REGISTER NOW',
     },
     lightbox: {
@@ -590,7 +649,8 @@ const enUS: typeof thTH = {
   about: {
     eyebrow: 'ABOUT BOT BUILDER',
     title: 'We believe the best learning comes from building it yourself',
-    intro: 'Bot Builder creates a learning space where kids experiment, think, and grow together with technology.',
+    intro:
+      'Bot Builder creates a learning space where kids experiment, think, and grow together with technology.',
     missionHeading: 'Our Mission',
     missionText:
       'We build future-ready skills through fun, hands-on learning in science, technology, engineering, and mathematics.',
@@ -615,7 +675,8 @@ const enUS: typeof thTH = {
       {
         title: 'Master Engineers',
         badge: '36 lessons',
-        description: 'Level up ideas by building automated robots and solving real-world challenges.',
+        description:
+          'Level up ideas by building automated robots and solving real-world challenges.',
       },
     ],
   },
@@ -625,7 +686,10 @@ const enUS: typeof thTH = {
     paragraph: 'Articles, activities, and fun challenges to build on robotics learning.',
     items: [
       { title: 'Articles & Tips', text: 'Fun ideas for parents and students' },
-      { title: 'At-Home Activities', text: 'Practice thinking, building, and having fun every day' },
+      {
+        title: 'At-Home Activities',
+        text: 'Practice thinking, building, and having fun every day',
+      },
       { title: 'Competitions', text: 'Get ready for robotics competitions' },
     ],
   },
@@ -725,7 +789,7 @@ const enUS: typeof thTH = {
     },
     questions: [
       {
-        question: "Which component of the LEGO SPIKE Prime acts as the robot's \"brain\"?",
+        question: 'Which component of the LEGO SPIKE Prime acts as the robot\'s "brain"?',
         options: ['Motor', 'Sensor', 'Hub', 'Battery'],
       },
       {
@@ -777,11 +841,13 @@ const enUS: typeof thTH = {
         ],
       },
       {
-        question: 'To make the robot move forward or backward, which block category should you use?',
+        question:
+          'To make the robot move forward or backward, which block category should you use?',
         options: ['Sound (purple)', 'Events (yellow)', 'Movement (pink)', 'Sensors (blue)'],
       },
       {
-        question: 'What is the difference between the "Motors" (blue) and "Movement" (pink) block categories?',
+        question:
+          'What is the difference between the "Motors" (blue) and "Movement" (pink) block categories?',
         options: [
           'Motors control speed / Movement controls direction',
           'Motors is used with sensors / Movement is used with motors',
@@ -805,11 +871,21 @@ const enUS: typeof thTH = {
       {
         question:
           'To make the robot move forward until it detects a black line and then stop, which block should be used with the Color Sensor?',
-        options: ['Wait for 1 second', 'Wait until (Color is Black)', 'Repeat 10 times', 'Stop all'],
+        options: [
+          'Wait for 1 second',
+          'Wait until (Color is Black)',
+          'Repeat 10 times',
+          'Stop all',
+        ],
       },
       {
         question: 'How many sizes of motor come in the LEGO SPIKE Prime set?',
-        options: ['1 size', '2 sizes (Medium and Large)', '3 sizes (Small, Medium, Large)', '4 sizes'],
+        options: [
+          '1 size',
+          '2 sizes (Medium and Large)',
+          '3 sizes (Small, Medium, Large)',
+          '4 sizes',
+        ],
       },
       {
         question: 'In programming, a Variable is best compared to what?',
@@ -821,7 +897,8 @@ const enUS: typeof thTH = {
         ],
       },
       {
-        question: 'Programming the robot by running commands in order from top to bottom is called what?',
+        question:
+          'Programming the robot by running commands in order from top to bottom is called what?',
         options: ['Debugging', 'Sequence', 'Loop', 'Algorithm'],
       },
       {
@@ -849,7 +926,8 @@ const enUS: typeof thTH = {
         options: ['Green', 'Orange', 'Yellow', 'Blue'],
       },
       {
-        question: 'What is the main goal of using a Loop, such as the Repeat block, in programming?',
+        question:
+          'What is the main goal of using a Loop, such as the Repeat block, in programming?',
         options: [
           'Making the robot run twice as fast',
           "Shortening the code so you don't repeat the same commands many times",
@@ -858,6 +936,50 @@ const enUS: typeof thTH = {
         ],
       },
     ],
+  },
+  admin: {
+    title: 'Website Content Management System',
+    subtitle: 'Realtime live editing for all page sections',
+    reset: 'Reset to Defaults',
+    viewportDesktop: 'Desktop',
+    viewportTablet: 'Tablet',
+    viewportMobile: 'Mobile',
+    sections: {
+      header: 'Website Header',
+      hero: 'Hero Section',
+      benefits: 'Benefits / Features',
+      activityFormats: 'Activity Formats',
+      gallery: 'Gallery & Certificates',
+      activityGallery: 'Activity Photos',
+      quiz: 'Quiz Teaser',
+      branches: 'Our Branches',
+      cta: 'CTA Registration',
+      footer: 'Website Footer',
+    },
+    fields: {
+      logo: 'Website Logo',
+      heading: 'Main Heading',
+      paragraph: 'Description Paragraph',
+      skills: 'Skills Acquired',
+      bookingNote: 'Booking Note',
+      ctaLabel: 'Action Button Label',
+      ctaBangsaen: 'Bangsaen Button Text',
+      ctaSriracha: 'Sriracha Button Text',
+      addItem: 'Add Item',
+      removeItem: 'Remove Item',
+      title: 'Title',
+      description: 'Description',
+      icon: 'Icon',
+      image: 'Image',
+      name: 'Branch Name',
+      address: 'Address',
+      hours: 'Operating Hours',
+      phone: 'Phone Number',
+      contactName: 'Contact Name',
+      mapEmbedUrl: 'Google Maps Embed URL',
+      buttonText: 'Button Text',
+      copyright: 'Copyright Text',
+    },
   },
 };
 

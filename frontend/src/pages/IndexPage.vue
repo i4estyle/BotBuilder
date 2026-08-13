@@ -10,10 +10,15 @@
           </div>
         </div>
         <div class="hero__copy" data-reveal>
-          <h1><span>{{ t('home.hero.titleHighlight') }}</span>{{ t('home.hero.titleRest') }}</h1>
+          <h1>
+            <span>{{ t('home.hero.titleHighlight') }}</span
+            >{{ t('home.hero.titleRest') }}
+          </h1>
           <p>{{ t('home.hero.paragraph') }}</p>
           <ul class="hero__skills">
-            <li v-for="skill in i18n.tm('home.hero.skills') as string[]" :key="skill">{{ skill }}</li>
+            <li v-for="skill in i18n.tm('home.hero.skills') as string[]" :key="skill">
+              {{ skill }}
+            </li>
           </ul>
           <p class="hero__booking-note">
             {{ t('home.hero.bookingNote') }}
@@ -25,7 +30,10 @@
             >
           </p>
           <div class="hero__actions">
-            <AppButton href="https://line.me/R/ti/p/@botbuilderthailand" class="app-button--stacked">
+            <AppButton
+              href="https://line.me/R/ti/p/@botbuilderthailand"
+              class="app-button--stacked"
+            >
               {{ t('home.hero.ctaLabel') }}<span>{{ t('home.hero.ctaBangsaen') }}</span>
             </AppButton>
             <AppButton

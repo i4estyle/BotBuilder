@@ -1,9 +1,9 @@
 <template>
   <section class="page-hero">
-    <p>{{ eyebrow }}</p>
+    <p class="page-hero__eyebrow">{{ eyebrow }}</p>
     <h1>{{ title }}</h1>
     <span />
-    <slot />
+    <div class="page-hero__subtitle"><slot /></div>
   </section>
 </template>
 

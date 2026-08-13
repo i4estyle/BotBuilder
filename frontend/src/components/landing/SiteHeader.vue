@@ -1,34 +1,34 @@
 <template>
   <header class="site-header">
     <RouterLink to="/home" class="site-header__brand" aria-label="Bot Builder home">
-      <img :src="logo" alt="Bot Builder" class="site-header__logo" />
+      <img :src="headerData.logo || logo" alt="Bot Builder" class="site-header__logo" />
     </RouterLink>
 
     <nav class="site-header__nav" aria-label="Main navigation">
-      <RouterLink to="/home">{{ t('common.nav.home') }}</RouterLink>
-      <RouterLink to="/promotions">{{ t('common.nav.promotions') }}</RouterLink>
-      <RouterLink to="/courses">{{ t('common.nav.courses') }}</RouterLink>
-      <RouterLink to="/resources">{{ t('common.nav.resources') }}</RouterLink>
-      <RouterLink to="/about-us">{{ t('common.nav.about') }}</RouterLink>
+      <RouterLink to="/home">{{ headerData.nav.home }}</RouterLink>
+      <RouterLink to="/promotions">{{ headerData.nav.promotions }}</RouterLink>
+      <RouterLink to="/courses">{{ headerData.nav.courses }}</RouterLink>
+      <RouterLink to="/resources">{{ headerData.nav.resources }}</RouterLink>
+      <RouterLink to="/about-us">{{ headerData.nav.about }}</RouterLink>
     </nav>
 
     <div class="site-header__lang" role="group" aria-label="Language switch">
       <button
         type="button"
         class="site-header__lang-btn"
-        :class="{ 'site-header__lang-btn--active': locale === 'th-TH' }"
+        :class="{ 'site-header__lang-btn--active': editorLocale === 'th-TH' }"
         @click="setLocale('th-TH')"
       >
-        {{ t('common.langSwitch.th') }}
+        {{ editorLocale === 'th-TH' ? 'ไทย' : 'TH' }}
       </button>
       <span class="site-header__lang-divider">|</span>
       <button
         type="button"
         class="site-header__lang-btn"
-        :class="{ 'site-header__lang-btn--active': locale === 'en-US' }"
+        :class="{ 'site-header__lang-btn--active': editorLocale === 'en-US' }"
         @click="setLocale('en-US')"
       >
-        {{ t('common.langSwitch.en') }}
+        {{ editorLocale === 'th-TH' ? 'อังกฤษ' : 'EN' }}
       </button>
     </div>
 
@@ -41,10 +41,13 @@ import { RouterLink } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import logo from '@/assets/landing/logo.png';
 import { LOCALE_STORAGE_KEY, type MessageLanguages } from '@/boot/i18n';
+import { useWebsiteEditor } from '@/composables/use-website-editor';
 
-const { t, locale } = useI18n();
+const { locale } = useI18n();
+const { header: headerData, editorLocale, setEditorLocale } = useWebsiteEditor();
 
 function setLocale(value: MessageLanguages) {
+  setEditorLocale(value);
   locale.value = value;
   localStorage.setItem(LOCALE_STORAGE_KEY, value);
 }

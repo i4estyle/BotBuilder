@@ -1,4 +1,28 @@
-@media (max-width: 700px) {
+@mixin tablet-responsive-styles {
+  .activities__row,
+  .activities__row--reverse {
+    grid-template-columns: 1fr;
+  }
+  .activities__row--reverse .activities__media,
+  .activities__row--reverse .activities__copy {
+    order: initial;
+  }
+  .activities__media img {
+    height: 260px;
+  }
+  .promotion-course {
+    padding: 56px 5%;
+
+    &__inner {
+      gap: 36px;
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+@mixin mobile-responsive-styles {
+  @include tablet-responsive-styles;
+
   .site-header {
     height: 91px;
     padding: 10px 16px;
@@ -125,6 +149,30 @@
     grid-template-columns: 1fr;
     gap: 40px;
   }
+  .promotions-hero {
+    padding: 58px 16px;
+
+    > p:last-child {
+      font-size: 16px;
+    }
+  }
+  .promotion-list {
+    padding: 48px 16px 28px;
+  }
 }
 
+@media (max-width: 900px) {
+  @include tablet-responsive-styles;
+}
 
+@media (max-width: 700px) {
+  @include mobile-responsive-styles;
+}
+
+.admin-preview-scroll-wrapper--tablet {
+  @include tablet-responsive-styles;
+}
+
+.admin-preview-scroll-wrapper--mobile {
+  @include mobile-responsive-styles;
+}

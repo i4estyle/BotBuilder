@@ -1,9 +1,10 @@
 .page-hero {
   background: linear-gradient(135deg, #f8f9fa 0%, #e4f1e5 100%);
-  padding: 100px 5%;
+  padding: 80px 5% 60px;
   text-align: center;
 }
-.page-hero > p:first-child {
+.page-hero__eyebrow,
+.page-hero > p:first-of-type {
   color: var(--red);
   font:
     700 14px Montserrat,
@@ -26,8 +27,10 @@
   margin: 20px auto;
   width: 96px;
 }
-.page-hero > p:last-child {
+.page-hero__subtitle,
+.page-hero > p:last-of-type {
   font-size: 18px;
+  color: #475569;
   line-height: 1.7;
   margin: 0 auto;
   max-width: 700px;

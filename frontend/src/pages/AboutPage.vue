@@ -2,15 +2,15 @@
   <q-page class="landing-page">
     <SiteHeader />
     <main>
-      <PageHero :eyebrow="t('about.eyebrow')" :title="t('about.title')">
-        <p>{{ t('about.intro') }}</p>
+      <PageHero :eyebrow="aboutPageData.eyebrow" :title="aboutPageData.title">
+        <p>{{ aboutPageData.intro }}</p>
       </PageHero>
       <section class="section section--muted about-grid">
         <div>
-          <SectionHeading :title="t('about.missionHeading')" :centered="false" />
-          <p>{{ t('about.missionText') }}</p>
+          <SectionHeading :title="aboutPageData.missionHeading" :centered="false" />
+          <p>{{ aboutPageData.missionText }}</p>
         </div>
-        <img :src="heroImage" :alt="t('about.imageAlt')" />
+        <img :src="aboutPageData.image" :alt="aboutPageData.imageAlt" />
       </section>
     </main>
     <SiteFooter />
@@ -18,12 +18,11 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
 import PageHero from '@/components/landing/PageHero.vue';
 import SectionHeading from '@/components/landing/SectionHeading.vue';
 import SiteFooter from '@/components/landing/SiteFooter.vue';
 import SiteHeader from '@/components/landing/SiteHeader.vue';
-import heroImage from '@/assets/landing/hero.jpeg';
+import { useWebsiteEditor } from '@/composables/use-website-editor';
 
-const { t } = useI18n();
+const { aboutPage: aboutPageData } = useWebsiteEditor();
 </script>

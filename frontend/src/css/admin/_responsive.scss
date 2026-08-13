@@ -1,0 +1,31 @@
+@media (max-width: 1024px) {
+  .admin-page {
+    &__workspace {
+      flex-direction: column;
+    }
+
+    &__editor-sidebar {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      flex-direction: row;
+      overflow-x: auto;
+    }
+
+    &__preview-pane {
+      height: calc(100vh - 120px);
+      padding: 12px;
+    }
+  }
+
+  .admin-toolbar {
+    padding: 8px 12px;
+    height: auto;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    &__status-pill {
+      display: none;
+    }
+  }
+}

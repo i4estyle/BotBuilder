@@ -6,8 +6,11 @@
     </div>
     <div class="course-card__content">
       <h3>{{ title }}</h3>
-      <p>{{ description }}</p>
-      <AppButton variant="red">{{ t('courses.viewDetails') }}</AppButton>
+      <div v-if="Array.isArray(description)">
+        <p v-for="(line, i) in description" :key="i">{{ line }}</p>
+      </div>
+      <p v-else>{{ description }}</p>
+      <AppButton variant="red">{{ buttonText || t('courses.viewDetails') }}</AppButton>
     </div>
   </article>
 </template>
@@ -16,7 +19,13 @@
 import { useI18n } from 'vue-i18n';
 import AppButton from './AppButton.vue';
 
-defineProps<{ image: string; title: string; description: string; badge?: string }>();
+defineProps<{
+  image: string;
+  title: string;
+  description: string | string[];
+  badge?: string;
+  buttonText?: string;
+}>();
 
 const { t } = useI18n();
 </script>

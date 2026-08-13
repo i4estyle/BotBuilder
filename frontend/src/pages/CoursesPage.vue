@@ -2,12 +2,17 @@
   <q-page class="landing-page">
     <SiteHeader />
     <main>
-      <PageHero :eyebrow="t('courses.eyebrow')" :title="t('courses.title')">
-        <p>{{ t('courses.paragraph') }}</p>
+      <PageHero :eyebrow="coursesPageData.eyebrow" :title="coursesPageData.title">
+        <p>{{ coursesPageData.paragraph }}</p>
       </PageHero>
       <section class="section">
         <div class="courses-grid">
-          <CourseCard v-for="(course, index) in courses" :key="index" v-bind="course" />
+          <CourseCard
+            v-for="(course, index) in coursesPageData.items"
+            :key="index"
+            v-bind="course"
+            :button-text="coursesPageData.buttonText"
+          />
         </div>
       </section>
     </main>
@@ -16,22 +21,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import CourseCard from '@/components/landing/CourseCard.vue';
 import PageHero from '@/components/landing/PageHero.vue';
 import SiteFooter from '@/components/landing/SiteFooter.vue';
 import SiteHeader from '@/components/landing/SiteHeader.vue';
-import explorerImage from '@/assets/landing/roboticcamp.png';
-import masterImage from '@/assets/landing/precompete.png';
-import starterImage from '@/assets/landing/playlearn.png';
+import { useWebsiteEditor } from '@/composables/use-website-editor';
 
-const i18n = useI18n();
-const { t } = i18n;
-
-const courseImages = [starterImage, explorerImage, masterImage];
-const courses = computed(() => {
-  const items = i18n.tm('courses.items');
-  return items.map((item, index) => ({ ...item, image: courseImages[index]! }));
-});
+const { coursesPage: coursesPageData } = useWebsiteEditor();
 </script>

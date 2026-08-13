@@ -28,7 +28,8 @@
     width: 96px;
   }
 
-  > p:last-child {
+  &__subtitle,
+  > p:last-of-type {
     font-size: 18px;
     margin: 0;
   }
@@ -130,7 +131,6 @@
   &--alt {
     background: linear-gradient(135deg, #f8f9fa 0%, #e4f1e5 100%);
   }
-
 }
 
 .promotion-cta {

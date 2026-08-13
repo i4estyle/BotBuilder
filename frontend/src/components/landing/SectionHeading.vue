@@ -8,4 +8,3 @@
 <script setup lang="ts">
 withDefaults(defineProps<{ title: string; centered?: boolean }>(), { centered: true });
 </script>
-  

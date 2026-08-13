@@ -86,11 +86,14 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AppButton from './AppButton.vue';
 
+import { useWebsiteEditor } from '@/composables/use-website-editor';
+
 const props = defineProps<{ modelValue: boolean }>();
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>();
 
 const i18n = useI18n();
 const { t } = i18n;
+const { quiz: quizData } = useWebsiteEditor();
 
 const letters = ['A', 'B', 'C', 'D'];
 
@@ -100,16 +103,20 @@ interface Question {
   correctIndex: number;
 }
 
-// Order matches quiz.questions in the locale files — the correct answer index
-// doesn't change between languages, so it's kept here rather than translated.
 const correctIndexes = [2, 1, 2, 1, 3, 3, 0, 1, 2, 2, 2, 2, 1, 1, 0, 1, 3, 2, 0, 1];
 
 const allQuestions = computed<Question[]>(() => {
-  const questions = i18n.tm('quiz.questions');
-  return questions.map((question, index) => ({
-    ...question,
-    correctIndex: correctIndexes[index]!,
-  }));
+  if (quizData.questions && quizData.questions.length > 0) {
+    return quizData.questions;
+  }
+  const questionsList = i18n.tm('quiz.questions');
+  if (Array.isArray(questionsList) && questionsList.length > 0) {
+    return questionsList.map((question, index) => ({
+      ...question,
+      correctIndex: correctIndexes[index] ?? 0,
+    }));
+  }
+  return [];
 });
 
 const QUIZ_LENGTH = 10;
@@ -124,7 +131,10 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 function pickRandomQuestions(): Question[] {
-  return shuffle(allQuestions.value).slice(0, QUIZ_LENGTH);
+  const pool = allQuestions.value;
+  if (pool.length === 0) return [];
+  const len = Math.min(pool.length, QUIZ_LENGTH);
+  return shuffle(pool).slice(0, len);
 }
 
 const questions = ref<Question[]>(pickRandomQuestions());
