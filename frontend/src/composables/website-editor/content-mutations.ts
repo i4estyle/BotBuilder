@@ -48,13 +48,39 @@ export function moveActivityFormatItem(from: number, to: number): void {
   if (item) contentState.activityFormats.items.splice(to, 0, item);
 }
 
-export function addGalleryPhoto(groupIndex: number): void {
+export function addActivityGroup(title?: string): void {
+  saveHistorySnapshot();
+  contentState.activityGallery.groups.push({
+    title: title || 'กลุ่มกิจกรรมใหม่',
+    photos: [
+      {
+        src: promotionsPhotoDefault,
+        alt: 'ภาพกิจกรรมใหม่',
+      },
+    ],
+  });
+}
+
+export function removeActivityGroup(groupIndex: number): void {
+  if (contentState.activityGallery.groups.length <= 1) return;
+  saveHistorySnapshot();
+  contentState.activityGallery.groups.splice(groupIndex, 1);
+}
+
+export function moveActivityGroup(from: number, to: number): void {
+  if (to < 0 || to >= contentState.activityGallery.groups.length) return;
+  saveHistorySnapshot();
+  const grp = contentState.activityGallery.groups.splice(from, 1)[0];
+  if (grp) contentState.activityGallery.groups.splice(to, 0, grp);
+}
+
+export function addGalleryPhoto(groupIndex: number, photoSrc?: string, photoAlt?: string): void {
   saveHistorySnapshot();
   const grp = contentState.activityGallery.groups[groupIndex];
   if (grp) {
     grp.photos.push({
-      src: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80',
-      alt: 'ภาพกิจกรรมใหม่',
+      src: photoSrc || promotionsPhotoDefault,
+      alt: photoAlt || 'ภาพกิจกรรมใหม่',
     });
   }
 }
@@ -65,6 +91,14 @@ export function removeGalleryPhoto(groupIndex: number, photoIndex: number): void
   if (grp && grp.photos.length > 1) {
     grp.photos.splice(photoIndex, 1);
   }
+}
+
+export function moveGalleryPhoto(groupIndex: number, from: number, to: number): void {
+  const grp = contentState.activityGallery.groups[groupIndex];
+  if (!grp || to < 0 || to >= grp.photos.length) return;
+  saveHistorySnapshot();
+  const photo = grp.photos.splice(from, 1)[0];
+  if (photo) grp.photos.splice(to, 0, photo);
 }
 
 export function addBranchItem(): void {

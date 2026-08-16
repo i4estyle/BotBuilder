@@ -27,7 +27,7 @@
           data-image-key="promotionsPage.item"
           :data-promo-index="pIdx"
         >
-          <img :src="promo.image" :alt="promo.title" />
+          <img :src="resolveAssetUrl(promo.image)" :alt="promo.title" />
           <div class="admin-image-hover-overlay">
             <q-icon name="photo_camera" size="28px" />
             <span>เปลี่ยนรูป</span>
@@ -97,6 +97,7 @@
 import AdminSectionBlockLayer from '@/components/admin/sections/common/admin-section-block-layer.vue';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
 import { onTextChange } from '@/utils/admin-helpers';
+import { resolveAssetUrl } from '@/utils/asset-helper';
 
 defineProps<{
   isActive: boolean;

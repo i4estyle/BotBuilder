@@ -18,7 +18,9 @@ export function setActivePage(page: ActivePage): void {
   activeSectionId.value = '';
 }
 
-export function syncActiveContentToTarget(targetState: ReturnType<typeof createInitialState>): void {
+export function syncActiveContentToTarget(
+  targetState: ReturnType<typeof createInitialState>,
+): void {
   Object.assign(contentState.header, targetState.header);
   Object.assign(contentState.hero, targetState.hero);
   Object.assign(contentState.benefits, targetState.benefits);

@@ -7,23 +7,29 @@
   >
     <div class="cta__dots" />
     <h2
+      data-style-key="cta.heading"
       contenteditable="true"
       class="admin-inline-editable"
+      :style="getStyleOverride('cta.heading')"
       @blur="(e) => onTextChange(e, (val) => (ctaData.heading = val))"
     >
       {{ ctaData.heading }}
     </h2>
     <p
+      data-style-key="cta.paragraph"
       contenteditable="true"
       class="admin-inline-editable"
+      :style="getStyleOverride('cta.paragraph')"
       @blur="(e) => onTextChange(e, (val) => (ctaData.paragraph = val))"
     >
       {{ ctaData.paragraph }}
     </p>
     <AppButton variant="green">
       <span
+        data-style-key="cta.button"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('cta.button')"
         @blur="(e) => onTextChange(e, (val) => (ctaData.button = val))"
         >{{ ctaData.button }}</span
       >
@@ -46,5 +52,5 @@ defineEmits<{
   (e: 'select', id: string): void;
 }>();
 
-const { cta: ctaData } = useWebsiteEditor();
+const { cta: ctaData, getStyleOverride } = useWebsiteEditor();
 </script>

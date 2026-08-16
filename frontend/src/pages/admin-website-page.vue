@@ -17,6 +17,10 @@
         <AdminPreviewFrame />
       </section>
     </div>
+
+    <q-inner-loading :showing="isLoading">
+      <q-spinner-dots size="50px" color="primary" />
+    </q-inner-loading>
   </q-page>
 </template>
 
@@ -29,7 +33,8 @@ import AdminEditSectionModal from '@/components/admin/modals/admin-edit-section-
 import AdminQuizModal from '@/components/admin/modals/admin-quiz-modal.vue';
 import { useWebsiteEditor, type SectionNavItem } from '@/composables/use-website-editor';
 
-const { ghostBlockType, cancelPlacingBlock } = useWebsiteEditor();
+const { ghostBlockType, cancelPlacingBlock, fetchPageData, activePage, editorLocale, isLoading } =
+  useWebsiteEditor();
 
 const showEditSectionModal = ref(false);
 const editingSection = ref<SectionNavItem | null>(null);
@@ -45,19 +50,18 @@ function openQuizModal(): void {
   showQuizModal.value = true;
 }
 
-onMounted(() => {
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && ghostBlockType.value) {
-      cancelPlacingBlock();
-    }
-  });
+function handleEscape(e: KeyboardEvent): void {
+  if (e.key === 'Escape' && ghostBlockType.value) {
+    cancelPlacingBlock();
+  }
+}
+
+onMounted(async () => {
+  window.addEventListener('keydown', handleEscape);
+  await fetchPageData(activePage.value, editorLocale.value);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && ghostBlockType.value) {
-      cancelPlacingBlock();
-    }
-  });
+  window.removeEventListener('keydown', handleEscape);
 });
 </script>

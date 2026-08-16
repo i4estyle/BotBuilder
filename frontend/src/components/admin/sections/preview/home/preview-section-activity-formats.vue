@@ -27,7 +27,7 @@
           data-image-key="activityFormats.item"
           :data-image-index="index"
         >
-          <img :src="actItem.image" :alt="actItem.title" />
+          <img :src="resolveAssetUrl(actItem.image)" :alt="actItem.title" />
           <div class="admin-image-hover-overlay">
             <q-icon name="photo_camera" size="28px" />
             <span>ปรับแต่งรูปกิจกรรม</span>
@@ -59,6 +59,7 @@
 import AdminSectionBlockLayer from '@/components/admin/sections/common/admin-section-block-layer.vue';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
 import { onTextChange } from '@/utils/admin-helpers';
+import { resolveAssetUrl } from '@/utils/asset-helper';
 
 defineProps<{
   isActive: boolean;

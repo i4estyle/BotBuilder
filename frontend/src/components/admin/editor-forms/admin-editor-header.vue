@@ -1,15 +1,19 @@
 <template>
   <q-form class="admin-editor-form">
     <div class="admin-field-group">
-      <label class="admin-label">{{ t('admin.fields.logo') }}</label>
+      <label class="admin-label">โลโก้เว็บไซต์ (Logo)</label>
       <div class="admin-image-picker">
-        <img :src="header.logo" alt="Logo preview" class="admin-image-picker__preview" />
+        <img
+          :src="resolveAssetUrl(header.logo)"
+          alt="Logo preview"
+          class="admin-image-picker__preview"
+        />
         <q-file
           v-model="logoFile"
           outlined
           dense
           accept="image/*"
-          label="Change Logo Image"
+          label="เปลี่ยนรูปโลโก้"
           class="admin-input"
           @update:model-value="onLogoChange"
         >
@@ -21,27 +25,27 @@
     </div>
 
     <div class="admin-field-group">
-      <label class="admin-label">Nav Link: Home</label>
+      <label class="admin-label">ลิงก์เมนู: หน้าหลัก (Home)</label>
       <q-input v-model="header.nav.home" outlined dense class="admin-input" />
     </div>
 
     <div class="admin-field-group">
-      <label class="admin-label">Nav Link: Promotions</label>
+      <label class="admin-label">ลิงก์เมนู: โปรโมชั่น (Promotions)</label>
       <q-input v-model="header.nav.promotions" outlined dense class="admin-input" />
     </div>
 
     <div class="admin-field-group">
-      <label class="admin-label">Nav Link: Courses</label>
+      <label class="admin-label">ลิงก์เมนู: คอร์สเรียน (Courses)</label>
       <q-input v-model="header.nav.courses" outlined dense class="admin-input" />
     </div>
 
     <div class="admin-field-group">
-      <label class="admin-label">Nav Link: Resources</label>
+      <label class="admin-label">ลิงก์เมนู: คลังความรู้ (Resources)</label>
       <q-input v-model="header.nav.resources" outlined dense class="admin-input" />
     </div>
 
     <div class="admin-field-group">
-      <label class="admin-label">Nav Link: About Us</label>
+      <label class="admin-label">ลิงก์เมนู: เกี่ยวกับเรา (About Us)</label>
       <q-input v-model="header.nav.about" outlined dense class="admin-input" />
     </div>
   </q-form>
@@ -49,15 +53,20 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
+import { resolveAssetUrl } from '@/utils/asset-helper';
+import { uploadImageFile } from '@/utils/upload-helper';
 
-const { t } = useI18n();
 const { header } = useWebsiteEditor();
 const logoFile = ref<File | null>(null);
 
-function onLogoChange(file: File | null): void {
+async function onLogoChange(file: File | null): Promise<void> {
   if (!file) return;
-  header.logo = URL.createObjectURL(file);
+  try {
+    const uploadedUrl = await uploadImageFile(file);
+    header.logo = uploadedUrl;
+  } catch {
+    header.logo = URL.createObjectURL(file);
+  }
 }
 </script>

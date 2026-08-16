@@ -20,6 +20,10 @@ export const contentState = createInitialState();
 export const editorLocale = ref<EditorLocale>('th-TH');
 export const activePage = ref<ActivePage>('home');
 
+export const isLoading = ref(false);
+export const isSaving = ref(false);
+export const error = ref<string | null>(null);
+
 export const customBlocks = reactive<CustomBlockItem[]>([]);
 export const sectionBlocks = reactive<SectionBlockItem[]>([]);
 export const ghostBlockType = ref<'text' | 'image' | 'icon' | 'shape' | null>(null);

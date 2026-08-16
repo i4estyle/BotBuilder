@@ -9,7 +9,7 @@
       :style="{ '--reveal-delay': `${index * 90}ms` }"
     >
       <div class="activities__media">
-        <img :src="item.image" :alt="item.title" />
+        <img :src="resolveAssetUrl(item.image)" :alt="item.title" />
       </div>
       <div class="activities__copy">
         <h3>{{ item.title }}</h3>
@@ -20,7 +20,13 @@
 </template>
 
 <script setup lang="ts">
-type ActivityItem = { image: string; title: string; description: string };
+import { resolveAssetUrl } from '@/utils/asset-helper';
+
+interface ActivityItem {
+  image: string;
+  title: string;
+  description: string;
+}
 
 defineProps<{ items: ActivityItem[] }>();
 </script>

@@ -25,7 +25,7 @@
       </p>
     </div>
     <div class="admin-image-hover-trigger" data-image-key="aboutPage.image">
-      <img :src="aboutPageData.image" :alt="aboutPageData.imageAlt" />
+      <img :src="resolveAssetUrl(aboutPageData.image)" :alt="aboutPageData.imageAlt" />
       <div class="admin-image-hover-overlay">
         <q-icon name="photo_camera" size="32px" />
         <span>คลิกเพื่อเปลี่ยนรูปภาพ</span>
@@ -39,6 +39,7 @@
 import AdminSectionBlockLayer from '@/components/admin/sections/common/admin-section-block-layer.vue';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
 import { onTextChange } from '@/utils/admin-helpers';
+import { resolveAssetUrl } from '@/utils/asset-helper';
 
 defineProps<{
   isActive: boolean;

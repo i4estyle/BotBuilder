@@ -1,15 +1,15 @@
 <template>
   <header class="site-header">
     <RouterLink to="/home" class="site-header__brand" aria-label="Bot Builder home">
-      <img :src="headerData.logo || logo" alt="Bot Builder" class="site-header__logo" />
+      <img :src="resolveAssetUrl(headerData.logo)" alt="Bot Builder" class="site-header__logo" />
     </RouterLink>
 
     <nav class="site-header__nav" aria-label="Main navigation">
-      <RouterLink to="/home">{{ headerData.nav.home }}</RouterLink>
-      <RouterLink to="/promotions">{{ headerData.nav.promotions }}</RouterLink>
-      <RouterLink to="/courses">{{ headerData.nav.courses }}</RouterLink>
-      <RouterLink to="/resources">{{ headerData.nav.resources }}</RouterLink>
-      <RouterLink to="/about-us">{{ headerData.nav.about }}</RouterLink>
+      <RouterLink to="/home">{{ headerData.nav?.home || 'หน้าหลัก' }}</RouterLink>
+      <RouterLink to="/promotions">{{ headerData.nav?.promotions || 'โปรโมชั่น' }}</RouterLink>
+      <RouterLink to="/courses">{{ headerData.nav?.courses || 'คอร์สเรียน' }}</RouterLink>
+      <RouterLink to="/resources">{{ headerData.nav?.resources || 'คลังความรู้' }}</RouterLink>
+      <RouterLink to="/about-us">{{ headerData.nav?.about || 'เกี่ยวกับเรา' }}</RouterLink>
     </nav>
 
     <div class="site-header__lang" role="group" aria-label="Language switch">
@@ -17,7 +17,7 @@
         type="button"
         class="site-header__lang-btn"
         :class="{ 'site-header__lang-btn--active': editorLocale === 'th-TH' }"
-        @click="setLocale('th-TH')"
+        @click="setEditorLocale('th-TH')"
       >
         {{ editorLocale === 'th-TH' ? 'ไทย' : 'TH' }}
       </button>
@@ -26,7 +26,7 @@
         type="button"
         class="site-header__lang-btn"
         :class="{ 'site-header__lang-btn--active': editorLocale === 'en-US' }"
-        @click="setLocale('en-US')"
+        @click="setEditorLocale('en-US')"
       >
         {{ editorLocale === 'th-TH' ? 'อังกฤษ' : 'EN' }}
       </button>
@@ -38,17 +38,8 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import logo from '@/assets/landing/logo.png';
-import { LOCALE_STORAGE_KEY, type MessageLanguages } from '@/boot/i18n';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
+import { resolveAssetUrl } from '@/utils/asset-helper';
 
-const { locale } = useI18n();
 const { header: headerData, editorLocale, setEditorLocale } = useWebsiteEditor();
-
-function setLocale(value: MessageLanguages) {
-  setEditorLocale(value);
-  locale.value = value;
-  localStorage.setItem(LOCALE_STORAGE_KEY, value);
-}
 </script>

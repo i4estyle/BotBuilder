@@ -1,27 +1,44 @@
-import { IsObject, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsBoolean,
+  IsNotEmpty,
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreatePageSectionDto {
-  @IsObject()
-  @IsOptional()
-  pageSectionInfo?: Record<string, unknown>;
+  @ApiProperty({ example: 'home', description: 'Page name identifier' })
+  @IsString()
+  @IsNotEmpty()
+  pageName!: string;
 
-  @IsObject()
-  @IsOptional()
-  pageSectionWhy?: Record<string, unknown>;
+  @ApiProperty({ example: 'th-TH', description: 'Locale identifier' })
+  @IsString()
+  @IsNotEmpty()
+  locale!: string;
 
-  @IsObject()
-  @IsOptional()
-  pageSectionCourse?: Record<string, unknown>;
+  @ApiProperty({ example: 'hero', description: 'Section key identifier' })
+  @IsString()
+  @IsNotEmpty()
+  sectionKey!: string;
 
-  @IsObject()
+  @ApiPropertyOptional({ example: 'ส่วนต้อนรับหลัก' })
+  @IsString()
   @IsOptional()
-  pageSectionDescription?: Record<string, unknown>;
+  sectionTitle?: string;
 
-  @IsObject()
+  @ApiPropertyOptional({ description: 'Section JSON payload' })
   @IsOptional()
-  pageSectionMap?: Record<string, unknown>;
+  content?: Record<string, unknown> | Array<unknown> | null;
 
-  @IsObject()
+  @ApiPropertyOptional({ example: 0 })
+  @IsNumber()
   @IsOptional()
-  pageSectionEnv?: Record<string, unknown>;
+  sortOrder?: number;
+
+  @ApiPropertyOptional({ example: true })
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
 }

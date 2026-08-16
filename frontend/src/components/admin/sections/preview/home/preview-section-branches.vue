@@ -7,8 +7,10 @@
   >
     <div class="section-heading section-heading--centered">
       <h2
+        data-style-key="branches.heading"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('branches.heading')"
         @blur="(e) => onTextChange(e, (val) => (branchesData.heading = val))"
       >
         {{ branchesData.heading }}
@@ -30,20 +32,26 @@
           <q-icon name="location_on" class="admin-icon-clickable" />
           <div class="branch-card__content">
             <strong
+              :data-style-key="`branches.items.${index}.name`"
               contenteditable="true"
               class="admin-inline-editable"
+              :style="getStyleOverride(`branches.items.${index}.name`)"
               @blur="(e) => onTextChange(e, (val) => (branch.name = val))"
               >{{ branch.name }}</strong
             >
             <span
+              :data-style-key="`branches.items.${index}.address`"
               contenteditable="true"
               class="branch-card__address admin-inline-editable"
+              :style="getStyleOverride(`branches.items.${index}.address`)"
               @blur="(e) => onTextChange(e, (val) => (branch.address = val))"
               >{{ branch.address }}</span
             >
             <p
+              :data-style-key="`branches.items.${index}.description`"
               contenteditable="true"
               class="admin-inline-editable"
+              :style="getStyleOverride(`branches.items.${index}.description`)"
               @blur="(e) => onTextChange(e, (val) => (branch.description = val))"
             >
               {{ branch.description }}
@@ -69,8 +77,10 @@
             <a href="javascript:void(0)" class="branch-card__phone">
               <q-icon name="phone" class="admin-icon-clickable" />
               <span
+                :data-style-key="`branches.items.${index}.phone`"
                 contenteditable="true"
                 class="admin-inline-editable"
+                :style="getStyleOverride(`branches.items.${index}.phone`)"
                 @blur="(e) => onTextChange(e, (val) => (branch.phone = val))"
                 >{{ branch.phone }}</span
               >
@@ -102,5 +112,5 @@ defineEmits<{
   (e: 'select', id: string): void;
 }>();
 
-const { branches: branchesData } = useWebsiteEditor();
+const { branches: branchesData, getStyleOverride } = useWebsiteEditor();
 </script>

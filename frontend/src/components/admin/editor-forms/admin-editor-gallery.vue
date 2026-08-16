@@ -1,12 +1,12 @@
 <template>
   <q-form class="admin-editor-form">
     <div class="admin-field-group">
-      <label class="admin-label">{{ t('admin.fields.heading') }}</label>
+      <label class="admin-label">หัวข้อหลัก (Heading)</label>
       <q-input v-model="gallery.heading" outlined dense class="admin-input" />
     </div>
 
     <div class="admin-field-group">
-      <label class="admin-label">{{ t('admin.fields.paragraph') }}</label>
+      <label class="admin-label">คำอธิบาย (Paragraph)</label>
       <q-input
         v-model="gallery.paragraph"
         type="textarea"
@@ -18,20 +18,20 @@
     </div>
 
     <div class="admin-field-group">
-      <label class="admin-label">Stat Badge 1: Course Certified</label>
+      <label class="admin-label">ป้ายสถิติ 1: Course Certified</label>
       <q-input v-model="gallery.courseCertified" outlined dense class="admin-input" />
     </div>
 
     <div class="admin-field-group">
-      <label class="admin-label">Stat Badge 2: Skill Badges</label>
+      <label class="admin-label">ป้ายสถิติ 2: Skill Badges</label>
       <q-input v-model="gallery.skillBadges" outlined dense class="admin-input" />
     </div>
 
     <div class="admin-field-group">
-      <label class="admin-label">Certificate Image</label>
+      <label class="admin-label">รูปภาพประกาศนียบัตร (Certificate Image)</label>
       <div class="admin-image-picker">
         <img
-          :src="gallery.certificateImage"
+          :src="resolveAssetUrl(gallery.certificateImage)"
           :alt="gallery.imageAlt"
           class="admin-image-picker__preview"
         />
@@ -40,7 +40,7 @@
           outlined
           dense
           accept="image/*"
-          label="Change Certificate Image"
+          label="เปลี่ยนรูปประกาศนียบัตร"
           class="admin-input"
           @update:model-value="onImageChange"
         >
@@ -55,15 +55,20 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
+import { resolveAssetUrl } from '@/utils/asset-helper';
+import { uploadImageFile } from '@/utils/upload-helper';
 
-const { t } = useI18n();
 const { gallery } = useWebsiteEditor();
 const certificateFile = ref<File | null>(null);
 
-function onImageChange(file: File | null): void {
+async function onImageChange(file: File | null): Promise<void> {
   if (!file) return;
-  gallery.certificateImage = URL.createObjectURL(file);
+  try {
+    const uploadedUrl = await uploadImageFile(file);
+    gallery.certificateImage = uploadedUrl;
+  } catch {
+    gallery.certificateImage = URL.createObjectURL(file);
+  }
 }
 </script>

@@ -12,7 +12,11 @@
           data-image-key="coursesPage.item"
           :data-course-index="cIdx"
         >
-          <img :src="course.image" :alt="course.title" class="course-card__image" />
+          <img
+            :src="resolveAssetUrl(course.image)"
+            :alt="course.title"
+            class="course-card__image"
+          />
           <span
             v-if="course.badge"
             contenteditable="true"
@@ -74,6 +78,7 @@ import AppButton from '@/components/landing/AppButton.vue';
 import AdminSectionBlockLayer from '@/components/admin/sections/common/admin-section-block-layer.vue';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
 import { onTextChange } from '@/utils/admin-helpers';
+import { resolveAssetUrl } from '@/utils/asset-helper';
 
 defineProps<{
   isActive: boolean;

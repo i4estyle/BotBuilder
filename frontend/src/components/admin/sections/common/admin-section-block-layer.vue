@@ -56,7 +56,7 @@
 
         <div v-else-if="block.type === 'image'" class="admin-free-block__image-wrap">
           <img
-            :src="block.image"
+            :src="resolveAssetUrl(block.image)"
             alt=""
             draggable="false"
             style="pointer-events: none; -webkit-user-drag: none; user-select: none"
@@ -286,6 +286,7 @@
 <script setup lang="ts">
 import { computed, ref, onBeforeUnmount } from 'vue';
 import { useWebsiteEditor, type SectionBlockItem } from '@/composables/use-website-editor';
+import { resolveAssetUrl } from '@/utils/asset-helper';
 
 const props = defineProps<{
   sectionId: string;

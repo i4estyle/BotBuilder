@@ -1,13 +1,13 @@
 <template>
   <q-form class="admin-editor-form">
     <div class="admin-field-group">
-      <label class="admin-label">{{ t('admin.fields.heading') }}</label>
+      <label class="admin-label">หัวข้อหลัก (Heading)</label>
       <q-input v-model="activityFormats.heading" outlined dense class="admin-input" />
     </div>
 
     <div v-for="(item, index) in activityFormats.items" :key="index" class="admin-card-editor">
       <header class="admin-card-editor__header">
-        <span class="admin-card-editor__title">Activity Format #{{ index + 1 }}</span>
+        <span class="admin-card-editor__title">รูปแบบกิจกรรม #{{ index + 1 }}</span>
         <div class="admin-card-editor__actions">
           <q-btn
             flat
@@ -38,15 +38,19 @@
       </header>
 
       <div class="admin-field-group">
-        <label class="admin-label">{{ t('admin.fields.image') }}</label>
+        <label class="admin-label">รูปภาพ (Image)</label>
         <div class="admin-image-picker">
-          <img :src="item.image" :alt="item.title" class="admin-image-picker__preview" />
+          <img
+            :src="resolveAssetUrl(item.image)"
+            :alt="item.title"
+            class="admin-image-picker__preview"
+          />
           <q-file
             :model-value="null"
             outlined
             dense
             accept="image/*"
-            label="Change Image"
+            label="เปลี่ยนรูปภาพ"
             class="admin-input"
             @update:model-value="(file) => onImageChange(file, index)"
           >
@@ -58,12 +62,12 @@
       </div>
 
       <div class="admin-field-group">
-        <label class="admin-label">{{ t('admin.fields.title') }}</label>
+        <label class="admin-label">ชื่อรูปแบบกิจกรรม (Title)</label>
         <q-input v-model="item.title" outlined dense class="admin-input" />
       </div>
 
       <div class="admin-field-group">
-        <label class="admin-label">{{ t('admin.fields.description') }}</label>
+        <label class="admin-label">คำอธิบาย (Description)</label>
         <q-input
           v-model="item.description"
           type="textarea"
@@ -79,7 +83,7 @@
       outline
       color="positive"
       icon="add"
-      :label="t('admin.fields.addItem')"
+      label="เพิ่มรูปแบบกิจกรรม"
       class="admin-add-btn"
       @click="addItem"
     />
@@ -87,24 +91,29 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
-import starterImageDefault from '@/assets/landing/playlearn.png';
 import { useWebsiteEditor, type ActivityFormatItem } from '@/composables/use-website-editor';
+import { resolveAssetUrl } from '@/utils/asset-helper';
+import { uploadImageFile } from '@/utils/upload-helper';
 
-const { t } = useI18n();
 const { activityFormats } = useWebsiteEditor();
 
-function onImageChange(file: File | null, index: number): void {
+async function onImageChange(file: File | null, index: number): Promise<void> {
   if (!file) return;
   const item = activityFormats.items[index];
-  if (item) item.image = URL.createObjectURL(file);
+  if (!item) return;
+  try {
+    const uploadedUrl = await uploadImageFile(file);
+    item.image = uploadedUrl;
+  } catch {
+    item.image = URL.createObjectURL(file);
+  }
 }
 
 function addItem(): void {
   const newItem: ActivityFormatItem = {
-    image: starterImageDefault,
-    title: 'New Activity Format',
-    description: 'Description of the activity format.',
+    image: '/src/assets/landing/playlearn.png',
+    title: 'รูปแบบกิจกรรมใหม่',
+    description: 'รายละเอียดของรูปแบบกิจกรรม',
   };
   activityFormats.items.push(newItem);
 }

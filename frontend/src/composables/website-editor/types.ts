@@ -261,3 +261,42 @@ export interface ImageSizeSpec {
   height: number;
   label: string;
 }
+
+export interface PageSectionItem {
+  id: number;
+  pageName: string;
+  locale: string;
+  sectionKey: string;
+  sectionTitle?: string;
+  content?: Record<string, unknown> | Array<unknown> | null;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
+}
+
+export interface PageDataResponse {
+  pageName: string;
+  locale: string;
+  sections: Record<string, Record<string, unknown>>;
+  navSections: SectionNavItem[];
+  themeSettings: ThemeSettings;
+  customBlocks: CustomBlockItem[];
+  sectionBlocks?: SectionBlockItem[];
+  inlineDomStates?: InlineDomState[];
+  styleOverrides?: Record<string, unknown>;
+}
+
+export interface BulkSavePayload {
+  pageName: string;
+  locale: string;
+  sections?: unknown;
+  contentStateMap?: unknown;
+  navSections?: SectionNavItem[];
+  themeSettings?: ThemeSettings;
+  customBlocks?: CustomBlockItem[];
+  sectionBlocks?: SectionBlockItem[];
+  inlineDomStates?: InlineDomState[];
+  styleOverrides?: Record<string, unknown>;
+}

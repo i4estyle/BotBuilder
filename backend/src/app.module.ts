@@ -6,6 +6,7 @@ import { UsersModule } from './modules/users/users.module.js';
 import { RolesModule } from './modules/roles/roles.module.js';
 import { UserRolesModule } from './modules/user-roles/user-roles.module.js';
 import { PageSectionsModule } from './modules/page-sections/page-sections.module.js';
+import { UploadsModule } from './modules/uploads/uploads.module.js';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { PageSectionsModule } from './modules/page-sections/page-sections.module
     RolesModule,
     UserRolesModule,
     PageSectionsModule,
+    UploadsModule,
   ],
 })
 export class AppModule {}

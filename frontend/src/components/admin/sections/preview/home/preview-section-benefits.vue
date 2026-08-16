@@ -7,8 +7,10 @@
   >
     <div class="section-heading section-heading--centered">
       <h2
+        data-style-key="benefits.heading"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('benefits.heading')"
         @blur="(e) => onTextChange(e, (val) => (benefitsData.heading = val))"
       >
         {{ benefitsData.heading }}
@@ -17,17 +19,26 @@
     </div>
     <div class="benefits__grid">
       <article v-for="(benefit, index) in benefitsData.items" :key="index" class="benefit-card">
-        <q-icon :name="benefit.icon" class="admin-icon-clickable" />
+        <q-icon
+          :name="benefit.icon"
+          class="admin-icon-clickable"
+          :data-style-key="`benefits.items.${index}.icon`"
+          :style="getStyleOverride(`benefits.items.${index}.icon`)"
+        />
         <h3
+          :data-style-key="`benefits.items.${index}.title`"
           contenteditable="true"
           class="admin-inline-editable"
+          :style="getStyleOverride(`benefits.items.${index}.title`)"
           @blur="(e) => onTextChange(e, (val) => (benefit.title = val))"
         >
           {{ benefit.title }}
         </h3>
         <p
+          :data-style-key="`benefits.items.${index}.text`"
           contenteditable="true"
           class="admin-inline-editable"
+          :style="getStyleOverride(`benefits.items.${index}.text`)"
           @blur="(e) => onTextChange(e, (val) => (benefit.text = val))"
         >
           {{ benefit.text }}
@@ -51,5 +62,5 @@ defineEmits<{
   (e: 'select', id: string): void;
 }>();
 
-const { benefits: benefitsData } = useWebsiteEditor();
+const { benefits: benefitsData, getStyleOverride } = useWebsiteEditor();
 </script>

@@ -5,25 +5,36 @@
     :class="{ 'admin-preview-section--active': isActive }"
     @click="$emit('select', 'quiz')"
   >
-    <q-icon name="quiz" class="quiz__icon admin-icon-clickable" />
+    <q-icon
+      name="quiz"
+      class="quiz__icon admin-icon-clickable"
+      data-style-key="quiz.icon"
+      :style="getStyleOverride('quiz.icon')"
+    />
     <h2
+      data-style-key="quiz.heading"
       contenteditable="true"
       class="admin-inline-editable"
+      :style="getStyleOverride('quiz.heading')"
       @blur="(e) => onTextChange(e, (val) => (quizData.heading = val))"
     >
       {{ quizData.heading }}
     </h2>
     <p
+      data-style-key="quiz.paragraph"
       contenteditable="true"
       class="admin-inline-editable"
+      :style="getStyleOverride('quiz.paragraph')"
       @blur="(e) => onTextChange(e, (val) => (quizData.paragraph = val))"
     >
       {{ quizData.paragraph }}
     </p>
     <AppButton>
       <span
+        data-style-key="quiz.cta"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('quiz.cta')"
         @blur="(e) => onTextChange(e, (val) => (quizData.cta = val))"
         >{{ quizData.cta }}</span
       >
@@ -46,5 +57,5 @@ defineEmits<{
   (e: 'select', id: string): void;
 }>();
 
-const { quiz: quizData } = useWebsiteEditor();
+const { quiz: quizData, getStyleOverride } = useWebsiteEditor();
 </script>

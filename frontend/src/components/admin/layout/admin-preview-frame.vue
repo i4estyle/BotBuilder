@@ -400,6 +400,7 @@ import PreviewSectionAboutMission from '@/components/admin/sections/preview/abou
 import PreviewSectionFooter from '@/components/admin/sections/preview/home/preview-section-footer.vue';
 import PreviewSectionCustomBlock from '@/components/admin/sections/preview/custom/preview-section-custom-block.vue';
 import { useWebsiteEditor, type InlineDomState } from '@/composables/use-website-editor';
+import { uploadImageFile } from '@/utils/upload-helper';
 
 const {
   activePage,
@@ -419,6 +420,7 @@ const {
   imageBlockSizes,
   getDefaultImageSrcs,
   saveHistorySnapshot,
+  setStyleOverride,
 } = useWebsiteEditor();
 
 function getCustomBlock(id: string) {
@@ -581,10 +583,16 @@ function onFilePicked(event: Event): void {
   }
 }
 
-function onCropConfirm(croppedDataUrl: string): void {
+async function onCropConfirm(croppedDataUrl: string): Promise<void> {
   if (activeImageCallback) {
     saveHistorySnapshot();
-    activeImageCallback(croppedDataUrl);
+    try {
+      const uploadedUrl = await uploadImageFile(croppedDataUrl);
+      activeImageCallback(uploadedUrl);
+    } catch (err: unknown) {
+      console.error('Failed to upload image:', err);
+      activeImageCallback(croppedDataUrl);
+    }
   }
   showCropDialog.value = false;
   activeImageCallback = null;
@@ -782,6 +790,15 @@ function startInlineDrag(e: PointerEvent): void {
     inlineOverlayPos.width = finalRect.width;
     inlineOverlayPos.height = finalRect.height;
 
+    const finalMatrix = new DOMMatrix(window.getComputedStyle(targetEl).transform);
+    const k = getActiveInlineKey();
+    if (k) {
+      setStyleOverride(k, {
+        transformX: Math.round(finalMatrix.m41),
+        transformY: Math.round(finalMatrix.m42),
+      });
+    }
+
     saveHistorySnapshot();
   }
 
@@ -861,6 +878,14 @@ function onInlineResizeDown(e: PointerEvent, corner: string): void {
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('pointerup', onPointerUp);
 
+    const k = getActiveInlineKey();
+    if (k) {
+      setStyleOverride(k, {
+        width: targetEl.style.width,
+        height: targetEl.style.height,
+      });
+    }
+
     updateInlineOverlayPos();
   }
 
@@ -868,11 +893,24 @@ function onInlineResizeDown(e: PointerEvent, corner: string): void {
   window.addEventListener('pointerup', onPointerUp);
 }
 
+function getActiveInlineKey(): string {
+  if (!activeInlineEl.value) return '';
+  return (
+    activeInlineEl.value.getAttribute('data-style-key') ||
+    activeInlineEl.value.getAttribute('data-image-key') ||
+    activeInlineEl.value.closest('[data-style-key]')?.getAttribute('data-style-key') ||
+    activeInlineEl.value.closest('[data-image-key]')?.getAttribute('data-image-key') ||
+    ''
+  );
+}
+
 function toggleInlineBold(): void {
   if (!activeInlineEl.value) return;
   saveHistorySnapshot();
   inlineElStyle.isBold = !inlineElStyle.isBold;
   activeInlineEl.value.style.fontWeight = inlineElStyle.isBold ? '700' : '400';
+  const k = getActiveInlineKey();
+  if (k) setStyleOverride(k, { isBold: inlineElStyle.isBold });
   syncInlineElStyle(activeInlineEl.value);
 }
 
@@ -881,6 +919,8 @@ function toggleInlineItalic(): void {
   saveHistorySnapshot();
   inlineElStyle.isItalic = !inlineElStyle.isItalic;
   activeInlineEl.value.style.fontStyle = inlineElStyle.isItalic ? 'italic' : 'normal';
+  const k = getActiveInlineKey();
+  if (k) setStyleOverride(k, { isItalic: inlineElStyle.isItalic });
   syncInlineElStyle(activeInlineEl.value);
 }
 
@@ -892,6 +932,8 @@ function stepInlineFontSize(delta: number): void {
   activeInlineEl.value.style.fontSize = `${newSize}px`;
   activeInlineEl.value.style.setProperty('--admin-inline-active-font-size', `${newSize}px`);
   inlineElStyle.fontSizePx = newSize;
+  const k = getActiveInlineKey();
+  if (k) setStyleOverride(k, { fontSizePx: newSize });
   updateInlineOverlayPos();
 }
 
@@ -904,6 +946,8 @@ function onInlineFontSizeInput(e: Event): void {
     activeInlineEl.value.style.fontSize = `${clamped}px`;
     activeInlineEl.value.style.setProperty('--admin-inline-active-font-size', `${clamped}px`);
     inlineElStyle.fontSizePx = clamped;
+    const k = getActiveInlineKey();
+    if (k) setStyleOverride(k, { fontSizePx: clamped });
     updateInlineOverlayPos();
   }
 }
@@ -915,6 +959,8 @@ function onInlineColorInput(e: Event): void {
     activeInlineEl.value.style.color = target.value;
     activeInlineEl.value.style.setProperty('--admin-inline-active-color', target.value);
     inlineElStyle.textColor = target.value;
+    const k = getActiveInlineKey();
+    if (k) setStyleOverride(k, { textColor: target.value });
   }
 }
 
@@ -1129,6 +1175,8 @@ function deleteActiveInline(): void {
   if (activeInlineEl.value) {
     saveHistorySnapshot();
     activeInlineEl.value.style.display = 'none';
+    const k = getActiveInlineKey();
+    if (k) setStyleOverride(k, { display: 'none' });
   }
   activeInlineEl.value?.classList.remove('admin-inline-editable--active');
   activeInlineEl.value = null;

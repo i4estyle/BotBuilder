@@ -11,7 +11,7 @@ export default defineConfig((ctx) => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['i18n'],
+    boot: [],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
     css: ['app.scss'],
@@ -62,22 +62,6 @@ export default defineConfig((ctx) => {
 
       vitePlugins: [
         [
-          '@intlify/unplugin-vue-i18n/vite',
-          {
-            // if you want to use Vue I18n Legacy API, you need to set `compositionOnly: false`
-            // compositionOnly: false,
-
-            // if you want to use named tokens in your Vue I18n messages, such as 'Hello {name}',
-            // you need to set `runtimeOnly: false`
-            // runtimeOnly: false,
-
-            ssr: ctx.modeName === 'ssr',
-
-            // you need to set i18n resource including paths !
-            include: [ctx.appPaths.resolve.app('src/i18n')],
-          },
-        ],
-        [
           'vite-plugin-checker',
           {
             vueTsc: true,
@@ -99,7 +83,12 @@ export default defineConfig((ctx) => {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
-      config: {},
+      config: {
+        notify: {
+          position: 'top',
+          timeout: 1800,
+        },
+      },
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -112,25 +101,12 @@ export default defineConfig((ctx) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: ['Notify'],
     },
 
     // animations: 'all', // --- includes all animations
     // https://v2.quasar.dev/options/animations
     animations: [],
-
-    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#sourcefiles
-    // sourceFiles: {
-    //   rootComponent: 'src/App.vue',
-    //   router: 'src/router/index',
-    //   store: 'src/store/index',
-    //   pwaRegisterServiceWorker: 'src-pwa/register-sw',
-    //   pwaServiceWorker: 'src-pwa/sw/custom-sw',
-    //   pwaManifestFile: 'src-pwa/manifest.json',
-    //   electronMain: 'src-electron/electron-main',
-    //   electronPreload: 'src-electron/electron-preload'
-    //   bexManifestFile: 'src-bex/manifest.json
-    // },
 
     // https://v2.quasar.dev/quasar-cli-vite/developing-ssr/configuring-ssr
     ssr: {
@@ -148,9 +124,6 @@ export default defineConfig((ctx) => {
       // manualStoreSsrContextInjection: true,
       // manualStoreHydration: true,
       // manualPostHydrationTrigger: true,
-
-      pwa: false,
-      // pwaOfflineHtmlFilename: 'offline.html', // do NOT use index.html as name!
 
       // extendSSRGenerateSWOptions (cfg) {},
       // extendSSRInjectManifestOptions (cfg) {}

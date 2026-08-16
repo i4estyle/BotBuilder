@@ -1,13 +1,13 @@
 <template>
   <q-form class="admin-editor-form">
     <div class="admin-field-group">
-      <label class="admin-label">{{ t('admin.fields.heading') }}</label>
+      <label class="admin-label">หัวข้อหลัก (Heading)</label>
       <q-input v-model="benefits.heading" outlined dense class="admin-input" />
     </div>
 
     <div v-for="(item, index) in benefits.items" :key="index" class="admin-card-editor">
       <header class="admin-card-editor__header">
-        <span class="admin-card-editor__title">Benefit Card #{{ index + 1 }}</span>
+        <span class="admin-card-editor__title">การ์ดจุดเด่น #{{ index + 1 }}</span>
         <div class="admin-card-editor__actions">
           <q-btn
             flat
@@ -38,7 +38,7 @@
       </header>
 
       <div class="admin-field-group">
-        <label class="admin-label">{{ t('admin.fields.icon') }} (Material Icon name)</label>
+        <label class="admin-label">ไอคอน (Material Icon name)</label>
         <q-input v-model="item.icon" outlined dense class="admin-input">
           <template #prepend>
             <q-icon :name="item.icon || 'star'" />
@@ -47,12 +47,12 @@
       </div>
 
       <div class="admin-field-group">
-        <label class="admin-label">{{ t('admin.fields.title') }}</label>
+        <label class="admin-label">หัวข้อจุดเด่น (Title)</label>
         <q-input v-model="item.title" outlined dense class="admin-input" />
       </div>
 
       <div class="admin-field-group">
-        <label class="admin-label">{{ t('admin.fields.description') }}</label>
+        <label class="admin-label">คำอธิบาย (Description)</label>
         <q-input v-model="item.text" type="textarea" rows="3" outlined dense class="admin-input" />
       </div>
     </div>
@@ -61,7 +61,7 @@
       outline
       color="positive"
       icon="add"
-      :label="t('admin.fields.addItem')"
+      label="เพิ่มจุดเด่น"
       class="admin-add-btn"
       @click="addItem"
     />
@@ -69,17 +69,15 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
 import { useWebsiteEditor, type BenefitItem } from '@/composables/use-website-editor';
 
-const { t } = useI18n();
 const { benefits } = useWebsiteEditor();
 
 function addItem(): void {
   const newItem: BenefitItem = {
     icon: 'star',
-    title: 'NEW BENEFIT',
-    text: 'Description of the benefit goes here.',
+    title: 'จุดเด่นใหม่',
+    text: 'รายละเอียดของจุดเด่น',
   };
   benefits.items.push(newItem);
 }

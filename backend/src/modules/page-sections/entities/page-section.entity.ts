@@ -5,75 +5,80 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity('BB_PAGE_SECTION')
+@Index('UQ_PAGE_LOCALE_SECTION', ['pageName', 'locale', 'sectionKey'], {
+  unique: true,
+})
 export class PageSection {
   @PrimaryGeneratedColumn({
-    name: 'PAGE_ID',
-    comment: 'รหัสหน้าเพจ',
+    name: 'ID',
   })
-  pageId!: number;
+  id!: number;
 
   @Column({
-    name: 'PAGE_SECTION_INFO',
-    type: 'json',
-    nullable: true,
-    comment: 'ข้อมูลส่วนแนะนำ',
+    name: 'PAGE_NAME',
+    type: 'varchar',
+    length: 50,
+    default: 'home',
   })
-  pageSectionInfo?: Record<string, unknown>;
+  pageName!: string;
 
   @Column({
-    name: 'PAGE_SECTION_WHY',
-    type: 'json',
-    nullable: true,
-    comment: 'ข้อมูลส่วนเหตุผล',
+    name: 'LOCALE',
+    type: 'varchar',
+    length: 10,
+    default: 'th-TH',
   })
-  pageSectionWhy?: Record<string, unknown>;
+  locale!: string;
 
   @Column({
-    name: 'PAGE_SECTION_COURSE',
-    type: 'json',
-    nullable: true,
-    comment: 'ข้อมูลส่วนหลักสูตร',
+    name: 'SECTION_KEY',
+    type: 'varchar',
+    length: 50,
   })
-  pageSectionCourse?: Record<string, unknown>;
+  sectionKey!: string;
 
   @Column({
-    name: 'PAGE_SECTION_DESCRIPTION',
-    type: 'json',
+    name: 'SECTION_TITLE',
+    type: 'varchar',
+    length: 100,
     nullable: true,
-    comment: 'ข้อมูลส่วนรายละเอียด',
   })
-  pageSectionDescription?: Record<string, unknown>;
+  sectionTitle?: string;
 
   @Column({
-    name: 'PAGE_SECTION_MAP',
+    name: 'CONTENT',
     type: 'json',
     nullable: true,
-    comment: 'ข้อมูลส่วนแผนที่',
   })
-  pageSectionMap?: Record<string, unknown>;
+  content?: Record<string, unknown> | Array<unknown> | null;
 
   @Column({
-    name: 'PAGE_SECTION_ENV',
-    type: 'json',
-    nullable: true,
-    comment: 'ข้อมูลส่วนสภาพแวดล้อม',
+    name: 'SORT_ORDER',
+    type: 'int',
+    default: 0,
   })
-  pageSectionEnv?: Record<string, unknown>;
+  sortOrder!: number;
+
+  @Column({
+    name: 'IS_ACTIVE',
+    type: 'boolean',
+    default: true,
+  })
+  isActive!: boolean;
 
   @CreateDateColumn({
     name: 'CREATED_AT',
     type: 'timestamp',
-    comment: 'วันที่สร้าง',
   })
   createdAt!: Date;
 
   @UpdateDateColumn({
     name: 'UPDATED_AT',
     type: 'timestamp',
-    comment: 'วันที่แก้ไข',
   })
   updatedAt!: Date;
 
@@ -81,7 +86,6 @@ export class PageSection {
     name: 'DELETED_AT',
     type: 'timestamp',
     nullable: true,
-    comment: 'วันที่ลบ (soft delete)',
   })
   deletedAt?: Date;
 }

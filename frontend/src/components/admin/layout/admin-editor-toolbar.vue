@@ -5,7 +5,11 @@
         <q-icon name="arrow_back" size="18px" />
         <q-tooltip>กลับหน้าหลัก</q-tooltip>
       </RouterLink>
-      <img :src="headerData.logo" alt="BotBuilder Logo" class="admin-toolbar__logo" />
+      <img
+        :src="resolveAssetUrl(headerData.logo)"
+        alt="BotBuilder Logo"
+        class="admin-toolbar__logo"
+      />
       <div class="admin-toolbar__title-group">
         <h1 class="admin-toolbar__title">ระบบจัดการเนื้อหาเว็บไซต์</h1>
       </div>
@@ -44,7 +48,7 @@
           icon="desktop_mac"
           class="admin-toolbar__btn"
           :class="{ 'admin-toolbar__btn--active': viewportMode === 'desktop' }"
-          :aria-label="t('admin.viewportDesktop')"
+          aria-label="Desktop viewport"
           @click="viewportMode = 'desktop'"
         >
           <q-tooltip>คอมพิวเตอร์</q-tooltip>
@@ -55,7 +59,7 @@
           icon="tablet_mac"
           class="admin-toolbar__btn"
           :class="{ 'admin-toolbar__btn--active': viewportMode === 'tablet' }"
-          :aria-label="t('admin.viewportTablet')"
+          aria-label="Tablet viewport"
           @click="viewportMode = 'tablet'"
         >
           <q-tooltip>แท็บเล็ต</q-tooltip>
@@ -66,7 +70,7 @@
           icon="smartphone"
           class="admin-toolbar__btn"
           :class="{ 'admin-toolbar__btn--active': viewportMode === 'mobile' }"
-          :aria-label="t('admin.viewportMobile')"
+          aria-label="Mobile viewport"
           @click="viewportMode = 'mobile'"
         >
           <q-tooltip>มือถือ</q-tooltip>
@@ -103,8 +107,9 @@
           icon="save"
           label="บันทึกทั้งหมด"
           class="admin-toolbar__commit-btn admin-toolbar__commit-btn--save"
+          :loading="isSaving"
           no-caps
-          @click="saveAll"
+          @click="handleSaveAll"
         >
           <q-tooltip>บันทึก</q-tooltip>
         </q-btn>
@@ -126,57 +131,59 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
 import { RouterLink } from 'vue-router';
-import { useQuasar } from 'quasar';
-import { useI18n } from 'vue-i18n';
+import { Notify } from 'quasar';
 import { useWebsiteEditor, type EditorLocale } from '@/composables/use-website-editor';
+import { resolveAssetUrl } from '@/utils/asset-helper';
 
-const { t } = useI18n();
-const $q = useQuasar();
 const {
   header: headerData,
-  navSections,
-  themeSettings,
   viewportMode,
   editorLocale,
   setEditorLocale,
-  saveCurrentStateToMap,
-  contentStateMap,
   canUndo,
   canRedo,
   undo,
   redo,
   resetAll,
+  saveToBackend,
+  isSaving,
 } = useWebsiteEditor();
 
-function changeEditorLanguage(value: EditorLocale): void {
-  setEditorLocale(value);
+async function changeEditorLanguage(value: EditorLocale): Promise<void> {
+  await setEditorLocale(value);
 }
 
-function saveAll(): void {
-  saveCurrentStateToMap();
-
-  localStorage.setItem(
-    'botbuilder-admin-website-draft',
-    JSON.stringify({
-      savedAt: new Date().toISOString(),
-      editorLocale: editorLocale.value,
-      contentStateMap,
-      navSections,
-      themeSettings,
-    }),
-  );
-
-  $q.notify({
-    type: 'positive',
-    icon: 'check_circle',
-    message: `บันทึกข้อมูลเว็บไซต์ (${editorLocale.value === 'th-TH' ? 'ภาษาไทย' : 'ภาษาอังกฤษ'}) เรียบร้อยแล้ว`,
-    position: 'top-right',
-    timeout: 1800,
-  });
+async function handleSaveAll(): Promise<void> {
+  if (isSaving.value) return;
+  const success = await saveToBackend();
+  if (success) {
+    Notify.create({
+      type: 'positive',
+      icon: 'check_circle',
+      message: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+      caption: 'อัปเดตข้อมูลขึ้นระบบแบบ Real-time ทันที',
+      position: 'top',
+      timeout: 1800,
+      progress: true,
+    });
+  } else {
+    Notify.create({
+      type: 'negative',
+      icon: 'error',
+      message: 'เกิดข้อผิดพลาดในการบันทึก',
+      caption: 'กรุณาตรวจสอบการเชื่อมต่อแล้วลองใหม่อีกครั้ง',
+      position: 'top',
+      timeout: 3000,
+      progress: true,
+    });
+  }
 }
 
 function handleKeydown(event: KeyboardEvent): void {
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+    event.preventDefault();
+    void handleSaveAll();
+  } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
     event.preventDefault();
     if (event.shiftKey) {
       redo();

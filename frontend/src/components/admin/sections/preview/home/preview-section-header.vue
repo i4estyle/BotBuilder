@@ -10,7 +10,7 @@
       class="site-header__brand admin-image-hover-trigger"
       data-image-key="header.logo"
     >
-      <img :src="headerData.logo" alt="Bot Builder" class="site-header__logo" />
+      <img :src="resolveAssetUrl(headerData.logo)" alt="Bot Builder" class="site-header__logo" />
     </a>
     <nav class="site-header__nav">
       <a
@@ -75,6 +75,7 @@
 import AdminSectionBlockLayer from '@/components/admin/sections/common/admin-section-block-layer.vue';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
 import { onTextChange } from '@/utils/admin-helpers';
+import { resolveAssetUrl } from '@/utils/asset-helper';
 
 defineProps<{
   isActive: boolean;
