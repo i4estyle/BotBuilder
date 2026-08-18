@@ -7,8 +7,10 @@
   >
     <div class="section-heading section-heading--centered">
       <h2
+        data-style-key="activityFormats.heading"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('activityFormats.heading')"
         @blur="(e) => onTextChange(e, (val) => (activityFormatsData.heading = val))"
       >
         {{ activityFormatsData.heading }}
@@ -25,7 +27,9 @@
         <div
           class="activities__media admin-image-hover-trigger"
           data-image-key="activityFormats.item"
+          :data-style-key="`activityFormats.items.${index}.image`"
           :data-image-index="index"
+          :style="getStyleOverride(`activityFormats.items.${index}.image`)"
         >
           <img :src="resolveAssetUrl(actItem.image)" :alt="actItem.title" />
           <div class="admin-image-hover-overlay">
@@ -35,15 +39,19 @@
         </div>
         <div class="activities__copy">
           <h3
+            :data-style-key="`activityFormats.items.${index}.title`"
             contenteditable="true"
             class="admin-inline-editable"
+            :style="getStyleOverride(`activityFormats.items.${index}.title`)"
             @blur="(e) => onTextChange(e, (val) => (actItem.title = val))"
           >
             {{ actItem.title }}
           </h3>
           <p
+            :data-style-key="`activityFormats.items.${index}.description`"
             contenteditable="true"
             class="admin-inline-editable"
+            :style="getStyleOverride(`activityFormats.items.${index}.description`)"
             @blur="(e) => onTextChange(e, (val) => (actItem.description = val))"
           >
             {{ actItem.description }}
@@ -69,5 +77,5 @@ defineEmits<{
   (e: 'select', id: string): void;
 }>();
 
-const { activityFormats: activityFormatsData } = useWebsiteEditor();
+const { activityFormats: activityFormatsData, getStyleOverride } = useWebsiteEditor();
 </script>

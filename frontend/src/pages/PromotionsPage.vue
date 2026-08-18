@@ -29,7 +29,10 @@
             :class="{ 'promotion-course--alt': index % 2 === 1 }"
           >
             <div class="promotion-course__inner">
-              <div class="promotion-course__image">
+              <div
+                class="promotion-course__image"
+                :style="getStyleOverride(`promotionsPage.items.${index}.image`)"
+              >
                 <img :src="resolveAssetUrl(promotion.image)" :alt="promotion.title" />
               </div>
               <div class="promotion-course__content">
@@ -39,21 +42,40 @@
                 <h3 :style="getStyleOverride(`promotionsPage.items.${index}.title`)">
                   {{ promotion.title }}
                 </h3>
-                <p v-for="(line, i) in promotion.description" :key="i">{{ line }}</p>
-                <ul v-if="promotion.details" class="promotion-course__details">
-                  <li v-for="detail in promotion.details" :key="detail">{{ detail }}</li>
-                </ul>
-                <p v-if="promotion.likeUrl" class="promotion-course__like">
-                  {{ promotion.likeText }}
-                  <a :href="promotion.likeUrl" target="_blank" rel="noopener">{{
-                    promotion.likeLabel
-                  }}</a>
+                <p
+                  v-for="(line, i) in promotion.description"
+                  :key="i"
+                  :style="getStyleOverride(`promotionsPage.items.${index}.description.${i}`)"
+                >
+                  {{ line }}
                 </p>
-                <p v-if="promotion.price" class="promotion-course__price">{{ promotion.price }}</p>
-                <p v-if="promotion.note" class="promotion-course__note">{{ promotion.note }}</p>
+                <ul v-if="promotion.details" class="promotion-course__details">
+                  <li
+                    v-for="(detail, dIdx) in promotion.details"
+                    :key="dIdx"
+                    :style="getStyleOverride(`promotionsPage.items.${index}.details.${dIdx}`)"
+                  >
+                    {{ detail }}
+                  </li>
+                </ul>
+                <p
+                  v-if="promotion.price"
+                  class="promotion-course__price"
+                  :style="getStyleOverride(`promotionsPage.items.${index}.price`)"
+                >
+                  {{ promotion.price }}
+                </p>
+                <p
+                  v-if="promotion.note"
+                  class="promotion-course__note"
+                  :style="getStyleOverride(`promotionsPage.items.${index}.note`)"
+                >
+                  {{ promotion.note }}
+                </p>
               </div>
             </div>
           </section>
+          <AdminSectionBlockLayer section-id="promotionsList" />
         </div>
 
         <section v-else-if="item.id === 'promotionsCta'" class="promotion-cta">
@@ -81,6 +103,26 @@
           <AdminSectionBlockLayer section-id="promotionsCta" />
         </section>
 
+        <section
+          v-else-if="item.isCustomPage"
+          :id="item.id"
+          class="section custom-section"
+          data-reveal
+        >
+          <SectionHeading :title="item.title" />
+          <div v-if="getCustomBlock(item.id)?.type === 'text'" class="custom-section__text">
+            <p>{{ getCustomBlock(item.id)?.content }}</p>
+          </div>
+          <div v-else-if="getCustomBlock(item.id)?.type === 'image'" class="custom-section__image">
+            <img
+              :src="resolveAssetUrl(getCustomBlock(item.id)?.image || '')"
+              :alt="item.title"
+              style="max-width: 100%; border-radius: 12px"
+            />
+          </div>
+          <AdminSectionBlockLayer :section-id="item.id" />
+        </section>
+
         <SiteFooter v-else-if="item.id === 'footer'" />
       </template>
     </main>
@@ -89,6 +131,7 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, watch } from 'vue';
+import SectionHeading from '@/components/landing/SectionHeading.vue';
 import SiteFooter from '@/components/landing/SiteFooter.vue';
 import SiteHeader from '@/components/landing/SiteHeader.vue';
 import AdminSectionBlockLayer from '@/components/admin/sections/common/admin-section-block-layer.vue';
@@ -97,11 +140,16 @@ import { resolveAssetUrl } from '@/utils/asset-helper';
 
 const {
   promotionsPage: promotionsPageData,
+  customBlocks,
   navSections,
   editorLocale,
   fetchPageData,
   getStyleOverride,
 } = useWebsiteEditor();
+
+function getCustomBlock(id: string) {
+  return customBlocks.find((b) => b.id === id);
+}
 
 let liveSyncChannel: BroadcastChannel | null = null;
 

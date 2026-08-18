@@ -7,6 +7,8 @@ export * from './website-editor/content-mutations';
 export * from './website-editor/free-blocks';
 export * from './website-editor/style-overrides';
 
+import type { ActivePage } from './website-editor/types';
+
 import {
   createInitialState,
   createInitialEnState,
@@ -39,6 +41,7 @@ import {
   setStyleOverride,
   removeStyleOverride,
   clearStyleOverrides,
+  clearPageStyleOverrides,
   type StyleOverrideItem,
 } from './website-editor/style-overrides';
 import {
@@ -169,7 +172,7 @@ export function useWebsiteEditor() {
         sectionBlocks.splice(0, sectionBlocks.length, ...data.sectionBlocks);
       }
       if (data.styleOverrides && typeof data.styleOverrides === 'object') {
-        clearStyleOverrides();
+        clearPageStyleOverrides(true);
         Object.assign(styleOverrides, data.styleOverrides);
       }
       if (data.inlineDomStates && Array.isArray(data.inlineDomStates)) {
@@ -271,9 +274,14 @@ export function useWebsiteEditor() {
     window.dispatchEvent(new CustomEvent('editor-state-reset'));
   };
 
+  const selectActivePage = async (page: ActivePage): Promise<void> => {
+    setActivePage(page);
+    await fetchPageData(page, editorLocale.value);
+  };
+
   return {
     activePage,
-    setActivePage,
+    setActivePage: selectActivePage,
     header: contentState.header,
     hero: contentState.hero,
     benefits: contentState.benefits,

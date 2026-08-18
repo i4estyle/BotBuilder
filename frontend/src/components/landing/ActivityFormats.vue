@@ -8,18 +8,24 @@
       data-reveal
       :style="{ '--reveal-delay': `${index * 90}ms` }"
     >
-      <div class="activities__media">
+      <div
+        class="activities__media"
+        :style="getStyleOverride(`activityFormats.items.${index}.image`)"
+      >
         <img :src="resolveAssetUrl(item.image)" :alt="item.title" />
       </div>
       <div class="activities__copy">
-        <h3>{{ item.title }}</h3>
-        <p>{{ item.description }}</p>
+        <h3 :style="getStyleOverride(`activityFormats.items.${index}.title`)">{{ item.title }}</h3>
+        <p :style="getStyleOverride(`activityFormats.items.${index}.description`)">
+          {{ item.description }}
+        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useWebsiteEditor } from '@/composables/use-website-editor';
 import { resolveAssetUrl } from '@/utils/asset-helper';
 
 interface ActivityItem {
@@ -29,4 +35,6 @@ interface ActivityItem {
 }
 
 defineProps<{ items: ActivityItem[] }>();
+
+const { getStyleOverride } = useWebsiteEditor();
 </script>

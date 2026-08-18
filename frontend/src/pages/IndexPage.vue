@@ -185,10 +185,12 @@
 
         <!-- Quiz -->
         <section v-else-if="item.id === 'quiz'" class="quiz section" data-reveal>
-          <q-icon name="quiz" class="quiz__icon" />
+          <q-icon name="quiz" class="quiz__icon" :style="getStyleOverride('quiz.icon')" />
           <h2 :style="getStyleOverride('quiz.heading')">{{ quizData.heading }}</h2>
           <p :style="getStyleOverride('quiz.paragraph')">{{ quizData.paragraph }}</p>
-          <AppButton @click="quizOpen = true">{{ quizData.cta }}</AppButton>
+          <AppButton @click="quizOpen = true">
+            <span :style="getStyleOverride('quiz.cta')">{{ quizData.cta }}</span>
+          </AppButton>
           <AdminSectionBlockLayer section-id="quiz" />
         </section>
 
@@ -237,7 +239,15 @@
                   </dl>
                   <a :href="`tel:${branch.phone.replace(/-/g, '')}`" class="branch-card__phone">
                     <q-icon name="phone" />
-                    <span>โทร. {{ branch.phone }} (ครู{{ branch.contactName }})</span>
+                    <span
+                      >โทร.
+                      <span :style="getStyleOverride(`branches.items.${index}.phone`)">{{
+                        branch.phone
+                      }}</span>
+                      (<span :style="getStyleOverride(`branches.items.${index}.contactName`)"
+                        >ครู{{ branch.contactName }}</span
+                      >)</span
+                    >
                   </a>
                 </div>
               </article>
@@ -251,9 +261,9 @@
           <div class="cta__dots" />
           <h2 :style="getStyleOverride('cta.heading')">{{ ctaData.heading }}</h2>
           <p :style="getStyleOverride('cta.paragraph')">{{ ctaData.paragraph }}</p>
-          <AppButton variant="green" href="https://line.me/R/ti/p/@botbuilderthailand">{{
-            ctaData.button
-          }}</AppButton>
+          <AppButton variant="green" href="https://line.me/R/ti/p/@botbuilderthailand">
+            <span :style="getStyleOverride('cta.button')">{{ ctaData.button }}</span>
+          </AppButton>
           <AdminSectionBlockLayer section-id="cta" />
         </section>
 

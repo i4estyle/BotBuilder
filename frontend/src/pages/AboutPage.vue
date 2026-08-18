@@ -3,14 +3,17 @@
     <main>
       <template v-for="item in navSections" :key="item.id">
         <SiteHeader v-if="item.id === 'header'" />
-        <PageHero
-          v-else-if="item.id === 'aboutHero'"
-          :eyebrow="aboutPageData.eyebrow"
-          :title="aboutPageData.title"
-          :style="getStyleOverride('aboutPage.hero')"
-        >
-          <p :style="getStyleOverride('aboutPage.intro')">{{ aboutPageData.intro }}</p>
-        </PageHero>
+        <section v-else-if="item.id === 'aboutHero'" style="position: relative">
+          <PageHero
+            :eyebrow="aboutPageData.eyebrow"
+            :title="aboutPageData.title"
+            :eyebrow-style="getStyleOverride('aboutPage.eyebrow')"
+            :title-style="getStyleOverride('aboutPage.title')"
+          >
+            <p :style="getStyleOverride('aboutPage.intro')">{{ aboutPageData.intro }}</p>
+          </PageHero>
+          <AdminSectionBlockLayer section-id="aboutHero" />
+        </section>
         <section v-else-if="item.id === 'aboutMission'" class="section section--muted about-grid">
           <div>
             <SectionHeading
@@ -27,7 +30,26 @@
             :alt="aboutPageData.imageAlt"
             :style="getStyleOverride('aboutPage.image')"
           />
-          <AdminSectionBlockLayer section-id="about" />
+          <AdminSectionBlockLayer section-id="aboutMission" />
+        </section>
+        <section
+          v-else-if="item.isCustomPage"
+          :id="item.id"
+          class="section custom-section"
+          data-reveal
+        >
+          <SectionHeading :title="item.title" />
+          <div v-if="getCustomBlock(item.id)?.type === 'text'" class="custom-section__text">
+            <p>{{ getCustomBlock(item.id)?.content }}</p>
+          </div>
+          <div v-else-if="getCustomBlock(item.id)?.type === 'image'" class="custom-section__image">
+            <img
+              :src="resolveAssetUrl(getCustomBlock(item.id)?.image || '')"
+              :alt="item.title"
+              style="max-width: 100%; border-radius: 12px"
+            />
+          </div>
+          <AdminSectionBlockLayer :section-id="item.id" />
         </section>
         <SiteFooter v-else-if="item.id === 'footer'" />
       </template>
@@ -47,11 +69,16 @@ import { resolveAssetUrl } from '@/utils/asset-helper';
 
 const {
   aboutPage: aboutPageData,
+  customBlocks,
   navSections,
   editorLocale,
   fetchPageData,
   getStyleOverride,
 } = useWebsiteEditor();
+
+function getCustomBlock(id: string) {
+  return customBlocks.find((b) => b.id === id);
+}
 
 let liveSyncChannel: BroadcastChannel | null = null;
 

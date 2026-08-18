@@ -7,15 +7,19 @@
   >
     <div class="page-hero">
       <p
+        data-style-key="resourcesPage.eyebrow"
         contenteditable="true"
         class="page-hero__eyebrow admin-inline-editable"
+        :style="getStyleOverride('resourcesPage.eyebrow')"
         @blur="(e) => onTextChange(e, (val) => (resourcesPageData.eyebrow = val))"
       >
         {{ resourcesPageData.eyebrow }}
       </p>
       <h1
+        data-style-key="resourcesPage.title"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('resourcesPage.title')"
         @blur="(e) => onTextChange(e, (val) => (resourcesPageData.title = val))"
       >
         {{ resourcesPageData.title }}
@@ -23,8 +27,10 @@
       <span />
       <div class="page-hero__subtitle">
         <p
+          data-style-key="resourcesPage.paragraph"
           contenteditable="true"
           class="admin-inline-editable"
+          :style="getStyleOverride('resourcesPage.paragraph')"
           @blur="(e) => onTextChange(e, (val) => (resourcesPageData.paragraph = val))"
         >
           {{ resourcesPageData.paragraph }}
@@ -48,5 +54,5 @@ defineEmits<{
   (e: 'select', id: string): void;
 }>();
 
-const { resourcesPage: resourcesPageData } = useWebsiteEditor();
+const { resourcesPage: resourcesPageData, getStyleOverride } = useWebsiteEditor();
 </script>

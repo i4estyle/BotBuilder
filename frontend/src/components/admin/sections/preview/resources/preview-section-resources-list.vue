@@ -10,6 +10,8 @@
         <div class="q-mb-sm">
           <div
             class="admin-icon-clickable"
+            :data-style-key="`resourcesPage.items.${rIdx}.icon`"
+            :style="getStyleOverride(`resourcesPage.items.${rIdx}.icon`)"
             @click.stop="$emit('openIconPicker', (iconName) => (res.icon = iconName))"
           >
             <q-icon :name="res.icon" size="32px" />
@@ -17,15 +19,19 @@
           </div>
         </div>
         <h2
+          :data-style-key="`resourcesPage.items.${rIdx}.title`"
           contenteditable="true"
           class="admin-inline-editable"
+          :style="getStyleOverride(`resourcesPage.items.${rIdx}.title`)"
           @blur="(e) => onTextChange(e, (val) => (res.title = val))"
         >
           {{ res.title }}
         </h2>
         <p
+          :data-style-key="`resourcesPage.items.${rIdx}.text`"
           contenteditable="true"
           class="admin-inline-editable"
+          :style="getStyleOverride(`resourcesPage.items.${rIdx}.text`)"
           @blur="(e) => onTextChange(e, (val) => (res.text = val))"
         >
           {{ res.text }}
@@ -50,5 +56,5 @@ defineEmits<{
   (e: 'openIconPicker', cb: (iconName: string) => void): void;
 }>();
 
-const { resourcesPage: resourcesPageData } = useWebsiteEditor();
+const { resourcesPage: resourcesPageData, getStyleOverride } = useWebsiteEditor();
 </script>

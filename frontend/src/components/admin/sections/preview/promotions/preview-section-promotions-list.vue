@@ -7,8 +7,10 @@
   >
     <div class="promotion-list">
       <h2
+        data-style-key="promotionsPage.listHeading"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('promotionsPage.listHeading')"
         @blur="(e) => onTextChange(e, (val) => (promotionsPageData.listHeading = val))"
       >
         {{ promotionsPageData.listHeading }}
@@ -25,7 +27,9 @@
         <div
           class="promotion-course__image admin-image-hover-trigger"
           data-image-key="promotionsPage.item"
+          :data-style-key="`promotionsPage.items.${pIdx}.image`"
           :data-promo-index="pIdx"
+          :style="getStyleOverride(`promotionsPage.items.${pIdx}.image`)"
         >
           <img :src="resolveAssetUrl(promo.image)" :alt="promo.title" />
           <div class="admin-image-hover-overlay">
@@ -36,16 +40,20 @@
         <div class="promotion-course__content">
           <div>
             <span
+              :data-style-key="`promotionsPage.items.${pIdx}.label`"
               contenteditable="true"
               class="admin-inline-editable"
+              :style="getStyleOverride(`promotionsPage.items.${pIdx}.label`)"
               @blur="(e) => onTextChange(e, (val) => (promo.label = val))"
             >
               {{ promo.label }}
             </span>
           </div>
           <h3
+            :data-style-key="`promotionsPage.items.${pIdx}.title`"
             contenteditable="true"
             class="admin-inline-editable"
+            :style="getStyleOverride(`promotionsPage.items.${pIdx}.title`)"
             @blur="(e) => onTextChange(e, (val) => (promo.title = val))"
           >
             {{ promo.title }}
@@ -53,8 +61,10 @@
           <p
             v-for="(line, lIdx) in promo.description"
             :key="lIdx"
+            :data-style-key="`promotionsPage.items.${pIdx}.description.${lIdx}`"
             contenteditable="true"
             class="admin-inline-editable"
+            :style="getStyleOverride(`promotionsPage.items.${pIdx}.description.${lIdx}`)"
             @blur="(e) => onTextChange(e, (val) => (promo.description[lIdx] = val))"
           >
             {{ line }}
@@ -63,8 +73,10 @@
             <li
               v-for="(det, dIdx) in promo.details"
               :key="dIdx"
+              :data-style-key="`promotionsPage.items.${pIdx}.details.${dIdx}`"
               contenteditable="true"
               class="admin-inline-editable"
+              :style="getStyleOverride(`promotionsPage.items.${pIdx}.details.${dIdx}`)"
               @blur="(e) => onTextChange(e, (val) => (promo.details![dIdx] = val))"
             >
               {{ det }}
@@ -72,16 +84,20 @@
           </ul>
           <p
             v-if="promo.price"
+            :data-style-key="`promotionsPage.items.${pIdx}.price`"
             contenteditable="true"
             class="promotion-course__price admin-inline-editable"
+            :style="getStyleOverride(`promotionsPage.items.${pIdx}.price`)"
             @blur="(e) => onTextChange(e, (val) => (promo.price = val))"
           >
             {{ promo.price }}
           </p>
           <p
             v-if="promo.note"
+            :data-style-key="`promotionsPage.items.${pIdx}.note`"
             contenteditable="true"
             class="promotion-course__note admin-inline-editable"
+            :style="getStyleOverride(`promotionsPage.items.${pIdx}.note`)"
             @blur="(e) => onTextChange(e, (val) => (promo.note = val))"
           >
             {{ promo.note }}
@@ -107,5 +123,5 @@ defineEmits<{
   (e: 'select', id: string): void;
 }>();
 
-const { promotionsPage: promotionsPageData } = useWebsiteEditor();
+const { promotionsPage: promotionsPageData, getStyleOverride } = useWebsiteEditor();
 </script>

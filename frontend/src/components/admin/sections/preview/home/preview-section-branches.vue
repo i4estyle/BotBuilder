@@ -85,8 +85,10 @@
                 >{{ branch.phone }}</span
               >
               <span
+                :data-style-key="`branches.items.${index}.contactName`"
                 contenteditable="true"
                 class="admin-inline-editable"
+                :style="getStyleOverride(`branches.items.${index}.contactName`)"
                 @blur="(e) => onTextChange(e, (val) => (branch.contactName = val))"
                 >({{ branch.contactName }})</span
               >

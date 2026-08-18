@@ -7,8 +7,10 @@
   >
     <div class="section-heading section-heading--centered">
       <h2
+        data-style-key="activityGallery.heading"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('activityGallery.heading')"
         @blur="(e) => onTextChange(e, (val) => (activityGalleryData.heading = val))"
       >
         {{ activityGalleryData.heading }}
@@ -23,8 +25,10 @@
         class="activity-gallery__column"
       >
         <h3
+          :data-style-key="`activityGallery.groups.${groupIndex}.title`"
           contenteditable="true"
           class="activity-gallery__column-title admin-inline-editable"
+          :style="getStyleOverride(`activityGallery.groups.${groupIndex}.title`)"
           @blur="(e) => onTextChange(e, (val) => (group.title = val))"
         >
           {{ group.title }}
@@ -140,6 +144,7 @@ const {
   addGalleryPhoto,
   removeGalleryPhoto,
   saveHistorySnapshot,
+  getStyleOverride,
 } = useWebsiteEditor();
 
 const groupSlides = reactive<number[]>([]);

@@ -9,42 +9,54 @@
       href="javascript:void(0)"
       class="site-header__brand admin-image-hover-trigger"
       data-image-key="header.logo"
+      data-style-key="header.logo"
+      :style="getStyleOverride('header.logo')"
     >
       <img :src="resolveAssetUrl(headerData.logo)" alt="Bot Builder" class="site-header__logo" />
     </a>
     <nav class="site-header__nav">
       <a
         href="javascript:void(0)"
+        data-style-key="header.nav.home"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('header.nav.home')"
         @blur="(e) => onTextChange(e, (val) => (headerData.nav.home = val))"
         >{{ headerData.nav.home }}</a
       >
       <a
         href="javascript:void(0)"
+        data-style-key="header.nav.promotions"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('header.nav.promotions')"
         @blur="(e) => onTextChange(e, (val) => (headerData.nav.promotions = val))"
         >{{ headerData.nav.promotions }}</a
       >
       <a
         href="javascript:void(0)"
+        data-style-key="header.nav.courses"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('header.nav.courses')"
         @blur="(e) => onTextChange(e, (val) => (headerData.nav.courses = val))"
         >{{ headerData.nav.courses }}</a
       >
       <a
         href="javascript:void(0)"
+        data-style-key="header.nav.resources"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('header.nav.resources')"
         @blur="(e) => onTextChange(e, (val) => (headerData.nav.resources = val))"
         >{{ headerData.nav.resources }}</a
       >
       <a
         href="javascript:void(0)"
+        data-style-key="header.nav.about"
         contenteditable="true"
         class="admin-inline-editable"
+        :style="getStyleOverride('header.nav.about')"
         @blur="(e) => onTextChange(e, (val) => (headerData.nav.about = val))"
         >{{ headerData.nav.about }}</a
       >
@@ -85,5 +97,5 @@ defineEmits<{
   (e: 'select', id: string): void;
 }>();
 
-const { header: headerData, editorLocale } = useWebsiteEditor();
+const { header: headerData, editorLocale, getStyleOverride } = useWebsiteEditor();
 </script>

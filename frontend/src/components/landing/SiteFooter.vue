@@ -35,11 +35,13 @@
     <p class="site-footer__copyright" :style="getStyleOverride('footer.copyright')">
       {{ footerData.copyright || '© 2024 Bot Builder Academy. Built for future engineers.' }}
     </p>
+    <AdminSectionBlockLayer section-id="footer" />
   </footer>
 </template>
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+import AdminSectionBlockLayer from '@/components/admin/sections/common/admin-section-block-layer.vue';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
 
 const { footer: footerData, getStyleOverride } = useWebsiteEditor();

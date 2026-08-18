@@ -29,6 +29,13 @@ export interface PageDataResponse {
 }
 
 const SECTION_PAGE_MAP: Record<string, string> = {
+  hero: 'home',
+  benefits: 'home',
+  activityFormats: 'home',
+  gallery: 'home',
+  activityGallery: 'home',
+  quiz: 'home',
+  branches: 'home',
   promotionsPage: 'promotions',
   coursesPage: 'courses',
   resourcesPage: 'resources',
@@ -116,6 +123,46 @@ export class PageSectionsService {
         }
       }
     });
+
+    if (pageName !== 'home') {
+      const homeRecords = await this.pageSectionsRepository.find({
+        where: { pageName: 'home', locale, isActive: true },
+      });
+      homeRecords.forEach((hr) => {
+        if (hr.sectionKey === 'header' && !sections.header) {
+          sections.header = hr.content as Record<string, unknown>;
+        } else if (hr.sectionKey === 'footer' && !sections.footer) {
+          sections.footer = hr.content as Record<string, unknown>;
+        } else if (
+          hr.sectionKey === 'styleOverrides' &&
+          hr.content &&
+          typeof hr.content === 'object' &&
+          !Array.isArray(hr.content)
+        ) {
+          const homeStyles = hr.content;
+          Object.entries(homeStyles).forEach(([k, v]) => {
+            if (
+              (k.startsWith('header.') || k.startsWith('footer.')) &&
+              !styleOverrides[k]
+            ) {
+              styleOverrides[k] = v;
+            }
+          });
+        } else if (
+          hr.sectionKey === 'sectionBlocks' &&
+          Array.isArray(hr.content)
+        ) {
+          const globalBlocks = (hr.content as Record<string, unknown>[]).filter(
+            (b) => b.sectionId === 'header' || b.sectionId === 'footer',
+          );
+          globalBlocks.forEach((gb) => {
+            if (!sectionBlocks.some((sb) => sb.id === gb.id)) {
+              sectionBlocks.push(gb);
+            }
+          });
+        }
+      });
+    }
 
     return {
       pageName,
@@ -375,30 +422,144 @@ export class PageSectionsService {
     sectionKey: string,
     content: unknown,
   ): void {
-    const pagesToUpdate = ['themeSettings'].includes(sectionKey)
-      ? ALL_PAGES
-      : [pageName];
+    if (sectionKey === 'themeSettings') {
+      for (const targetPage of ALL_PAGES) {
+        const mapKey = `${targetPage}:${locale}:${sectionKey}`;
+        let existing = entitiesToSave.get(mapKey) || recordMap.get(mapKey);
 
-    for (const targetPage of pagesToUpdate) {
-      const mapKey = `${targetPage}:${locale}:${sectionKey}`;
-      let existing = entitiesToSave.get(mapKey) || recordMap.get(mapKey);
-
-      if (existing) {
-        existing.content = content as Record<string, unknown> | Array<unknown>;
-        existing.isActive = true;
-      } else {
-        existing = manager.create(PageSection, {
-          pageName: targetPage,
-          locale,
-          sectionKey,
-          content: content as Record<string, unknown> | Array<unknown>,
-          sortOrder: 999,
-          isActive: true,
-        });
-        recordMap.set(mapKey, existing);
+        if (existing) {
+          existing.content = content as
+            Record<string, unknown> | Array<unknown>;
+          existing.isActive = true;
+        } else {
+          existing = manager.create(PageSection, {
+            pageName: targetPage,
+            locale,
+            sectionKey,
+            content: content as Record<string, unknown> | Array<unknown>,
+            sortOrder: 999,
+            isActive: true,
+          });
+          recordMap.set(mapKey, existing);
+        }
+        entitiesToSave.set(mapKey, existing);
       }
-      entitiesToSave.set(mapKey, existing);
+      return;
     }
+
+    if (sectionKey === 'styleOverrides') {
+      const incomingOverrides =
+        content && typeof content === 'object' && !Array.isArray(content)
+          ? (content as Record<string, unknown>)
+          : {};
+
+      const globalOverrides: Record<string, unknown> = {};
+      Object.entries(incomingOverrides).forEach(([k, v]) => {
+        if (k.startsWith('header.') || k.startsWith('footer.')) {
+          globalOverrides[k] = v;
+        }
+      });
+
+      for (const targetPage of ALL_PAGES) {
+        const mapKey = `${targetPage}:${locale}:${sectionKey}`;
+        let existing = entitiesToSave.get(mapKey) || recordMap.get(mapKey);
+
+        let finalContent: Record<string, unknown>;
+        if (targetPage === pageName) {
+          finalContent = { ...incomingOverrides };
+        } else {
+          const prev =
+            existing &&
+            existing.content &&
+            typeof existing.content === 'object' &&
+            !Array.isArray(existing.content)
+              ? existing.content
+              : {};
+          finalContent = { ...prev, ...globalOverrides };
+        }
+
+        if (existing) {
+          existing.content = finalContent;
+          existing.isActive = true;
+        } else {
+          existing = manager.create(PageSection, {
+            pageName: targetPage,
+            locale,
+            sectionKey,
+            content: finalContent,
+            sortOrder: 999,
+            isActive: true,
+          });
+          recordMap.set(mapKey, existing);
+        }
+        entitiesToSave.set(mapKey, existing);
+      }
+      return;
+    }
+
+    if (sectionKey === 'sectionBlocks') {
+      const incomingBlocks = Array.isArray(content)
+        ? (content as Record<string, unknown>[])
+        : [];
+      const globalBlocks = incomingBlocks.filter(
+        (b) => b.sectionId === 'header' || b.sectionId === 'footer',
+      );
+
+      for (const targetPage of ALL_PAGES) {
+        const mapKey = `${targetPage}:${locale}:${sectionKey}`;
+        let existing = entitiesToSave.get(mapKey) || recordMap.get(mapKey);
+
+        let finalBlocks: Record<string, unknown>[];
+        if (targetPage === pageName) {
+          finalBlocks = incomingBlocks;
+        } else {
+          const prevBlocks =
+            existing && Array.isArray(existing.content)
+              ? (existing.content as Record<string, unknown>[])
+              : [];
+          const localBlocks = prevBlocks.filter(
+            (b) => b.sectionId !== 'header' && b.sectionId !== 'footer',
+          );
+          finalBlocks = [...localBlocks, ...globalBlocks];
+        }
+
+        if (existing) {
+          existing.content = finalBlocks;
+          existing.isActive = true;
+        } else {
+          existing = manager.create(PageSection, {
+            pageName: targetPage,
+            locale,
+            sectionKey,
+            content: finalBlocks,
+            sortOrder: 999,
+            isActive: true,
+          });
+          recordMap.set(mapKey, existing);
+        }
+        entitiesToSave.set(mapKey, existing);
+      }
+      return;
+    }
+
+    const mapKey = `${pageName}:${locale}:${sectionKey}`;
+    let existing = entitiesToSave.get(mapKey) || recordMap.get(mapKey);
+
+    if (existing) {
+      existing.content = content as Record<string, unknown> | Array<unknown>;
+      existing.isActive = true;
+    } else {
+      existing = manager.create(PageSection, {
+        pageName,
+        locale,
+        sectionKey,
+        content: content as Record<string, unknown> | Array<unknown>,
+        sortOrder: 999,
+        isActive: true,
+      });
+      recordMap.set(mapKey, existing);
+    }
+    entitiesToSave.set(mapKey, existing);
   }
 
   private async seedDefaultSectionsForPage(

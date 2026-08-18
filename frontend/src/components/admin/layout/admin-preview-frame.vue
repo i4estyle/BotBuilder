@@ -751,15 +751,19 @@ function startInlineDrag(e: PointerEvent): void {
   const initElDx = elMatrix.m41;
   const initElDy = elMatrix.m42;
 
+  const ratio = viewportMode.value === 'desktop' ? 1 : scaleRatio.value || 1;
+
   function renderDrag(): void {
     rafId = null;
-    const dx = latestX - startX;
-    const dy = latestY - startY;
+    const screenDx = latestX - startX;
+    const screenDy = latestY - startY;
+    const dx = screenDx / ratio;
+    const dy = screenDy / ratio;
 
     targetEl.style.transform = `translate3d(${initElDx + dx}px, ${initElDy + dy}px, 0)`;
 
     const ov = inlineOverlayRef.value ?? overlayEl;
-    if (ov) ov.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+    if (ov) ov.style.transform = `translate3d(${screenDx}px, ${screenDy}px, 0)`;
   }
 
   function onMove(ev: PointerEvent): void {
@@ -822,11 +826,12 @@ function onInlineResizeDown(e: PointerEvent, corner: string): void {
   const startH = targetEl.offsetHeight;
 
   targetEl.style.willChange = 'width, height';
+  const ratio = viewportMode.value === 'desktop' ? 1 : scaleRatio.value || 1;
 
   function renderInlineResize(): void {
     inlineResizeRafId = null;
-    const dx = latestX - startX;
-    const dy = latestY - startY;
+    const dx = (latestX - startX) / ratio;
+    const dy = (latestY - startY) / ratio;
 
     let newW = startW;
     let newH = startH;

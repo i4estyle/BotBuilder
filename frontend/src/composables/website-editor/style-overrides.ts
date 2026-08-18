@@ -53,3 +53,12 @@ export function clearStyleOverrides(): void {
     delete styleOverrides[key];
   }
 }
+
+export function clearPageStyleOverrides(preserveShared = true): void {
+  for (const key of Object.keys(styleOverrides)) {
+    if (preserveShared && (key.startsWith('header.') || key.startsWith('footer.'))) {
+      continue;
+    }
+    delete styleOverrides[key];
+  }
+}
