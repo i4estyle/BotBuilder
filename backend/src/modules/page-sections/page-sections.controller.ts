@@ -8,8 +8,9 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
   PageSectionsService,
   PageDataResponse,
@@ -19,6 +20,7 @@ import { UpdatePageSectionDto } from './dto/update-page-section.dto.js';
 import { BulkSavePageSectionsDto } from './dto/bulk-save-page-sections.dto.js';
 import { PageSectionQueryDto } from './dto/page-section-query.dto.js';
 import { PageSection } from './entities/page-section.entity.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
 @ApiTags('PageSections')
 @Controller('page-sections')
@@ -48,6 +50,8 @@ export class PageSectionsController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a single section record' })
   async create(
     @Body() createPageSectionDto: CreatePageSectionDto,
@@ -56,6 +60,8 @@ export class PageSectionsController {
   }
 
   @Post('bulk-save')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Bulk save all page builder sections atomically' })
   async bulkSave(
     @Body() bulkSaveDto: BulkSavePageSectionsDto,
@@ -64,6 +70,8 @@ export class PageSectionsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update single section record by ID' })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -73,6 +81,8 @@ export class PageSectionsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Soft delete single section record by ID' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<PageSection> {
     return this.pageSectionsService.remove(id);

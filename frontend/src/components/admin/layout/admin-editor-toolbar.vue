@@ -123,6 +123,16 @@
         >
           <q-tooltip>คืนค่าเริ่มต้น</q-tooltip>
         </q-btn>
+        <q-btn
+          flat
+          dense
+          icon="logout"
+          class="admin-toolbar__btn"
+          aria-label="Log out"
+          @click="handleLogout"
+        >
+          <q-tooltip>ออกจากระบบ</q-tooltip>
+        </q-btn>
       </div>
     </div>
   </header>
@@ -130,10 +140,14 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 import { Notify } from 'quasar';
 import { useWebsiteEditor, type EditorLocale } from '@/composables/use-website-editor';
 import { resolveAssetUrl } from '@/utils/asset-helper';
+import { useAuthStore } from '@/stores/auth-store';
+
+const router = useRouter();
+const authStore = useAuthStore();
 
 const {
   header: headerData,
@@ -148,6 +162,11 @@ const {
   saveToBackend,
   isSaving,
 } = useWebsiteEditor();
+
+function handleLogout(): void {
+  authStore.logout();
+  void router.replace('/login');
+}
 
 async function changeEditorLanguage(value: EditorLocale): Promise<void> {
   await setEditorLocale(value);

@@ -1,16 +1,9 @@
-import axios from 'axios';
+import { apiClient } from './api-client';
 import type {
   PageDataResponse,
   BulkSavePayload,
   PageSectionItem,
 } from '@/composables/website-editor/types';
-
-const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000';
-
-const apiClient = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
-  timeout: 15000,
-});
 
 export const pageSectionsApiService = {
   async getPageData(pageName = 'home', locale = 'th-TH'): Promise<PageDataResponse> {

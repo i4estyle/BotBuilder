@@ -7,6 +7,7 @@ import { RolesModule } from './modules/roles/roles.module.js';
 import { UserRolesModule } from './modules/user-roles/user-roles.module.js';
 import { PageSectionsModule } from './modules/page-sections/page-sections.module.js';
 import { UploadsModule } from './modules/uploads/uploads.module.js';
+import { AuthModule } from './modules/auth/auth.module.js';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UploadsModule } from './modules/uploads/uploads.module.js';
         migrations: ['dist/database/migrations/*.js'],
       }),
     }),
+    AuthModule,
     UsersModule,
     RolesModule,
     UserRolesModule,

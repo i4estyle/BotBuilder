@@ -1,11 +1,10 @@
-import axios from 'axios';
+import { apiClient, API_BASE_URL } from '@/services/api-client';
 
 export async function uploadImageFile(fileOrDataUrl: File | Blob | string): Promise<string> {
   if (typeof fileOrDataUrl === 'string' && !fileOrDataUrl.startsWith('data:')) {
     return fileOrDataUrl;
   }
 
-  const backendUrl = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000';
   const formData = new FormData();
 
   if (typeof fileOrDataUrl === 'string' && fileOrDataUrl.startsWith('data:')) {
@@ -19,9 +18,9 @@ export async function uploadImageFile(fileOrDataUrl: File | Blob | string): Prom
     return fileOrDataUrl;
   }
 
-  const { data } = await axios.post<{ url: string }>(`${backendUrl}/api/uploads`, formData, {
+  const { data } = await apiClient.post<{ url: string }>('/uploads', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 
-  return `${backendUrl}${data.url}`;
+  return `${API_BASE_URL}${data.url}`;
 }

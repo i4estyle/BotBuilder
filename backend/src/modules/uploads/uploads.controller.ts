@@ -1,16 +1,19 @@
 import {
   Controller,
   Post,
+  UseGuards,
   UseInterceptors,
   UploadedFile,
   BadRequestException,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import 'multer';
 import { UploadsService, UploadResult } from './uploads.service.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
 const uploadDirectory = join(process.cwd(), 'uploads', 'images');
 
@@ -19,6 +22,8 @@ export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({

@@ -68,6 +68,16 @@ export class User {
   })
   userStatus!: UserStatus;
 
+  @Column({
+    name: 'PASSWORD_HASH',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    select: false,
+    comment: 'รหัสผ่านที่เข้ารหัสแล้ว (ใช้สำหรับเข้าสู่ระบบแอดมิน)',
+  })
+  passwordHash?: string | null;
+
   @CreateDateColumn({
     name: 'CREATED_AT',
     type: 'timestamp',
