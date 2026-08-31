@@ -62,18 +62,10 @@ export class PageSectionsService {
     const pageName = query.pageName || 'home';
     const locale = query.locale || 'th-TH';
 
-    let records = await this.pageSectionsRepository.find({
+    const records = await this.pageSectionsRepository.find({
       where: { pageName, locale, isActive: true },
       order: { sortOrder: 'ASC' },
     });
-
-    if (records.length === 0) {
-      await this.seedDefaultSectionsForPage(pageName, locale);
-      records = await this.pageSectionsRepository.find({
-        where: { pageName, locale, isActive: true },
-        order: { sortOrder: 'ASC' },
-      });
-    }
 
     const sections: Record<string, Record<string, unknown>> = {};
     let navSections: Record<string, unknown>[] =
@@ -84,45 +76,55 @@ export class PageSectionsService {
     let inlineDomStates: Record<string, unknown>[] = [];
     let styleOverrides: Record<string, unknown> = {};
 
-    records.forEach((record) => {
-      if (record.sectionKey === 'navSections') {
-        if (Array.isArray(record.content) && record.content.length > 0) {
-          navSections = record.content as Record<string, unknown>[];
-        }
-      } else if (record.sectionKey === 'themeSettings') {
-        if (record.content && typeof record.content === 'object') {
-          themeSettings = record.content as Record<string, unknown>;
-        }
-      } else if (record.sectionKey === 'customBlocks') {
-        if (Array.isArray(record.content)) {
-          customBlocks = record.content as Record<string, unknown>[];
-        }
-      } else if (record.sectionKey === 'sectionBlocks') {
-        if (Array.isArray(record.content)) {
-          sectionBlocks = record.content as Record<string, unknown>[];
-        }
-      } else if (record.sectionKey === 'inlineDomStates') {
-        if (Array.isArray(record.content)) {
-          inlineDomStates = record.content as Record<string, unknown>[];
-        }
-      } else if (record.sectionKey === 'styleOverrides') {
-        if (
-          record.content &&
-          typeof record.content === 'object' &&
-          !Array.isArray(record.content)
-        ) {
-          styleOverrides = record.content;
-        }
-      } else {
-        if (
-          record.content &&
-          typeof record.content === 'object' &&
-          !Array.isArray(record.content)
-        ) {
-          sections[record.sectionKey] = record.content;
-        }
+    if (records.length === 0) {
+      const defaultData =
+        locale === 'en-US'
+          ? DEFAULT_SECTIONS_EN[pageName]
+          : DEFAULT_SECTIONS_TH[pageName];
+      if (defaultData) {
+        Object.assign(sections, defaultData);
       }
-    });
+    } else {
+      records.forEach((record) => {
+        if (record.sectionKey === 'navSections') {
+          if (Array.isArray(record.content) && record.content.length > 0) {
+            navSections = record.content as Record<string, unknown>[];
+          }
+        } else if (record.sectionKey === 'themeSettings') {
+          if (record.content && typeof record.content === 'object') {
+            themeSettings = record.content as Record<string, unknown>;
+          }
+        } else if (record.sectionKey === 'customBlocks') {
+          if (Array.isArray(record.content)) {
+            customBlocks = record.content as Record<string, unknown>[];
+          }
+        } else if (record.sectionKey === 'sectionBlocks') {
+          if (Array.isArray(record.content)) {
+            sectionBlocks = record.content as Record<string, unknown>[];
+          }
+        } else if (record.sectionKey === 'inlineDomStates') {
+          if (Array.isArray(record.content)) {
+            inlineDomStates = record.content as Record<string, unknown>[];
+          }
+        } else if (record.sectionKey === 'styleOverrides') {
+          if (
+            record.content &&
+            typeof record.content === 'object' &&
+            !Array.isArray(record.content)
+          ) {
+            styleOverrides = record.content;
+          }
+        } else {
+          if (
+            record.content &&
+            typeof record.content === 'object' &&
+            !Array.isArray(record.content)
+          ) {
+            sections[record.sectionKey] = record.content;
+          }
+        }
+      });
+    }
 
     if (pageName !== 'home') {
       const homeRecords = await this.pageSectionsRepository.find({
@@ -560,55 +562,6 @@ export class PageSectionsService {
       recordMap.set(mapKey, existing);
     }
     entitiesToSave.set(mapKey, existing);
-  }
-
-  private async seedDefaultSectionsForPage(
-    pageName: string,
-    locale: string,
-  ): Promise<void> {
-    const dataSourceMap =
-      locale === 'en-US'
-        ? DEFAULT_SECTIONS_EN[pageName]
-        : DEFAULT_SECTIONS_TH[pageName];
-
-    if (!dataSourceMap) {
-      return;
-    }
-
-    let sortOrder = 0;
-    for (const [sectionKey, content] of Object.entries(dataSourceMap)) {
-      const section = this.pageSectionsRepository.create({
-        pageName,
-        locale,
-        sectionKey,
-        content,
-        sortOrder: sortOrder++,
-        isActive: true,
-      });
-      await this.pageSectionsRepository.save(section);
-    }
-
-    const defaultNav =
-      DEFAULT_PAGE_NAV_SECTIONS[pageName] || DEFAULT_NAV_SECTIONS;
-    const navMeta = this.pageSectionsRepository.create({
-      pageName,
-      locale,
-      sectionKey: 'navSections',
-      content: defaultNav,
-      sortOrder: 999,
-      isActive: true,
-    });
-    await this.pageSectionsRepository.save(navMeta);
-
-    const themeMeta = this.pageSectionsRepository.create({
-      pageName,
-      locale,
-      sectionKey: 'themeSettings',
-      content: DEFAULT_THEME_SETTINGS,
-      sortOrder: 999,
-      isActive: true,
-    });
-    await this.pageSectionsRepository.save(themeMeta);
   }
 
   async create(dto: CreatePageSectionDto): Promise<PageSection> {

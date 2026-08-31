@@ -415,6 +415,62 @@ export const DEFAULT_SECTIONS_TH: Record<
           likeUrl: 'https://www.facebook.com/BotBuilderThailand/',
           image: '/src/assets/landing/promotions.png',
         },
+        {
+          label: 'กิจกรรมพิเศษ',
+          title: 'Happy Play Time',
+          description: [
+            'กิจกรรมต้อนรับปิดเทอม ชวนน้อง ๆ มาสนุกกับการต่อเลโก้และฝึกเขียนโปรแกรมควบคุมหุ่นยนต์',
+            'สร้างทักษะความคิดสร้างสรรค์และการแก้ปัญหาผ่านภารกิจสนุก ๆ',
+          ],
+          details: [
+            'สำหรับน้อง ๆ อายุ 4 - 12 ปี',
+            'รอบละ 2 ชั่วโมง (จำกัดจำนวนผู้เรียนต่อรอบ)',
+          ],
+          price: 'ราคา 890 บาท / รอบ',
+          note: '*รวมอุปกรณ์และชีทกิจกรรมเรียบร้อยแล้ว',
+          image: '/src/assets/landing/happyplaytime.png',
+        },
+        {
+          label: 'Holiday Camp',
+          title: 'Exploring Space with LEGO Robotics',
+          description: [
+            'ค่ายหุ่นยนต์ตะลุยอวกาศ 3 วันเต็ม! เรียนรู้การสร้างหุ่นยนต์สปายแวร์ หุ่นยนต์สำรวจดาวอังคาร และฐานปล่อยจรวด',
+          ],
+          details: [
+            'วันที่ 15 - 17 ตุลาคม 2567',
+            'เวลา 09:00 - 15:30 น.',
+            'รับเกียรติบัตรเข้าร่วมกิจกรรมพร้อมผลงานสะสม',
+          ],
+          price: 'ราคา 4,500 บาท (รวมอาหารกลางวัน)',
+          image: '/src/assets/landing/exploringspace.png',
+        },
+        {
+          label: 'Takeaway Course',
+          title: 'Takeaway Robot Course (Micro:bit)',
+          description: [
+            'คอร์สเรียนพิเศษที่น้อง ๆ จะได้ประกอบหุ่นยนต์และเขียนโค้ดควบคุมด้วยบอร์ด Micro:bit',
+            'เมื่อเรียนจบสามารถนำหุ่นยนต์กลับบ้านไปฝึกต่อได้ทันที!',
+          ],
+          details: [
+            'เหมาะสำหรับน้อง ๆ อายุ 8 ปีขึ้นไป',
+            'เรียน 4 ครั้ง ครั้งละ 2 ชั่วโมง',
+          ],
+          price: 'ราคา 6,900 บาท (ฟรีชุดหุ่นยนต์กลับบ้าน)',
+          image: '/src/assets/landing/takeaway.png',
+        },
+        {
+          label: 'Takeaway Course',
+          title: 'Python Robotics Takeaway',
+          description: [
+            'ต่อยอดการเขียนโปรแกรมด้วยภาษา Python ควบคุมเซนเซอร์และมอเตอร์หุ่นยนต์ระดับสูง',
+          ],
+          details: [
+            'สำหรับน้อง ๆ ที่มีพื้นฐานการเขียนโปรแกรมบล็อก',
+            'รวมอุปกรณ์ฮาร์ดแวร์กลับบ้าน',
+          ],
+          price: 'ราคา 7,900 บาท',
+          image: '/src/assets/landing/takegreen.png',
+        },
       ],
       cta: {
         eyebrow: 'สอบถามรายละเอียดเพิ่มเติม',
@@ -440,6 +496,24 @@ export const DEFAULT_SECTIONS_TH: Record<
           ],
           image: '/src/assets/landing/playlearn.png',
         },
+        {
+          badge: 'อายุ 7 - 10 ปี',
+          title: 'Explorer Bots (นักสำรวจ)',
+          description: [
+            'สร้างและเขียนโปรแกรมควบคุมหุ่นยนต์ด้วย Scratch & Block-based coding',
+            'เรียนรู้การทำงานของเซนเซอร์ตรวจจับแสง เสียง และระยะทางผ่านภารกิจสนุก ๆ',
+          ],
+          image: '/src/assets/landing/roboticcamp.png',
+        },
+        {
+          badge: 'อายุ 11 - 16 ปี',
+          title: 'Master Engineers (วิศวกรน้อย)',
+          description: [
+            'ออกแบบหุ่นยนต์ระดับสูงด้วย LEGO Spike Prime และการเขียนโค้ดด้วย Python',
+            'เตรียมความพร้อมก้าวสู่การแข่งขันหุ่นยนต์ระดับประเทศและนานาชาติ (FLL / WRO)',
+          ],
+          image: '/src/assets/landing/precompete.png',
+        },
       ],
     },
   },
@@ -454,6 +528,16 @@ export const DEFAULT_SECTIONS_TH: Record<
           icon: 'article',
           title: 'คู่มือการใช้งาน LEGO Spike Prime เบื้องต้น',
           text: 'รวมเทคนิคการประกอบโครงสร้างและการใช้เซนเซอร์ที่น้อง ๆ ควรรู้ก่อนเริ่มสร้างหุ่นยนต์ตัวแรก',
+        },
+        {
+          icon: 'extension',
+          title: '10 โจทย์ท้าทายเขียนโค้ด Scratch สำหรับเด็ก',
+          text: 'ฝึกตรรกะการคิดแก้ปัญหาด้วยมินิเกมและภารกิจควบคุมตัวละครอย่างสนุกสนาน',
+        },
+        {
+          icon: 'emoji_events',
+          title: 'แนวทางการเตรียมตัวสอบแข่งขันหุ่นยนต์ FLL',
+          text: 'เคล็ดลับจากรุ่นพี่ที่เคยผ่านเวทีแข่งขันจริง ทั้งการวางแผน การนำเสนอ และการลุยภารกิจสนาม',
         },
       ],
     },
@@ -726,6 +810,59 @@ export const DEFAULT_SECTIONS_EN: Record<
           likeUrl: 'https://www.facebook.com/BotBuilderThailand/',
           image: '/src/assets/landing/promotions.png',
         },
+        {
+          label: 'Special Activity',
+          title: 'Happy Play Time',
+          description: [
+            'School break activity inviting kids to enjoy LEGO building and robot coding!',
+            'Boost creativity and problem-solving through fun missions.',
+          ],
+          details: [
+            'For kids aged 4 - 12 years',
+            '2 hours per session (Limited seats)',
+          ],
+          price: '890 THB / session',
+          note: '*Equipment and activity sheets included',
+          image: '/src/assets/landing/happyplaytime.png',
+        },
+        {
+          label: 'Holiday Camp',
+          title: 'Exploring Space with LEGO Robotics',
+          description: [
+            '3-day space robotics camp! Learn to build rover bots, Mars explorers, and launch pads.',
+          ],
+          details: [
+            'October 15 - 17, 2024',
+            '09:00 - 15:30',
+            'Certificate of completion & portfolio items included',
+          ],
+          price: '4,500 THB (Includes lunch)',
+          image: '/src/assets/landing/exploringspace.png',
+        },
+        {
+          label: 'Takeaway Course',
+          title: 'Takeaway Robot Course (Micro:bit)',
+          description: [
+            'Special course where students assemble robots and code with Micro:bit controller.',
+            'Take the robot home upon course completion to keep practicing!',
+          ],
+          details: ['Suitable for ages 8+', '4 sessions, 2 hours each'],
+          price: '6,900 THB (Includes takeaway robot kit)',
+          image: '/src/assets/landing/takeaway.png',
+        },
+        {
+          label: 'Takeaway Course',
+          title: 'Python Robotics Takeaway',
+          description: [
+            'Advanced programming with Python controlling sensors and motors.',
+          ],
+          details: [
+            'For students with block-coding background',
+            'Hardware kit included to take home',
+          ],
+          price: '7,900 THB',
+          image: '/src/assets/landing/takegreen.png',
+        },
       ],
       cta: {
         eyebrow: 'Inquire For Details',
@@ -752,6 +889,24 @@ export const DEFAULT_SECTIONS_EN: Record<
           ],
           image: '/src/assets/landing/playlearn.png',
         },
+        {
+          badge: 'Ages 7 - 10 Years',
+          title: 'Explorer Bots',
+          description: [
+            'Build and code robots with Scratch & Block-based coding',
+            'Learn sensors for light, sound, and distance with engaging missions',
+          ],
+          image: '/src/assets/landing/roboticcamp.png',
+        },
+        {
+          badge: 'Ages 11 - 16 Years',
+          title: 'Master Engineers',
+          description: [
+            'Advanced robot design with LEGO Spike Prime and Python coding',
+            'Prepare for national and international robotics competitions (FLL / WRO)',
+          ],
+          image: '/src/assets/landing/precompete.png',
+        },
       ],
     },
   },
@@ -766,6 +921,16 @@ export const DEFAULT_SECTIONS_EN: Record<
           icon: 'article',
           title: 'Getting Started with LEGO Spike Prime',
           text: 'Essential structural assembly techniques and sensor guides before building your first robot.',
+        },
+        {
+          icon: 'extension',
+          title: '10 Scratch Coding Challenges for Kids',
+          text: 'Fun mini-games and character missions to develop problem-solving logic.',
+        },
+        {
+          icon: 'emoji_events',
+          title: 'Guide to Preparing for FLL Robotics Competition',
+          text: 'Tips from seasoned competitors on planning, presentations, and field challenges.',
         },
       ],
     },

@@ -1,4 +1,4 @@
-import { PAGE_SECTIONS, type createInitialState } from './defaults';
+import { getFallbackNavSections, type createInitialState } from './defaults';
 import {
   activePage,
   activeSectionId,
@@ -13,7 +13,7 @@ import type { ActivePage, EditorLocale, CustomBlock } from './types';
 
 export function setActivePage(page: ActivePage): void {
   activePage.value = page;
-  const sections = PAGE_SECTIONS[page] || PAGE_SECTIONS.home;
+  const sections = getFallbackNavSections(page, editorLocale.value);
   navSections.splice(0, navSections.length, ...sections);
   activeSectionId.value = '';
 }
@@ -63,6 +63,8 @@ export function setEditorLocale(newLocale: EditorLocale): void {
   saveCurrentStateToMap();
   editorLocale.value = newLocale;
   syncActiveContentToTarget(contentStateMap[newLocale]);
+  const sections = getFallbackNavSections(activePage.value, newLocale);
+  navSections.splice(0, navSections.length, ...sections);
 }
 
 export function addNewPageSection(): void {

@@ -29,6 +29,7 @@ import type {
   SectionNavItem,
   ImageSizeSpec,
   ActivePage,
+  EditorLocale,
 } from './types';
 
 export const createInitialState = () => ({
@@ -702,7 +703,7 @@ export const createInitialEnState = () => ({
 export const INITIAL_NAV_SECTIONS: SectionNavItem[] = [
   { id: 'header', title: 'ส่วนหัวเว็บไซต์', icon: 'web_asset', color: 'green' },
   { id: 'hero', title: 'ส่วนต้อนรับหลัก', icon: 'auto_awesome', color: 'green' },
-  { id: 'benefits', title: 'จุดเด่นของบริการ', icon: 'verified', color: 'green' },
+  { id: 'benefits', title: 'จุดเด่นบริการ', icon: 'verified', color: 'green' },
   { id: 'activityFormats', title: 'รูปแบบกิจกรรม', icon: 'dashboard_customize', color: 'green' },
   { id: 'gallery', title: 'ผลงานและประกาศ', icon: 'workspace_premium', color: 'green' },
   { id: 'activityGallery', title: 'คลังภาพกิจกรรม', icon: 'photo_library', color: 'green' },
@@ -805,32 +806,81 @@ export const PAGE_SECTIONS: Record<ActivePage, SectionNavItem[]> = {
   ],
   promotions: [
     { id: 'header', title: 'ส่วนหัวเว็บไซต์', icon: 'web_asset', color: 'green' },
-    { id: 'promotionsHero', title: 'ส่วนต้อนรับ', icon: 'local_offer', color: 'green' },
-    {
-      id: 'promotionsList',
-      title: 'รายการโปรโมชั่น',
-      icon: 'format_list_bulleted',
-      color: 'green',
-    },
-    { id: 'promotionsCta', title: 'ส่วนติดต่อสอบถาม', icon: 'send', color: 'green' },
+    { id: 'promotionsHero', title: 'หัวข้อโปรโมชั่น', icon: 'local_offer', color: 'green' },
+    { id: 'promotionsList', title: 'รายการโปรโมชั่น', icon: 'view_list', color: 'green' },
+    { id: 'promotionsCta', title: 'ส่วนติดต่อโปรโมชั่น', icon: 'campaign', color: 'green' },
     { id: 'footer', title: 'ส่วนท้ายเว็บไซต์', icon: 'vertical_align_bottom', color: 'green' },
   ],
   courses: [
     { id: 'header', title: 'ส่วนหัวเว็บไซต์', icon: 'web_asset', color: 'green' },
-    { id: 'coursesHero', title: 'ส่วนต้อนรับ', icon: 'school', color: 'green' },
+    { id: 'coursesHero', title: 'หัวข้อคอร์สเรียน', icon: 'school', color: 'green' },
     { id: 'coursesList', title: 'รายการคอร์สเรียน', icon: 'grid_view', color: 'green' },
     { id: 'footer', title: 'ส่วนท้ายเว็บไซต์', icon: 'vertical_align_bottom', color: 'green' },
   ],
   resources: [
     { id: 'header', title: 'ส่วนหัวเว็บไซต์', icon: 'web_asset', color: 'green' },
-    { id: 'resourcesHero', title: 'ส่วนต้อนรับ', icon: 'menu_book', color: 'green' },
+    { id: 'resourcesHero', title: 'หัวข้อคลังความรู้', icon: 'menu_book', color: 'green' },
     { id: 'resourcesList', title: 'รายการบทความ', icon: 'article', color: 'green' },
     { id: 'footer', title: 'ส่วนท้ายเว็บไซต์', icon: 'vertical_align_bottom', color: 'green' },
   ],
   about: [
     { id: 'header', title: 'ส่วนหัวเว็บไซต์', icon: 'web_asset', color: 'green' },
-    { id: 'aboutHero', title: 'ส่วนต้อนรับ', icon: 'info', color: 'green' },
-    { id: 'aboutMission', title: 'พันธกิจองค์กร', icon: 'flag', color: 'green' },
+    { id: 'aboutHero', title: 'หัวข้อเกี่ยวกับเรา', icon: 'info', color: 'green' },
+    { id: 'aboutMission', title: 'เป้าหมายและวิสัยทัศน์', icon: 'flag', color: 'green' },
     { id: 'footer', title: 'ส่วนท้ายเว็บไซต์', icon: 'vertical_align_bottom', color: 'green' },
   ],
 };
+
+export const PAGE_SECTIONS_EN: Record<ActivePage, SectionNavItem[]> = {
+  home: [
+    { id: 'header', title: 'Header', icon: 'web_asset', color: 'green' },
+    { id: 'hero', title: 'Hero', icon: 'auto_awesome', color: 'green' },
+    { id: 'benefits', title: 'Benefits', icon: 'verified', color: 'green' },
+    {
+      id: 'activityFormats',
+      title: 'Activity Formats',
+      icon: 'dashboard_customize',
+      color: 'green',
+    },
+    { id: 'gallery', title: 'Gallery & Certificates', icon: 'workspace_premium', color: 'green' },
+    { id: 'activityGallery', title: 'Activity Gallery', icon: 'photo_library', color: 'green' },
+    { id: 'quiz', title: 'Quiz', icon: 'quiz', color: 'green' },
+    { id: 'branches', title: 'Our Branches', icon: 'storefront', color: 'green' },
+    { id: 'cta', title: 'CTA Registration', icon: 'app_registration', color: 'green' },
+    { id: 'footer', title: 'Footer', icon: 'vertical_align_bottom', color: 'green' },
+  ],
+  promotions: [
+    { id: 'header', title: 'Header', icon: 'web_asset', color: 'green' },
+    { id: 'promotionsHero', title: 'Promotions Hero', icon: 'local_offer', color: 'green' },
+    { id: 'promotionsList', title: 'Promotions List', icon: 'view_list', color: 'green' },
+    { id: 'promotionsCta', title: 'Promotions Contact', icon: 'campaign', color: 'green' },
+    { id: 'footer', title: 'Footer', icon: 'vertical_align_bottom', color: 'green' },
+  ],
+  courses: [
+    { id: 'header', title: 'Header', icon: 'web_asset', color: 'green' },
+    { id: 'coursesHero', title: 'Courses Hero', icon: 'school', color: 'green' },
+    { id: 'coursesList', title: 'Courses List', icon: 'grid_view', color: 'green' },
+    { id: 'footer', title: 'Footer', icon: 'vertical_align_bottom', color: 'green' },
+  ],
+  resources: [
+    { id: 'header', title: 'Header', icon: 'web_asset', color: 'green' },
+    { id: 'resourcesHero', title: 'Resources Hero', icon: 'menu_book', color: 'green' },
+    { id: 'resourcesList', title: 'Resources List', icon: 'article', color: 'green' },
+    { id: 'footer', title: 'Footer', icon: 'vertical_align_bottom', color: 'green' },
+  ],
+  about: [
+    { id: 'header', title: 'Header', icon: 'web_asset', color: 'green' },
+    { id: 'aboutHero', title: 'About Hero', icon: 'info', color: 'green' },
+    { id: 'aboutMission', title: 'Mission & Vision', icon: 'flag', color: 'green' },
+    { id: 'footer', title: 'Footer', icon: 'vertical_align_bottom', color: 'green' },
+  ],
+};
+
+export function getFallbackNavSections(
+  page: ActivePage,
+  locale: EditorLocale = 'th-TH',
+): SectionNavItem[] {
+  const source = locale === 'en-US' ? PAGE_SECTIONS_EN : PAGE_SECTIONS;
+  const sections = source[page] || source.home;
+  return sections.map((s) => ({ ...s }));
+}

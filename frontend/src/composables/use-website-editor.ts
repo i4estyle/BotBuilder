@@ -16,6 +16,7 @@ import {
   IMAGE_BLOCK_SIZES,
   getDefaultImageSrcs,
   AVAILABLE_ICONS,
+  getFallbackNavSections,
 } from './website-editor/defaults';
 import {
   contentState,
@@ -146,10 +147,17 @@ function syncStateObjects(
 
 export function useWebsiteEditor() {
   const fetchPageData = async (pageName?: string, locale?: string): Promise<void> => {
-    const targetPage = pageName || activePage.value || 'home';
+    const targetPage: ActivePage = (pageName as ActivePage) || activePage.value || 'home';
     const targetLocale = (locale || editorLocale.value || 'th-TH') as EditorLocale;
     isLoading.value = true;
     error.value = null;
+
+    if (activePage.value !== targetPage) {
+      activePage.value = targetPage;
+    }
+    const initialSections = getFallbackNavSections(targetPage, targetLocale);
+    navSections.splice(0, navSections.length, ...initialSections);
+    syncActiveContentToTarget(contentStateMap[targetLocale]);
 
     try {
       const data = await pageSectionsApiService.getPageData(targetPage, targetLocale);
@@ -185,7 +193,11 @@ export function useWebsiteEditor() {
         }, 100);
       }
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch page data';
+      error.value =
+        err instanceof Error ? err.message : 'Database unavailable, using fallback mock';
+      const fallback = getFallbackNavSections(targetPage, targetLocale);
+      navSections.splice(0, navSections.length, ...fallback);
+      syncActiveContentToTarget(contentStateMap[targetLocale]);
     } finally {
       isLoading.value = false;
     }

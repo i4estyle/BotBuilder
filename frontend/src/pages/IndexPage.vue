@@ -2,10 +2,8 @@
   <q-page class="landing-page">
     <main ref="pageRoot">
       <template v-for="item in navSections" :key="item.id">
-        <!-- Header -->
         <SiteHeader v-if="item.id === 'header'" />
 
-        <!-- Hero -->
         <section v-else-if="item.id === 'hero'" class="hero" id="about">
           <div class="hero__image-frame">
             <div class="hero__image-inner" :style="getStyleOverride('hero.image')">
@@ -63,7 +61,6 @@
           <AdminSectionBlockLayer section-id="hero" />
         </section>
 
-        <!-- Benefits -->
         <section v-else-if="item.id === 'benefits'" class="benefits section section--muted">
           <SectionHeading
             :title="benefitsData.heading"
@@ -90,7 +87,6 @@
           <AdminSectionBlockLayer section-id="benefits" />
         </section>
 
-        <!-- Activity Formats -->
         <section v-else-if="item.id === 'activityFormats'" class="section" id="activity-formats">
           <SectionHeading
             :title="activityFormatsData.heading"
@@ -100,7 +96,6 @@
           <AdminSectionBlockLayer section-id="activityFormats" />
         </section>
 
-        <!-- Gallery -->
         <section
           v-else-if="item.id === 'gallery'"
           class="gallery section section--muted"
@@ -130,7 +125,6 @@
           <AdminSectionBlockLayer section-id="gallery" />
         </section>
 
-        <!-- Activity Gallery -->
         <section
           v-else-if="item.id === 'activityGallery'"
           class="section activity-gallery"
@@ -183,7 +177,6 @@
           <AdminSectionBlockLayer section-id="activityGallery" />
         </section>
 
-        <!-- Quiz -->
         <section v-else-if="item.id === 'quiz'" class="quiz section" data-reveal>
           <q-icon name="quiz" class="quiz__icon" :style="getStyleOverride('quiz.icon')" />
           <h2 :style="getStyleOverride('quiz.heading')">{{ quizData.heading }}</h2>
@@ -194,7 +187,6 @@
           <AdminSectionBlockLayer section-id="quiz" />
         </section>
 
-        <!-- Branches -->
         <section v-else-if="item.id === 'branches'" class="section branches">
           <SectionHeading
             :title="branchesData.heading"
@@ -240,12 +232,14 @@
                   <a :href="`tel:${branch.phone.replace(/-/g, '')}`" class="branch-card__phone">
                     <q-icon name="phone" />
                     <span
-                      >โทร.
+                      >{{ editorLocale === 'th-TH' ? 'โทร. ' : 'Tel. ' }}
                       <span :style="getStyleOverride(`branches.items.${index}.phone`)">{{
                         branch.phone
                       }}</span>
-                      (<span :style="getStyleOverride(`branches.items.${index}.contactName`)"
-                        >ครู{{ branch.contactName }}</span
+                      ({{ editorLocale === 'th-TH' ? 'ครู' : 'Teacher '
+                      }}<span :style="getStyleOverride(`branches.items.${index}.contactName`)">{{
+                        branch.contactName
+                      }}</span
                       >)</span
                     >
                   </a>
@@ -256,7 +250,6 @@
           <AdminSectionBlockLayer section-id="branches" />
         </section>
 
-        <!-- CTA -->
         <section v-else-if="item.id === 'cta'" class="cta" id="contact" data-reveal>
           <div class="cta__dots" />
           <h2 :style="getStyleOverride('cta.heading')">{{ ctaData.heading }}</h2>
@@ -267,10 +260,8 @@
           <AdminSectionBlockLayer section-id="cta" />
         </section>
 
-        <!-- Footer -->
         <SiteFooter v-else-if="item.id === 'footer'" />
 
-        <!-- Custom Page Block -->
         <section
           v-else-if="item.isCustomPage"
           :id="item.id"

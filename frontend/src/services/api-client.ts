@@ -17,7 +17,6 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Set by the auth store on init to react to 401s without a circular import.
 let onUnauthorized: (() => void) | null = null;
 
 export function registerUnauthorizedHandler(handler: () => void): void {
