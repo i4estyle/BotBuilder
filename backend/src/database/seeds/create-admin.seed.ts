@@ -68,6 +68,20 @@ async function run(): Promise<void> {
       );
       console.log(`Created admin user ${email} (USER_ID: ${userId}).`);
     }
+    await connection.execute(
+      "INSERT IGNORE INTO BB_ROLE (ROLE_ID, ROLE_NAME) VALUES ('ADMIN', 'admin'), ('USER', 'user')",
+    );
+    const [adminRows] = await connection.execute(
+      'SELECT USER_ID FROM BB_USER WHERE USER_EMAIL = ? LIMIT 1',
+      [email],
+    );
+    const adminUserId = (adminRows as Array<{ USER_ID: string }>)[0]?.USER_ID;
+    if (adminUserId) {
+      await connection.execute(
+        "INSERT INTO BB_USER_ROLE (USER_ID, ROLE_ID) SELECT ?, 'ADMIN' WHERE NOT EXISTS (SELECT 1 FROM BB_USER_ROLE WHERE USER_ID = ? AND ROLE_ID = 'ADMIN')",
+        [adminUserId, adminUserId],
+      );
+    }
   } finally {
     await connection.end();
   }

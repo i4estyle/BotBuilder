@@ -29,6 +29,11 @@ export class CreateUserDto {
   @MaxLength(15)
   userPhone!: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(20)
+  guardianRelation!: string;
+
   @IsEmail()
   @IsNotEmpty()
   @MaxLength(100)

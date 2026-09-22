@@ -85,6 +85,44 @@ body {
 .site-header__menu {
   display: none;
 }
+.site-header__auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.site-header__auth-btn {
+  min-height: 40px;
+  border-radius: 10px;
+  padding: 0 18px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+.site-header__auth-btn:hover {
+  transform: translateY(-1px);
+}
+.site-header__auth-btn--login,
+.site-header__auth-btn--logout {
+  color: #fff;
+  background: linear-gradient(135deg, var(--green), var(--bright-green));
+  box-shadow: 0 4px 10px rgba(0, 108, 12, 0.22);
+}
+.site-header__auth-btn--login:hover,
+.site-header__auth-btn--logout:hover {
+  box-shadow: 0 6px 14px rgba(0, 108, 12, 0.3);
+}
+.site-header__auth-btn--admin {
+  color: var(--green);
+  background: #fff;
+  border-color: var(--green);
+}
+.site-header__auth-btn--admin:hover {
+  background: #edf8ee;
+}
 .section {
   position: relative;
   padding: 80px 5%;

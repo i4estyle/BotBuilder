@@ -4,11 +4,21 @@ export interface AuthUser {
   userId: string;
   userEmail: string;
   userName: string;
+  roles: string[];
 }
 
 export interface LoginResponse {
   accessToken: string;
   user: AuthUser;
+}
+
+export interface RegisterPayload {
+  userName: string;
+  userEmail: string;
+  userPhone: string;
+  guardianRelation: 'FATHER' | 'MOTHER' | 'GUARDIAN' | 'OTHER';
+  password: string;
+  childAccessCode: string;
 }
 
 export const authApiService = {
@@ -17,6 +27,10 @@ export const authApiService = {
       userEmail,
       password,
     });
+    return data;
+  },
+  async register(payload: RegisterPayload): Promise<LoginResponse> {
+    const { data } = await apiClient.post<LoginResponse>('/auth/register', payload);
     return data;
   },
 

@@ -47,16 +47,52 @@
       </button>
     </div>
 
+    <q-btn
+      v-if="!authStore.isAuthenticated"
+      to="/login"
+      unelevated
+      label="เข้าสู่ระบบ"
+      no-caps
+      class="site-header__auth-btn site-header__auth-btn--login"
+    />
+    <div v-else class="site-header__auth-actions">
+      <q-btn
+        v-if="authStore.isAdmin"
+        to="/admin"
+        outline
+        icon="settings"
+        label="จัดการเว็บไซต์"
+        no-caps
+        class="site-header__auth-btn site-header__auth-btn--admin"
+      />
+      <q-btn
+        unelevated
+        icon="logout"
+        label="ออกจากระบบ"
+        no-caps
+        class="site-header__auth-btn site-header__auth-btn--logout"
+        @click="handleLogout"
+      />
+    </div>
+
     <q-btn flat round dense icon="menu" class="site-header__menu" aria-label="Open menu" />
     <AdminSectionBlockLayer section-id="header" />
   </header>
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 import AdminSectionBlockLayer from '@/components/admin/sections/common/admin-section-block-layer.vue';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
 import { resolveAssetUrl } from '@/utils/asset-helper';
+import { useAuthStore } from '@/stores/auth-store';
 
 const { header: headerData, editorLocale, setEditorLocale, getStyleOverride } = useWebsiteEditor();
+const authStore = useAuthStore();
+const router = useRouter();
+
+function handleLogout(): void {
+  authStore.logout();
+  void router.replace('/login');
+}
 </script>

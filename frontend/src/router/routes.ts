@@ -19,10 +19,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/LoginPage.vue'),
     meta: { guestOnly: true },
   },
+  { path: '/register', component: () => import('@/pages/RegisterPage.vue'), meta: { guestOnly: true } },
   {
     path: '/admin',
     component: () => import('@/layouts/admin-layout.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, requiresAdmin: true },
     children: [
       { path: '', redirect: '/admin/website' },
       {

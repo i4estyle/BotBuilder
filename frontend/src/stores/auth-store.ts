@@ -1,5 +1,5 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
-import { authApiService, type AuthUser } from '@/services/auth-api.service';
+import { authApiService, type AuthUser, type RegisterPayload } from '@/services/auth-api.service';
 import { registerUnauthorizedHandler } from '@/services/api-client';
 
 const TOKEN_STORAGE_KEY = 'bb_auth_token';
@@ -23,6 +23,7 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isAuthenticated: (state) => Boolean(state.token),
+    isAdmin: (state) => state.user?.roles?.includes('admin') ?? false,
   },
 
   actions: {
@@ -30,6 +31,12 @@ export const useAuthStore = defineStore('auth', {
       const { accessToken, user } = await authApiService.login(userEmail, password);
       this.token = accessToken;
       this.user = user;
+      localStorage.setItem(TOKEN_STORAGE_KEY, accessToken);
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+    },
+    async register(payload: RegisterPayload): Promise<void> {
+      const { accessToken, user } = await authApiService.register(payload);
+      this.token = accessToken; this.user = user;
       localStorage.setItem(TOKEN_STORAGE_KEY, accessToken);
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
     },

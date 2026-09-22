@@ -21,6 +21,7 @@ import { BulkSavePageSectionsDto } from './dto/bulk-save-page-sections.dto.js';
 import { PageSectionQueryDto } from './dto/page-section-query.dto.js';
 import { PageSection } from './entities/page-section.entity.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { AdminGuard } from '../auth/guards/admin.guard.js';
 
 @ApiTags('PageSections')
 @Controller('page-sections')
@@ -50,7 +51,7 @@ export class PageSectionsController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a single section record' })
   async create(
@@ -60,7 +61,7 @@ export class PageSectionsController {
   }
 
   @Post('bulk-save')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Bulk save all page builder sections atomically' })
   async bulkSave(
@@ -70,7 +71,7 @@ export class PageSectionsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update single section record by ID' })
   async update(
@@ -81,7 +82,7 @@ export class PageSectionsController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Soft delete single section record by ID' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<PageSection> {

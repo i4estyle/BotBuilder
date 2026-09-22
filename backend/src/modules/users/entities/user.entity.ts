@@ -32,25 +32,37 @@ export class User {
     name: 'NETIONAL_ID',
     type: 'char',
     length: 13,
+    nullable: true,
     comment: 'เลขบัตรประชาชน',
   })
-  netionalId!: string;
+  netionalId?: string | null;
 
   @Column({
     name: 'USER_ADDRESS',
     type: 'varchar',
     length: 255,
+    nullable: true,
     comment: 'ที่อยู่',
   })
-  userAddress!: string;
+  userAddress?: string | null;
 
   @Column({
     name: 'USER_PHONE',
     type: 'varchar',
     length: 15,
+    nullable: true,
     comment: 'เบอร์โทรศัพท์',
   })
-  userPhone!: string;
+  userPhone?: string | null;
+
+  @Column({
+    name: 'GUARDIAN_RELATION',
+    type: 'varchar',
+    length: 20,
+    nullable: true,
+    comment: 'ความสัมพันธ์กับเด็ก',
+  })
+  guardianRelation?: string | null;
 
   @Column({
     name: 'USER_EMAIL',
@@ -59,6 +71,9 @@ export class User {
     comment: 'อีเมล',
   })
   userEmail!: string;
+
+  @Column({ name: 'CHILD_ACCESS_CODE', type: 'char', length: 8, nullable: true })
+  childAccessCode?: string | null;
 
   @Column({
     name: 'USER_STATUS',
