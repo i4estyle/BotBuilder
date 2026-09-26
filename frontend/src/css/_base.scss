@@ -105,8 +105,8 @@ body {
 .site-header__auth-btn:hover {
   transform: translateY(-1px);
 }
-.site-header__auth-btn--login,
-.site-header__auth-btn--logout {
+.site-header .site-header__auth-btn--login,
+.site-header .site-header__auth-btn--logout {
   color: #fff;
   background: linear-gradient(135deg, var(--green), var(--bright-green));
   box-shadow: 0 4px 10px rgba(0, 108, 12, 0.22);
@@ -115,12 +115,14 @@ body {
 .site-header__auth-btn--logout:hover {
   box-shadow: 0 6px 14px rgba(0, 108, 12, 0.3);
 }
-.site-header__auth-btn--admin {
+.site-header__auth-btn--admin,
+.site-header__auth-btn--parent-form {
   color: var(--green);
   background: #fff;
   border-color: var(--green);
 }
-.site-header__auth-btn--admin:hover {
+.site-header__auth-btn--admin:hover,
+.site-header__auth-btn--parent-form:hover {
   background: #edf8ee;
 }
 .section {

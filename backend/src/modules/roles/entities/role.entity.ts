@@ -15,6 +15,7 @@ export class Role {
     name: 'ROLE_NAME',
     type: 'varchar',
     length: 50,
+    unique: true,
     comment: 'ชื่อบทบาท',
   })
   roleName!: string;

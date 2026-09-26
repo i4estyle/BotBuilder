@@ -2,7 +2,6 @@ import {
   ConflictException,
   Injectable,
   UnauthorizedException,
-  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -41,7 +40,9 @@ export class AuthService {
       .addSelect('user.passwordHash')
       .leftJoinAndSelect('user.userRoles', 'userRoles')
       .leftJoinAndSelect('userRoles.role', 'role')
-      .where('user.userEmail = :userEmail', { userEmail: dto.userEmail })
+      .where('user.loginName = :loginName OR user.userEmail = :loginName', {
+        loginName: dto.loginName,
+      })
       .getOne();
 
     if (!user || !user.passwordHash) {
@@ -64,29 +65,24 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto): Promise<LoginResult> {
-    const [emailExists, childAccessCode] = await Promise.all([
-      this.usersRepository.exists({ where: { userEmail: dto.userEmail } }),
-      this.childAccessCodesRepository.findOneBy({
-        accessCode: dto.childAccessCode.toUpperCase(),
-        isActive: true,
-      }),
-    ]);
-    if (emailExists) throw new ConflictException('Email already exists');
-    if (!childAccessCode)
-      throw new BadRequestException('Invalid child access code');
+    const loginNameExists = await this.usersRepository.exists({
+      where: { loginName: dto.loginName },
+    });
+    if (loginNameExists) throw new ConflictException('Username already exists');
     let userId = this.generateUserId();
     while (await this.usersRepository.exists({ where: { userId } }))
       userId = this.generateUserId();
     const user = await this.usersRepository.save(
       this.usersRepository.create({
         userId,
-        userName: dto.userName,
-        userEmail: dto.userEmail,
-        childAccessCode: childAccessCode.accessCode,
+        userName: dto.loginName,
+        loginName: dto.loginName,
+        userEmail: null,
+        childAccessCode: null,
         netionalId: null,
         userAddress: null,
-        userPhone: dto.userPhone?.trim() || null,
-        guardianRelation: dto.guardianRelation,
+        userPhone: null,
+        guardianRelation: null,
         userStatus: UserStatus.ACTIVE,
         passwordHash: await bcrypt.hash(dto.password, 10),
       }),
@@ -124,7 +120,7 @@ export class AuthService {
   private toAuthenticatedUser(user: User): AuthenticatedUser {
     return {
       userId: user.userId,
-      userEmail: user.userEmail,
+      userEmail: user.userEmail ?? null,
       userName: user.userName,
       roles: (user.userRoles ?? []).map((item) =>
         (item.role?.roleName ?? item.roleId).toLowerCase(),
@@ -132,10 +128,7 @@ export class AuthService {
     };
   }
   private async createLoginResult(user: User): Promise<LoginResult> {
-    const accessToken = await this.jwtService.signAsync({
-      sub: user.userId,
-      userEmail: user.userEmail,
-    });
+    const accessToken = await this.jwtService.signAsync({ sub: user.userId });
     return { accessToken, user: this.toAuthenticatedUser(user) };
   }
 }

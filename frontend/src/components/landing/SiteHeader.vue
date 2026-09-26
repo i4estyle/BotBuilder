@@ -51,11 +51,22 @@
       v-if="!authStore.isAuthenticated"
       to="/login"
       unelevated
+      icon="login"
       label="เข้าสู่ระบบ"
       no-caps
       class="site-header__auth-btn site-header__auth-btn--login"
     />
     <div v-else class="site-header__auth-actions">
+      <q-btn
+        href="https://i6uy4szve2.zite.so/registration"
+        target="_blank"
+        rel="noopener noreferrer"
+        outline
+        icon="assignment"
+        label="กรอกข้อมูลผู้ปกครอง"
+        no-caps
+        class="site-header__auth-btn site-header__auth-btn--parent-form"
+      />
       <q-btn
         v-if="authStore.isAdmin"
         to="/admin"

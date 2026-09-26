@@ -17,10 +17,11 @@ import { CreateUserRoleDto } from './dto/create-user-role.dto.js';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto.js';
 import { UserRole } from './entities/user-role.entity.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { AdminGuard } from '../auth/guards/admin.guard.js';
 
 @ApiTags('UserRoles')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('user-roles')
 export class UserRolesController {
   constructor(private readonly userRolesService: UserRolesService) {}

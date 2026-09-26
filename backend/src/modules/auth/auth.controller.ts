@@ -13,7 +13,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @ApiOperation({ summary: 'Log in with email and password' })
+  @ApiOperation({ summary: 'Log in with username and password' })
   async login(@Body() loginDto: LoginDto): Promise<LoginResult> {
     return this.authService.login(loginDto);
   }

@@ -29,6 +29,15 @@ export class User {
   userName!: string;
 
   @Column({
+    name: 'LOGIN_NAME',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+    unique: true,
+  })
+  loginName?: string | null;
+
+  @Column({
     name: 'NETIONAL_ID',
     type: 'char',
     length: 13,
@@ -68,11 +77,17 @@ export class User {
     name: 'USER_EMAIL',
     type: 'varchar',
     length: 100,
+    nullable: true,
     comment: 'อีเมล',
   })
-  userEmail!: string;
+  userEmail?: string | null;
 
-  @Column({ name: 'CHILD_ACCESS_CODE', type: 'char', length: 8, nullable: true })
+  @Column({
+    name: 'CHILD_ACCESS_CODE',
+    type: 'char',
+    length: 8,
+    nullable: true,
+  })
   childAccessCode?: string | null;
 
   @Column({
