@@ -9,6 +9,7 @@ import { PageSectionsModule } from './modules/page-sections/page-sections.module
 import { UploadsModule } from './modules/uploads/uploads.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { ChildAccessCodesModule } from './modules/child-access-codes/child-access-codes.module.js';
+import { GoogleSheetsModule } from './modules/google-sheets/google-sheets.module.js';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ChildAccessCodesModule } from './modules/child-access-codes/child-acces
     }),
     AuthModule,
     ChildAccessCodesModule,
+    GoogleSheetsModule,
     UsersModule,
     RolesModule,
     UserRolesModule,

@@ -35,3 +35,8 @@ pnpm-debug.log*
 
 # Local project memory / scratch notes (do not push)
 /memory/
+
+# Google service account keys
+credentials/
+*service-account*.json
+

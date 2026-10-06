@@ -12,6 +12,8 @@ const routes: RouteRecordRaw[] = [
       { path: 'resources', component: () => import('@/pages/ResourcesPage.vue') },
       { path: 'about-us', component: () => import('@/pages/AboutPage.vue') },
       { path: 'second', component: () => import('@/pages/SecondPage.vue') },
+      { path: 'evaluations', component: () => import('@/pages/EvaluationDashboardPage.vue') },
+      { path: 'report', component: () => import('@/pages/admin-report-page.vue') },
     ],
   },
   {
@@ -29,6 +31,14 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'website',
         component: () => import('@/pages/admin-website-page.vue'),
+      },
+      {
+        path: 'evaluations',
+        component: () => import('@/pages/EvaluationDashboardPage.vue'),
+      },
+      {
+        path: 'report',
+        component: () => import('@/pages/admin-report-page.vue'),
       },
     ],
   },
