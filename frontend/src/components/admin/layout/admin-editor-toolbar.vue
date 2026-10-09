@@ -164,7 +164,7 @@ const {
 } = useWebsiteEditor();
 
 function handleLogout(): void {
-  authStore.logout();
+  void authStore.logout();
   void router.replace('/login');
 }
 

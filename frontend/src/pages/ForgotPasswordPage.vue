@@ -1,0 +1,6 @@
+<template><div class="login-page flex flex-center"><q-card class="login-card"><div class="login-card__brand"><h1 class="login-card__title">ลืมรหัสผ่าน</h1><p class="login-card__subtitle">เราจะส่งลิงก์รีเซ็ตรหัสผ่านไปยังอีเมลของคุณ</p></div><q-form class="login-card__form" @submit.prevent="submit"><q-input v-model="email" type="email" label="อีเมล" outlined :rules="[required]" /><q-banner v-if="message" dense rounded class="bg-positive text-white">{{ message }}</q-banner><q-btn type="submit" unelevated no-caps label="ส่งลิงก์รีเซ็ต" :loading="loading" class="login-card__submit" /><p class="login-card__switch"><RouterLink to="/login">กลับไปเข้าสู่ระบบ</RouterLink></p></q-form></q-card></div></template>
+<script setup lang="ts">
+import { ref } from 'vue'; import { RouterLink } from 'vue-router'; import { authApiService } from '@/services/auth-api.service';
+const email = ref(''); const loading = ref(false); const message = ref(''); const required = (v: string) => !!v || 'กรุณากรอกอีเมล';
+async function submit(): Promise<void> { loading.value = true; try { await authApiService.forgotPassword(email.value); message.value = 'หากมีบัญชีนี้ ระบบได้ส่งลิงก์ให้แล้ว'; } finally { loading.value = false; } }
+</script>

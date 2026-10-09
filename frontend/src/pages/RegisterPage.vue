@@ -10,6 +10,9 @@
         <q-input v-model="loginName" label="ชื่อผู้ใช้งาน" outlined dense maxlength="50" :disable="loading" :rules="[loginNameRule]">
           <template #prepend><q-icon name="person" /></template>
         </q-input>
+        <q-input v-model="email" type="email" label="อีเมล" outlined dense maxlength="100" :disable="loading" :rules="[emailRule]">
+          <template #prepend><q-icon name="email" /></template>
+        </q-input>
         <q-input v-model="password" :type="showPassword ? 'text' : 'password'" label="รหัสผ่าน (อย่างน้อย 8 ตัวอักษร)" outlined dense :disable="loading" :rules="[passwordRule]">
           <template #prepend><q-icon name="lock" /></template>
           <template #append><q-icon :name="showPassword ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="showPassword = !showPassword" /></template>
@@ -36,6 +39,7 @@ import { useAuthStore } from '@/stores/auth-store';
 const router = useRouter();
 const auth = useAuthStore();
 const loginName = ref('');
+const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const showPassword = ref(false);
@@ -43,16 +47,16 @@ const showConfirmPassword = ref(false);
 const loading = ref(false);
 const errorMessage = ref('');
 const loginNameRule = (value: string) => /^[A-Za-z0-9]{3,50}$/.test(value) || 'ใช้ตัวอักษรภาษาอังกฤษหรือตัวเลข 3–50 ตัว';
+const emailRule = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || 'กรุณากรอกอีเมลให้ถูกต้อง';
 const passwordRule = (value: string) => value.length >= 8 || 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร';
 const confirmPasswordRule = (value: string) => value === password.value || 'รหัสผ่านไม่ตรงกัน';
 
 async function submit(): Promise<void> {
-  if (!/^[A-Za-z0-9]{3,50}$/.test(loginName.value) || password.value.length < 8 || password.value !== confirmPassword.value) return;
+  if (!/^[A-Za-z0-9]{3,50}$/.test(loginName.value) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value) || password.value.length < 8 || password.value !== confirmPassword.value) return;
   loading.value = true;
   errorMessage.value = '';
   try {
-    await auth.register({ loginName: loginName.value, password: password.value });
-    auth.logout();
+    await auth.register({ loginName: loginName.value, email: email.value, password: password.value });
     await router.replace('/login');
   } catch (error) {
     errorMessage.value = axios.isAxiosError(error) && error.response?.status === 409 ? 'ชื่อผู้ใช้งานนี้ถูกใช้แล้ว' : 'สร้างบัญชีไม่สำเร็จ กรุณาลองใหม่';

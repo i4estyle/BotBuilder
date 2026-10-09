@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService } from '../auth.service.js';
 import type {
-  AuthenticatedUser,
+  AuthenticatedAdmin,
   JwtPayload,
 } from '../interfaces/jwt-payload.interface.js';
 
@@ -23,11 +23,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload): Promise<AuthenticatedUser> {
-    const user = await this.authService.validateUserById(payload.sub);
-    if (!user) {
+  async validate(payload: JwtPayload): Promise<AuthenticatedAdmin> {
+    const admin = await this.authService.validateAdminById(payload.sub, payload.ver);
+    if (!admin) {
       throw new UnauthorizedException('บัญชีผู้ใช้ไม่ถูกต้องหรือถูกระงับ');
     }
-    return user;
+    return admin;
   }
 }

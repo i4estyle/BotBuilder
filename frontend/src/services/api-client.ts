@@ -7,6 +7,7 @@ const TOKEN_STORAGE_KEY = 'bb_auth_token';
 export const apiClient = axios.create({
   baseURL: `${API_BASE_URL}/api`,
   timeout: 15000,
+  withCredentials: true,
 });
 
 apiClient.interceptors.request.use((config) => {

@@ -1,4 +1,5 @@
 import {
+  IsEmail,
   IsAlphanumeric,
   IsNotEmpty,
   IsString,
@@ -15,6 +16,9 @@ export class RegisterDto {
   @MinLength(3)
   @MaxLength(50)
   loginName!: string;
+  @IsEmail()
+  @MaxLength(100)
+  email!: string;
   @IsString()
   @MinLength(8)
   @MaxLength(255)

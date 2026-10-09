@@ -108,6 +108,12 @@ export class User {
   })
   passwordHash?: string | null;
 
+  @Column({ name: 'AUTH_VERSION', type: 'int', default: 0 })
+  authVersion!: number;
+
+  @Column({ name: 'EMAIL_VERIFIED_AT', type: 'timestamp', nullable: true })
+  emailVerifiedAt?: Date | null;
+
   @CreateDateColumn({
     name: 'CREATED_AT',
     type: 'timestamp',

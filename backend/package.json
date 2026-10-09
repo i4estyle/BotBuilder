@@ -35,6 +35,7 @@
     "class-validator": "^0.15.1",
     "googleapis": "^183.0.0",
     "mysql2": "^3.23.0",
+    "nodemailer": "^10.0.16",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",

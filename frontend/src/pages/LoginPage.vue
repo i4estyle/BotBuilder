@@ -12,6 +12,7 @@
         <q-banner v-if="errorMessage" dense rounded class="login-card__error">{{ errorMessage }}</q-banner>
         <q-btn type="submit" icon="login" unelevated no-caps label="เข้าสู่ระบบ" :loading="loading" class="login-card__submit" />
         <p class="login-card__switch">ยังไม่มีบัญชี? <RouterLink to="/register">สร้างบัญชี</RouterLink></p>
+        <p class="login-card__switch"><RouterLink to="/forgot-password">ลืมรหัสผ่าน?</RouterLink></p>
       </q-form>
     </q-card>
   </div>

@@ -4,52 +4,56 @@
       <template v-for="item in navSections" :key="item.id">
         <SiteHeader v-if="item.id === 'header'" />
 
-        <section v-else-if="item.id === 'hero'" class="hero" id="about">
-          <div class="hero__copy" data-reveal>
-            <p class="hero__kicker">Robotics Design Studio for Kids</p>
-            <h1>
-              <span :style="getStyleOverride('hero.titleHighlight')">{{
-                heroData.titleHighlight
-              }}</span
-              ><span :style="getStyleOverride('hero.titleRest')">{{ heroData.titleRest }}</span>
-            </h1>
-            <p :style="getStyleOverride('hero.paragraph')">{{ heroData.paragraph }}</p>
-            <div class="hero__actions">
-              <AppButton
-                href="https://line.me/R/ti/p/@botbuilderthailand"
-                class="app-button--stacked"
-              >
-                <span :style="getStyleOverride('hero.ctaLabel')">{{ heroData.ctaLabel }}</span
-                ><span :style="getStyleOverride('hero.ctaBangsaen')">{{
-                  heroData.ctaBangsaen
-                }}</span>
-              </AppButton>
-              <AppButton
-                variant="outline"
-                href="https://line.me/R/ti/p/@botbuilderthailand"
-                class="app-button--stacked"
-              >
-                <span :style="getStyleOverride('hero.ctaLabel')">{{ heroData.ctaLabel }}</span
-                ><span :style="getStyleOverride('hero.ctaSriracha')">{{
-                  heroData.ctaSriracha
-                }}</span>
-              </AppButton>
+        <template v-else-if="item.id === 'hero'">
+          <section class="hero" id="about">
+            <div class="hero__copy" data-reveal>
+              <p class="hero__kicker">Robotics Design Studio for Kids</p>
+              <h1>
+                <span :style="getStyleOverride('hero.titleHighlight')">{{
+                  heroData.titleHighlight
+                }}</span
+                ><span :style="getStyleOverride('hero.titleRest')">{{ heroData.titleRest }}</span>
+              </h1>
+              <p :style="getStyleOverride('hero.paragraph')">{{ heroData.paragraph }}</p>
+              <div class="hero__actions">
+                <AppButton
+                  href="https://line.me/R/ti/p/@botbuilderthailand"
+                  class="app-button--stacked"
+                >
+                  <span :style="getStyleOverride('hero.ctaLabel')">{{ heroData.ctaLabel }}</span
+                  ><span :style="getStyleOverride('hero.ctaBangsaen')">{{
+                    heroData.ctaBangsaen
+                  }}</span>
+                </AppButton>
+                <AppButton
+                  variant="outline"
+                  href="https://line.me/R/ti/p/@botbuilderthailand"
+                  class="app-button--stacked"
+                >
+                  <span :style="getStyleOverride('hero.ctaLabel')">{{ heroData.ctaLabel }}</span
+                  ><span :style="getStyleOverride('hero.ctaSriracha')">{{
+                    heroData.ctaSriracha
+                  }}</span>
+                </AppButton>
+              </div>
             </div>
-          </div>
-          <div class="hero__image-frame">
-            <div class="hero__image-inner" :style="getStyleOverride('hero.image')">
-              <img :src="resolveAssetUrl(heroData.image)" :alt="heroData.imageAlt" />
-              <p class="hero__image-caption">พื้นที่ให้เด็กได้สร้าง ทดลอง และแก้ปัญหาด้วยตัวเอง</p>
+            <div class="hero__image-frame">
+              <div class="hero__image-inner" :style="getStyleOverride('hero.image')">
+                <img :src="resolveAssetUrl(heroData.image)" :alt="heroData.imageAlt" />
+                <p class="hero__image-caption">พื้นที่ให้เด็กได้สร้าง ทดลอง และแก้ปัญหาด้วยตัวเอง</p>
+              </div>
             </div>
-          </div>
+            <AdminSectionBlockLayer section-id="hero" />
+          </section>
           <div class="hero__brandline" aria-label="BotBuilder highlights">
-            <div><strong>Hands-on Learning</strong><span>สร้าง ทดลอง และเรียนรู้จากของจริง</span></div>
-            <div><strong>Age 3–16</strong><span>เส้นทางการเรียนรู้ตามวัยและทักษะ</span></div>
-            <div><strong>Build + Code</strong><span>เชื่อมการสร้าง กลไก และการเขียนโปรแกรม</span></div>
-            <div><strong>Think + Explain</strong><span>ฝึกคิด แก้ปัญหา และอธิบายสิ่งที่ทำ</span></div>
+            <div class="hero__brandline-grid">
+              <div><strong>Hands-on Learning</strong><span>สร้าง ทดลอง และเรียนรู้จากของจริง</span></div>
+              <div><strong>Age 3–16</strong><span>เส้นทางการเรียนรู้ตามวัยและทักษะ</span></div>
+              <div><strong>Build + Code</strong><span>เชื่อมการสร้าง กลไก และการเขียนโปรแกรม</span></div>
+              <div><strong>Think + Explain</strong><span>ฝึกคิด แก้ปัญหา และอธิบายสิ่งที่ทำ</span></div>
+            </div>
           </div>
-          <AdminSectionBlockLayer section-id="hero" />
-        </section>
+        </template>
 
         <section
           v-else-if="item.id === 'activityFormats'"

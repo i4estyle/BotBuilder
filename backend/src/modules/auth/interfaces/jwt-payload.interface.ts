@@ -1,10 +1,10 @@
 export interface JwtPayload {
   sub: string;
+  ver: number;
 }
 
-export interface AuthenticatedUser {
-  userId: string;
-  userEmail: string | null;
-  userName: string;
-  roles: string[];
+export interface AuthenticatedAdmin {
+  adminId: string;
+  email: string;
+  displayName: string;
 }

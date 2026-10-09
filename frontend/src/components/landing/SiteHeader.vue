@@ -58,6 +58,14 @@
     />
     <div v-else class="site-header__auth-actions">
       <q-btn
+        to="/account/password"
+        outline
+        icon="key"
+        label="เปลี่ยนรหัสผ่าน"
+        no-caps
+        class="site-header__auth-btn site-header__auth-btn--parent-form"
+      />
+      <q-btn
         href="https://i6uy4szve2.zite.so/registration"
         target="_blank"
         rel="noopener noreferrer"
@@ -103,7 +111,7 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 function handleLogout(): void {
-  authStore.logout();
+  void authStore.logout();
   void router.replace('/login');
 }
 </script>

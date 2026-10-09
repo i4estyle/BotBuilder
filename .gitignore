@@ -32,6 +32,7 @@ pnpm-debug.log*
 
 # local .env files
 .env*
+!.env.example
 
 # Local project memory / scratch notes (do not push)
 /memory/

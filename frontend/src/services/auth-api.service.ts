@@ -1,19 +1,19 @@
 import { apiClient } from './api-client';
 
-export interface AuthUser {
-  userId: string;
-  userEmail: string | null;
-  userName: string;
-  roles: string[];
+export interface AuthAdmin {
+  adminId: string;
+  email: string;
+  displayName: string;
 }
 
 export interface LoginResponse {
   accessToken: string;
-  user: AuthUser;
+  admin: AuthAdmin;
 }
 
 export interface RegisterPayload {
   loginName: string;
+  email: string;
   password: string;
 }
 
@@ -22,12 +22,17 @@ export const authApiService = {
     const { data } = await apiClient.post<LoginResponse>('/auth/login', { loginName, password });
     return data;
   },
-  async register(payload: RegisterPayload): Promise<LoginResponse> {
-    const { data } = await apiClient.post<LoginResponse>('/auth/register', payload);
+  async me(): Promise<AuthAdmin> {
+    const { data } = await apiClient.get<AuthAdmin>('/auth/me');
     return data;
   },
-  async me(): Promise<AuthUser> {
-    const { data } = await apiClient.get<AuthUser>('/auth/me');
+  async refresh(): Promise<LoginResponse> {
+    const { data } = await apiClient.post<LoginResponse>('/auth/refresh');
     return data;
   },
+  async logout(): Promise<void> { await apiClient.post('/auth/logout'); },
+  async forgotPassword(email: string): Promise<void> { await apiClient.post('/auth/forgot-password', { email }); },
+  async resetPassword(token: string, password: string): Promise<void> { await apiClient.post('/auth/reset-password', { token, password }); },
+  async verifyEmail(token: string): Promise<void> { await apiClient.post('/auth/verify-email', { token }); },
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> { await apiClient.post('/auth/change-password', { currentPassword, newPassword }); },
 };

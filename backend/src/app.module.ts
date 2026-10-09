@@ -2,9 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as path from 'path';
-import { UsersModule } from './modules/users/users.module.js';
-import { RolesModule } from './modules/roles/roles.module.js';
-import { UserRolesModule } from './modules/user-roles/user-roles.module.js';
 import { PageSectionsModule } from './modules/page-sections/page-sections.module.js';
 import { UploadsModule } from './modules/uploads/uploads.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
@@ -35,9 +32,6 @@ import { GoogleSheetsModule } from './modules/google-sheets/google-sheets.module
     AuthModule,
     ChildAccessCodesModule,
     GoogleSheetsModule,
-    UsersModule,
-    RolesModule,
-    UserRolesModule,
     PageSectionsModule,
     UploadsModule,
   ],

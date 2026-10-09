@@ -35,8 +35,9 @@ export default defineRouter((/* { store, ssrContext } */) => {
     history: createHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
   });
 
-  Router.beforeEach((to) => {
+  Router.beforeEach(async (to) => {
     const authStore = useAuthStore();
+    await authStore.initialize();
 
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
       return { path: '/login', query: { redirect: to.fullPath } };
