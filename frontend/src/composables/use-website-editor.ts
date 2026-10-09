@@ -120,11 +120,50 @@ function syncStateObjects(
   if (!source) return;
   if (source.header && typeof source.header === 'object')
     Object.assign(target.header, source.header);
-  if (source.hero && typeof source.hero === 'object') Object.assign(target.hero, source.hero);
+  if (source.hero && typeof source.hero === 'object') {
+    Object.assign(target.hero, source.hero);
+
+    // Apply the new Home hero copy when a saved page still contains the retired default copy.
+    // Custom editor content is intentionally left untouched.
+    if (target.hero.titleHighlight === 'เล่นและเรียนรู้ผ่านการทำจริง') {
+      Object.assign(target.hero, {
+        imageAlt: 'เด็ก ๆ กำลังทดลองเรียนรู้หุ่นยนต์ที่ BotBuilder',
+        titleHighlight: 'คิดเอง',
+        titleRest: 'สร้างเอง\nเขียนเอง\nอธิบายได้',
+        paragraph:
+          'BotBuilder เปลี่ยนการเรียนหุ่นยนต์จาก “ทำตามแบบ” ให้เป็นพื้นที่ที่เด็กได้สร้าง ทดลอง แก้ปัญหา และพัฒนาวิธีคิดของตัวเอง',
+        ctaLabel: 'จองรอบทดลองเรียนฟรี',
+        ctaBangsaen: 'สาขาบางแสน',
+        ctaSriracha: 'สาขาศรีราชา',
+      });
+    }
+  }
   if (source.benefits && typeof source.benefits === 'object')
     Object.assign(target.benefits, source.benefits);
   if (source.activityFormats && typeof source.activityFormats === 'object')
     Object.assign(target.activityFormats, source.activityFormats);
+  if (target.activityFormats.heading === 'รูปแบบกิจกรรม') {
+    Object.assign(target.activityFormats, {
+      heading: 'ให้ภาพจริงเล่าแทนคำว่า “เรียนสนุกและสร้างสรรค์”',
+      items: [
+        {
+          image: target.activityFormats.items[0]?.image || '',
+          title: 'Mission-based learning',
+          description: 'มีโจทย์ให้ลงมือและเห็นผลจริง',
+        },
+        {
+          image: target.activityFormats.items[1]?.image || '',
+          title: 'Teacher as coach',
+          description: 'ครูช่วยให้เด็กคิด ไม่ใช่บอกทุกคำตอบ',
+        },
+        {
+          image: target.activityFormats.items[2]?.image || '',
+          title: 'Hands-on',
+          description: 'เด็กต้องจับ สร้าง ปรับ และทดลองด้วยตัวเอง',
+        },
+      ],
+    });
+  }
   if (source.gallery && typeof source.gallery === 'object')
     Object.assign(target.gallery, source.gallery);
   if (source.activityGallery && typeof source.activityGallery === 'object')
@@ -145,6 +184,73 @@ function syncStateObjects(
     Object.assign(target.aboutPage, source.aboutPage);
 }
 
+function placeCourseMatcherAfterActivityFormats(page: ActivePage): void {
+  if (page !== 'home') return;
+
+  const matcherIndex = navSections.findIndex((section) => section.id === 'courseMatcher');
+  const activityIndex = navSections.findIndex((section) => section.id === 'activityFormats');
+  if (matcherIndex < 0 || activityIndex < 0 || matcherIndex === activityIndex + 1) return;
+
+  const [matcher] = navSections.splice(matcherIndex, 1);
+  if (matcher) navSections.splice(activityIndex + (matcherIndex < activityIndex ? 0 : 1), 0, matcher);
+}
+
+function placeLearningMethodAfterCourseMatcher(page: ActivePage): void {
+  if (page !== 'home') return;
+
+  const methodIndex = navSections.findIndex((section) => section.id === 'learningMethod');
+  const matcherIndex = navSections.findIndex((section) => section.id === 'courseMatcher');
+  if (methodIndex < 0 || matcherIndex < 0 || methodIndex === matcherIndex + 1) return;
+
+  const [method] = navSections.splice(methodIndex, 1);
+  if (method) navSections.splice(matcherIndex + (methodIndex < matcherIndex ? 0 : 1), 0, method);
+}
+
+function placeStudentProjectsAfterLearningMethod(page: ActivePage): void {
+  if (page !== 'home') return;
+
+  const projectsIndex = navSections.findIndex((section) => section.id === 'studentProjects');
+  const methodIndex = navSections.findIndex((section) => section.id === 'learningMethod');
+  if (projectsIndex < 0 || methodIndex < 0 || projectsIndex === methodIndex + 1) return;
+
+  const [projects] = navSections.splice(projectsIndex, 1);
+  if (projects) navSections.splice(methodIndex + (projectsIndex < methodIndex ? 0 : 1), 0, projects);
+}
+
+function placeParentProofAfterStudentProjects(page: ActivePage): void {
+  if (page !== 'home') return;
+
+  const proofIndex = navSections.findIndex((section) => section.id === 'parentProof');
+  const projectsIndex = navSections.findIndex((section) => section.id === 'studentProjects');
+  if (proofIndex < 0 || projectsIndex < 0 || proofIndex === projectsIndex + 1) return;
+
+  const [proof] = navSections.splice(proofIndex, 1);
+  if (proof) navSections.splice(projectsIndex + (proofIndex < projectsIndex ? 0 : 1), 0, proof);
+}
+
+function placeDiscoveryClassAfterParentProof(page: ActivePage): void {
+  if (page !== 'home') return;
+
+  const discoveryIndex = navSections.findIndex((section) => section.id === 'discoveryClass');
+  const proofIndex = navSections.findIndex((section) => section.id === 'parentProof');
+  if (discoveryIndex < 0 || proofIndex < 0 || discoveryIndex === proofIndex + 1) return;
+
+  const [discoveryClass] = navSections.splice(discoveryIndex, 1);
+  if (discoveryClass)
+    navSections.splice(proofIndex + (discoveryIndex < proofIndex ? 0 : 1), 0, discoveryClass);
+}
+
+function placeFaqBeforeCta(page: ActivePage): void {
+  if (page !== 'home') return;
+
+  const faqIndex = navSections.findIndex((section) => section.id === 'faq');
+  const ctaIndex = navSections.findIndex((section) => section.id === 'cta');
+  if (faqIndex < 0 || ctaIndex < 0 || faqIndex === ctaIndex - 1) return;
+
+  const [faq] = navSections.splice(faqIndex, 1);
+  if (faq) navSections.splice(ctaIndex - (faqIndex < ctaIndex ? 1 : 0), 0, faq);
+}
+
 export function useWebsiteEditor() {
   const fetchPageData = async (pageName?: string, locale?: string): Promise<void> => {
     const targetPage: ActivePage = (pageName as ActivePage) || activePage.value || 'home';
@@ -157,6 +263,12 @@ export function useWebsiteEditor() {
     }
     const initialSections = getFallbackNavSections(targetPage, targetLocale);
     navSections.splice(0, navSections.length, ...initialSections);
+    placeCourseMatcherAfterActivityFormats(targetPage);
+    placeLearningMethodAfterCourseMatcher(targetPage);
+    placeStudentProjectsAfterLearningMethod(targetPage);
+    placeParentProofAfterStudentProjects(targetPage);
+    placeDiscoveryClassAfterParentProof(targetPage);
+    placeFaqBeforeCta(targetPage);
     syncActiveContentToTarget(contentStateMap[targetLocale]);
 
     try {
@@ -168,7 +280,30 @@ export function useWebsiteEditor() {
         }
       }
       if (data.navSections && Array.isArray(data.navSections) && data.navSections.length > 0) {
-        navSections.splice(0, navSections.length, ...data.navSections);
+        const retiredSectionIds = new Set(['benefits', 'gallery', 'learningJourney', 'activityGallery']);
+        navSections.splice(
+          0,
+          navSections.length,
+          ...data.navSections.filter((section) => !retiredSectionIds.has(section.id)),
+        );
+        // Existing saved navigation predates newer built-in landing sections.
+        // Keep the editor's saved order, while making those sections visible after an upgrade.
+        const existingIds = new Set(navSections.map((section) => section.id));
+        const missingSections = initialSections.filter((section) => !existingIds.has(section.id));
+        if (missingSections.length) {
+          const footerIndex = navSections.findIndex((section) => section.id === 'footer');
+          navSections.splice(
+            footerIndex < 0 ? navSections.length : footerIndex,
+            0,
+            ...missingSections,
+          );
+        }
+        placeCourseMatcherAfterActivityFormats(targetPage);
+        placeLearningMethodAfterCourseMatcher(targetPage);
+        placeStudentProjectsAfterLearningMethod(targetPage);
+        placeParentProofAfterStudentProjects(targetPage);
+        placeDiscoveryClassAfterParentProof(targetPage);
+        placeFaqBeforeCta(targetPage);
       }
       if (data.themeSettings) {
         Object.assign(themeSettings, data.themeSettings);

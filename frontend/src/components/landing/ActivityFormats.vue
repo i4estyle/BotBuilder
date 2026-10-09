@@ -1,10 +1,9 @@
 <template>
-  <div class="activities">
-    <div
+  <div class="activities activities--photo-strip">
+    <figure
       v-for="(item, index) in items"
       :key="index"
-      class="activities__row"
-      :class="{ 'activities__row--reverse': index % 2 === 1 }"
+      class="activities__card"
       data-reveal
       :style="{ '--reveal-delay': `${index * 90}ms` }"
     >
@@ -14,13 +13,13 @@
       >
         <img :src="resolveAssetUrl(item.image)" :alt="item.title" />
       </div>
-      <div class="activities__copy">
-        <h3 :style="getStyleOverride(`activityFormats.items.${index}.title`)">{{ item.title }}</h3>
-        <p :style="getStyleOverride(`activityFormats.items.${index}.description`)">
-          {{ item.description }}
-        </p>
-      </div>
-    </div>
+      <figcaption class="activities__copy">
+        <strong :style="getStyleOverride(`activityFormats.items.${index}.title`)">{{ item.title }}</strong>
+        <span :style="getStyleOverride(`activityFormats.items.${index}.description`)">{{
+          item.description
+        }}</span>
+      </figcaption>
+    </figure>
   </div>
 </template>
 

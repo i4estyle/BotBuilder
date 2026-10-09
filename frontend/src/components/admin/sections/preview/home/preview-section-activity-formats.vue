@@ -5,7 +5,9 @@
     :class="{ 'admin-preview-section--active': isActive }"
     @click="$emit('select', 'activityFormats')"
   >
-    <div class="section-heading section-heading--centered">
+    <div class="activity-experience__intro">
+      <p class="section-kicker">WHAT LEARNING REALLY LOOKS LIKE</p>
+      <div class="section-heading">
       <h2
         data-style-key="activityFormats.heading"
         contenteditable="true"
@@ -16,13 +18,14 @@
         {{ activityFormatsData.heading }}
       </h2>
       <span class="section-heading__line" />
+      </div>
+      <p>เด็กไม่ได้ถูกวางให้นั่งดูครูสาธิต แต่ได้ลงมือกับโมเดล สนาม ภารกิจ และโปรแกรมของตัวเอง</p>
     </div>
-    <div class="activities">
-      <div
+    <div class="activities activities--photo-strip">
+      <figure
         v-for="(actItem, index) in activityFormatsData.items"
         :key="index"
-        class="activities__row"
-        :class="{ 'activities__row--reverse': index % 2 === 1 }"
+        class="activities__card"
       >
         <div
           class="activities__media admin-image-hover-trigger"
@@ -37,8 +40,8 @@
             <span>ปรับแต่งรูปกิจกรรม</span>
           </div>
         </div>
-        <div class="activities__copy">
-          <h3
+        <figcaption class="activities__copy">
+          <strong
             :data-style-key="`activityFormats.items.${index}.title`"
             contenteditable="true"
             class="admin-inline-editable"
@@ -46,8 +49,8 @@
             @blur="(e) => onTextChange(e, (val) => (actItem.title = val))"
           >
             {{ actItem.title }}
-          </h3>
-          <p
+          </strong>
+          <span
             :data-style-key="`activityFormats.items.${index}.description`"
             contenteditable="true"
             class="admin-inline-editable"
@@ -55,9 +58,9 @@
             @blur="(e) => onTextChange(e, (val) => (actItem.description = val))"
           >
             {{ actItem.description }}
-          </p>
-        </div>
-      </div>
+          </span>
+        </figcaption>
+      </figure>
     </div>
     <AdminSectionBlockLayer section-id="activityFormats" />
   </section>

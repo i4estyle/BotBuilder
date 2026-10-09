@@ -19,12 +19,6 @@ export const DEFAULT_NAV_SECTIONS: Record<string, unknown>[] = [
     icon: 'workspace_premium',
     color: 'green',
   },
-  {
-    id: 'activityGallery',
-    title: 'คลังภาพกิจกรรม',
-    icon: 'photo_library',
-    color: 'green',
-  },
   { id: 'quiz', title: 'แบบทดสอบสั้น', icon: 'quiz', color: 'green' },
   { id: 'branches', title: 'สาขาของเรา', icon: 'storefront', color: 'green' },
   {
@@ -180,11 +174,11 @@ export const DEFAULT_SECTIONS_TH: Record<
     },
     hero: {
       image: '/src/assets/landing/intro.png',
-      imageAlt: 'เด็ก ๆ เรียนรู้ผ่าน LEGO',
-      titleHighlight: 'เล่นและเรียนรู้ผ่านการทำจริง',
-      titleRest: 'ด้วยตัวต่อ LEGO',
+      imageAlt: 'เด็ก ๆ กำลังทดลองเรียนรู้หุ่นยนต์ที่ BotBuilder',
+      titleHighlight: 'คิดเอง',
+      titleRest: 'สร้างเอง\nเขียนเอง\nอธิบายได้',
       paragraph:
-        'BotBuilder ประเทศไทยขอเสนอการเรียนรู้แบบลงมือปฏิบัติจริงด้วยการบูรณาการ ผสานความรู้ทางวิทยาศาสตร์ คณิตศาสตร์และศิลปศาสตร์ ผ่านการสร้างหุ่นยนต์และชุดอุปกรณ์ที่ออกแบบมาอย่างเหมาะสมสำหรับเด็กอายุ 3-16 ปี เพื่อเสริมทักษะ',
+        'BotBuilder เปลี่ยนการเรียนหุ่นยนต์จาก “ทำตามแบบ” ให้เป็นพื้นที่ที่เด็กได้สร้าง ทดลอง แก้ปัญหา และพัฒนาวิธีคิดของตัวเอง',
       skills: [
         'การคิดอย่างมีเหตุผล (Logical Thinking)',
         'การวางแผนการทำงาน (Planning)',
@@ -218,25 +212,25 @@ export const DEFAULT_SECTIONS_TH: Record<
       ],
     },
     activityFormats: {
-      heading: 'รูปแบบกิจกรรม',
+      heading: 'ให้ภาพจริงเล่าแทนคำว่า “เรียนสนุกและสร้างสรรค์”',
       items: [
         {
           image: '/src/assets/landing/playlearn.png',
-          title: 'เล่น เรียน สร้าง',
+          title: 'Mission-based learning',
           description:
-            'มุ่งเน้นความหลากหลายของแบบหุ่นยนต์ ความคิดสร้างสรรค์ การเขียนโปรแกรมพื้นฐานและการนำเสนอผลงาน โดยมีความสอดคล้องกับอายุ ความสนใจและความสามารถของน้องแบ่งออกเป็น 3 ระดับ Beginner Intermediate และ Advance',
+            'มีโจทย์ให้ลงมือและเห็นผลจริง',
         },
         {
           image: '/src/assets/landing/roboticcamp.png',
-          title: 'ค่ายหุ่นยนต์',
+          title: 'Teacher as coach',
           description:
-            'มุ่งเน้นกิจกรรมภารกิจ การวางแผนและการทำงานเป็นทีม ภารกิจจะเป็นเครื่องกำหนดรูปแบบของหุ่นยนต์ ทำให้น้อง ๆ ต้องมีการออกแบบและสร้างขึ้นใหม่ตามรูปแบบกิจกรรมในแต่ละครั้ง และสามารถจัดแบบนอกสถานที่เพื่อสร้างความแปลกใหม่',
+            'ครูช่วยให้เด็กคิด ไม่ใช่บอกทุกคำตอบ',
         },
         {
           image: '/src/assets/landing/precompete.png',
-          title: 'เตรียมการแข่งขัน',
+          title: 'Hands-on',
           description:
-            'มุ่งเน้นการออกแบบและสร้างหุ่นยนต์เพื่อการแข่งขันโดยเฉพาะ เน้นการคิดเพื่อแก้ไขปัญหาและการซ้อมเพื่อสร้างโอกาสชนะในการแข่งขัน โดยมีรายการแข่งขัน เช่น LEGO FLL, World Robot Olympiad™ และ Robot Battle เป็นต้น',
+            'เด็กต้องจับ สร้าง ปรับ และทดลองด้วยตัวเอง',
         },
       ],
     },
@@ -574,11 +568,11 @@ export const DEFAULT_SECTIONS_EN: Record<
     },
     hero: {
       image: '/src/assets/landing/intro.png',
-      imageAlt: 'Children learning with LEGO',
-      titleHighlight: 'Play & Learn Through Hands-On Experience',
-      titleRest: 'With LEGO Bricks',
+      imageAlt: 'Children experimenting with robotics at BotBuilder',
+      titleHighlight: 'Think.',
+      titleRest: 'Build.\nCode.\nExplain.',
       paragraph:
-        'BotBuilder Thailand offers hands-on STEM learning combining Science, Math, and Art through robot building sets designed for kids aged 3-16 to build essential future skills.',
+        'BotBuilder turns robotics learning from following instructions into a space where children build, experiment, solve problems, and develop their own way of thinking.',
       skills: [
         'Logical Thinking',
         'Planning & Organization',
@@ -612,25 +606,25 @@ export const DEFAULT_SECTIONS_EN: Record<
       ],
     },
     activityFormats: {
-      heading: 'Activity Formats',
+      heading: 'Let real moments tell the story of fun, creative learning',
       items: [
         {
           image: '/src/assets/landing/playlearn.png',
-          title: 'Play, Learn, Create',
+          title: 'Mission-based learning',
           description:
-            'Focuses on robotics variety, creativity, basic programming, and presentation tailored to age and skill levels: Beginner, Intermediate, and Advance.',
+            'Hands-on challenges with real, visible results.',
         },
         {
           image: '/src/assets/landing/roboticcamp.png',
-          title: 'Robotics Camp',
+          title: 'Teacher as coach',
           description:
-            'Focuses on mission activities, planning, and teamwork. Missions define robot design requiring creative rebuilds for each camp.',
+            'Teachers help children think rather than provide every answer.',
         },
         {
           image: '/src/assets/landing/precompete.png',
-          title: 'Competition Prep',
+          title: 'Hands-on',
           description:
-            'Dedicated robot design and programming for competitions like LEGO FLL, World Robot Olympiad™, and Robot Battle.',
+            'Children build, adjust, and experiment for themselves.',
         },
       ],
     },

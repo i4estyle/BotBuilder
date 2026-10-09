@@ -45,11 +45,11 @@ export const createInitialState = () => ({
   }),
   hero: reactive<HeroState>({
     image: heroImageDefault,
-    imageAlt: 'เด็ก ๆ เรียนรู้ผ่าน LEGO',
-    titleHighlight: 'เล่นและเรียนรู้ผ่านการทำจริง',
-    titleRest: 'ด้วยตัวต่อ LEGO',
+    imageAlt: 'เด็ก ๆ กำลังทดลองเรียนรู้หุ่นยนต์ที่ BotBuilder',
+    titleHighlight: 'คิดเอง',
+    titleRest: 'สร้างเอง\nเขียนเอง\nอธิบายได้',
     paragraph:
-      'BotBuilder ประเทศไทยขอเสนอการเรียนรู้แบบลงมือปฏิบัติจริงด้วยการบูรณาการ ผสานความรู้ทางวิทยาศาสตร์ คณิตศาสตร์และศิลปศาสตร์ ผ่านการสร้างหุ่นยนต์และชุดอุปกรณ์ที่ออกแบบมาอย่างเหมาะสมสำหรับเด็กอายุ 3-16 ปี เพื่อเสริมทักษะ',
+      'BotBuilder เปลี่ยนการเรียนหุ่นยนต์จาก “ทำตามแบบ” ให้เป็นพื้นที่ที่เด็กได้สร้าง ทดลอง แก้ปัญหา และพัฒนาวิธีคิดของตัวเอง',
     skills: [
       'การคิดอย่างมีเหตุผล (Logical Thinking)',
       'การวางแผนการทำงาน (Planning)',
@@ -83,25 +83,25 @@ export const createInitialState = () => ({
     ],
   }),
   activityFormats: reactive<ActivityFormatsState>({
-    heading: 'รูปแบบกิจกรรม',
+    heading: 'ให้ภาพจริงเล่าแทนคำว่า “เรียนสนุกและสร้างสรรค์”',
     items: [
       {
         image: starterImageDefault,
-        title: 'เล่น เรียน สร้าง',
+        title: 'Mission-based learning',
         description:
-          'มุ่งเน้นความหลากหลายของแบบหุ่นยนต์ ความคิดสร้างสรรค์ การเขียนโปรแกรมพื้นฐานและการนำเสนอผลงาน โดยมีความสอดคล้องกับอายุ ความสนใจและความสามารถของน้องแบ่งออกเป็น 3 ระดับ Beginner Intermediate และ Advance',
+          'มีโจทย์ให้ลงมือและเห็นผลจริง',
       },
       {
         image: explorerImageDefault,
-        title: 'ค่ายหุ่นยนต์',
+        title: 'Teacher as coach',
         description:
-          'มุ่งเน้นกิจกรรมภารกิจ การวางแผนและการทำงานเป็นทีม ภารกิจจะเป็นเครื่องกำหนดรูปแบบของหุ่นยนต์ ทำให้น้อง ๆ ต้องมีการออกแบบและสร้างขึ้นใหม่ตามรูปแบบกิจกรรมในแต่ละครั้ง และสามารถจัดแบบนอกสถานที่เพื่อสร้างความแปลกใหม่',
+          'ครูช่วยให้เด็กคิด ไม่ใช่บอกทุกคำตอบ',
       },
       {
         image: masterImageDefault,
-        title: 'เตรียมการแข่งขัน',
+        title: 'Hands-on',
         description:
-          'มุ่งเน้นการออกแบบและสร้างหุ่นยนต์เพื่อการแข่งขันโดยเฉพาะ เน้นการคิดเพื่อแก้ไขปัญหาและการซ้อมเพื่อสร้างโอกาสชนะในการแข่งขัน โดยมีรายการแข่งขัน เช่น LEGO FLL, World Robot Olympiad™ และ Robot Battle เป็นต้น',
+          'เด็กต้องจับ สร้าง ปรับ และทดลองด้วยตัวเอง',
       },
     ],
   }),
@@ -380,11 +380,11 @@ export const createInitialEnState = () => ({
   }),
   hero: reactive<HeroState>({
     image: heroImageDefault,
-    imageAlt: 'Children learning with LEGO',
-    titleHighlight: 'Play & Learn Through Hands-On Experience',
-    titleRest: 'With LEGO Bricks',
+    imageAlt: 'Children experimenting with robotics at BotBuilder',
+    titleHighlight: 'Think.',
+    titleRest: 'Build.\nCode.\nExplain.',
     paragraph:
-      'BotBuilder Thailand offers hands-on STEM learning combining Science, Math, and Art through robot building sets designed for kids aged 3-16 to build essential future skills.',
+      'BotBuilder turns robotics learning from following instructions into a space where children build, experiment, solve problems, and develop their own way of thinking.',
     skills: [
       'Logical Thinking',
       'Planning & Organization',
@@ -418,25 +418,25 @@ export const createInitialEnState = () => ({
     ],
   }),
   activityFormats: reactive<ActivityFormatsState>({
-    heading: 'Activity Formats',
+    heading: 'Let real moments tell the story of fun, creative learning',
     items: [
       {
         image: starterImageDefault,
-        title: 'Play, Learn, Create',
+        title: 'Mission-based learning',
         description:
-          'Focuses on robotics variety, creativity, basic programming, and presentation tailored to age and skill levels: Beginner, Intermediate, and Advance.',
+          'Hands-on challenges with real, visible results.',
       },
       {
         image: explorerImageDefault,
-        title: 'Robotics Camp',
+        title: 'Teacher as coach',
         description:
-          'Focuses on mission activities, planning, and teamwork. Missions define robot design requiring creative rebuilds for each camp.',
+          'Teachers help children think rather than provide every answer.',
       },
       {
         image: masterImageDefault,
-        title: 'Competition Prep',
+        title: 'Hands-on',
         description:
-          'Dedicated robot design and programming for competitions like LEGO FLL, World Robot Olympiad™, and Robot Battle.',
+          'Children build, adjust, and experiment for themselves.',
       },
     ],
   }),
@@ -703,12 +703,15 @@ export const createInitialEnState = () => ({
 export const INITIAL_NAV_SECTIONS: SectionNavItem[] = [
   { id: 'header', title: 'ส่วนหัวเว็บไซต์', icon: 'web_asset', color: 'green' },
   { id: 'hero', title: 'ส่วนต้อนรับหลัก', icon: 'auto_awesome', color: 'green' },
-  { id: 'benefits', title: 'จุดเด่นบริการ', icon: 'verified', color: 'green' },
   { id: 'activityFormats', title: 'รูปแบบกิจกรรม', icon: 'dashboard_customize', color: 'green' },
-  { id: 'gallery', title: 'ผลงานและประกาศ', icon: 'workspace_premium', color: 'green' },
-  { id: 'activityGallery', title: 'คลังภาพกิจกรรม', icon: 'photo_library', color: 'green' },
+  { id: 'courseMatcher', title: 'เลือกจุดเริ่มต้น', icon: 'psychology', color: 'green' },
+  { id: 'learningMethod', title: 'กระบวนการเรียนรู้', icon: 'engineering', color: 'green' },
+  { id: 'studentProjects', title: 'ผลงานเด็ก', icon: 'emoji_events', color: 'green' },
+  { id: 'parentProof', title: 'ผลลัพธ์ที่ผู้ปกครองเห็น', icon: 'visibility', color: 'green' },
+  { id: 'discoveryClass', title: 'ทดลองเรียนจริง', icon: 'science', color: 'red' },
   { id: 'quiz', title: 'แบบทดสอบสั้น', icon: 'quiz', color: 'green' },
   { id: 'branches', title: 'สาขาของเรา', icon: 'storefront', color: 'green' },
+  { id: 'faq', title: 'คำถามที่พบบ่อย', icon: 'help_outline', color: 'green' },
   { id: 'cta', title: 'ส่วนลงทะเบียน', icon: 'app_registration', color: 'green' },
   { id: 'footer', title: 'ส่วนท้ายเว็บไซต์', icon: 'vertical_align_bottom', color: 'green' },
 ];
@@ -716,9 +719,7 @@ export const INITIAL_NAV_SECTIONS: SectionNavItem[] = [
 export const SECTION_TITLE_MAP: Record<string, string> = {
   header: 'ส่วนหัวเว็บไซต์ (Header)',
   hero: 'ส่วนต้อนรับหลัก (Hero)',
-  benefits: 'จุดเด่นของบริการ (Benefits)',
   activityFormats: 'รูปแบบกิจกรรม (Activity Formats)',
-  gallery: 'ผลงานและประกาศ (Gallery)',
   activityGallery: 'คลังภาพกิจกรรม (Activity Gallery)',
   quiz: 'แบบทดสอบสั้น (Quiz)',
   branches: 'สาขาของเรา (Branches)',
@@ -795,12 +796,15 @@ export const PAGE_SECTIONS: Record<ActivePage, SectionNavItem[]> = {
   home: [
     { id: 'header', title: 'ส่วนหัวเว็บไซต์', icon: 'web_asset', color: 'green' },
     { id: 'hero', title: 'ส่วนต้อนรับหลัก', icon: 'auto_awesome', color: 'green' },
-    { id: 'benefits', title: 'จุดเด่นบริการ', icon: 'verified', color: 'green' },
     { id: 'activityFormats', title: 'รูปแบบกิจกรรม', icon: 'dashboard_customize', color: 'green' },
-    { id: 'gallery', title: 'ผลงานและประกาศ', icon: 'workspace_premium', color: 'green' },
-    { id: 'activityGallery', title: 'คลังภาพกิจกรรม', icon: 'photo_library', color: 'green' },
+    { id: 'courseMatcher', title: 'เลือกจุดเริ่มต้น', icon: 'psychology', color: 'green' },
+    { id: 'learningMethod', title: 'กระบวนการเรียนรู้', icon: 'engineering', color: 'green' },
+    { id: 'studentProjects', title: 'ผลงานเด็ก', icon: 'emoji_events', color: 'green' },
+    { id: 'parentProof', title: 'ผลลัพธ์ที่ผู้ปกครองเห็น', icon: 'visibility', color: 'green' },
+    { id: 'discoveryClass', title: 'ทดลองเรียนจริง', icon: 'science', color: 'red' },
     { id: 'quiz', title: 'แบบทดสอบสั้น', icon: 'quiz', color: 'green' },
     { id: 'branches', title: 'สาขาของเรา', icon: 'storefront', color: 'green' },
+    { id: 'faq', title: 'คำถามที่พบบ่อย', icon: 'help_outline', color: 'green' },
     { id: 'cta', title: 'ส่วนลงทะเบียน', icon: 'app_registration', color: 'green' },
     { id: 'footer', title: 'ส่วนท้ายเว็บไซต์', icon: 'vertical_align_bottom', color: 'green' },
   ],
@@ -835,17 +839,20 @@ export const PAGE_SECTIONS_EN: Record<ActivePage, SectionNavItem[]> = {
   home: [
     { id: 'header', title: 'Header', icon: 'web_asset', color: 'green' },
     { id: 'hero', title: 'Hero', icon: 'auto_awesome', color: 'green' },
-    { id: 'benefits', title: 'Benefits', icon: 'verified', color: 'green' },
     {
       id: 'activityFormats',
       title: 'Activity Formats',
       icon: 'dashboard_customize',
       color: 'green',
     },
-    { id: 'gallery', title: 'Gallery & Certificates', icon: 'workspace_premium', color: 'green' },
-    { id: 'activityGallery', title: 'Activity Gallery', icon: 'photo_library', color: 'green' },
+    { id: 'courseMatcher', title: 'Find the Right Start', icon: 'psychology', color: 'green' },
+    { id: 'learningMethod', title: 'Learning Method', icon: 'engineering', color: 'green' },
+    { id: 'studentProjects', title: 'Student Projects', icon: 'emoji_events', color: 'green' },
+    { id: 'parentProof', title: 'Parent Outcomes', icon: 'visibility', color: 'green' },
+    { id: 'discoveryClass', title: 'Discovery Class', icon: 'science', color: 'red' },
     { id: 'quiz', title: 'Quiz', icon: 'quiz', color: 'green' },
     { id: 'branches', title: 'Our Branches', icon: 'storefront', color: 'green' },
+    { id: 'faq', title: 'FAQ', icon: 'help_outline', color: 'green' },
     { id: 'cta', title: 'CTA Registration', icon: 'app_registration', color: 'green' },
     { id: 'footer', title: 'Footer', icon: 'vertical_align_bottom', color: 'green' },
   ],

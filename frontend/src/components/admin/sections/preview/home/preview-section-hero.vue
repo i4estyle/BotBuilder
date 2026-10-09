@@ -20,6 +20,7 @@
       </div>
     </div>
     <div class="hero__copy">
+      <p class="hero__kicker">Robotics Design Studio for Kids</p>
       <h1>
         <span
           data-style-key="hero.titleHighlight"
@@ -109,6 +110,13 @@
           >
         </AppButton>
       </div>
+    </div>
+
+    <div class="hero__brandline">
+      <div><strong>Hands-on Learning</strong><span>สร้าง ทดลอง และเรียนรู้จากของจริง</span></div>
+      <div><strong>Age 3–16</strong><span>เส้นทางการเรียนรู้ตามวัยและทักษะ</span></div>
+      <div><strong>Build + Code</strong><span>เชื่อมการสร้าง กลไก และการเขียนโปรแกรม</span></div>
+      <div><strong>Think + Explain</strong><span>ฝึกคิด แก้ปัญหา และอธิบายสิ่งที่ทำ</span></div>
     </div>
 
     <AdminSectionBlockLayer section-id="hero" />
