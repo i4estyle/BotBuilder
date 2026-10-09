@@ -105,6 +105,7 @@ import {
   bringToFront,
   sendToBack,
 } from './website-editor/free-blocks';
+import { applyHomeNavigationPolicy } from './website-editor/home-navigation-policy';
 import { pageSectionsApiService } from '@/services/page-sections-api.service';
 import type { EditorLocale } from './website-editor/types';
 
@@ -184,73 +185,6 @@ function syncStateObjects(
     Object.assign(target.aboutPage, source.aboutPage);
 }
 
-function placeCourseMatcherAfterActivityFormats(page: ActivePage): void {
-  if (page !== 'home') return;
-
-  const matcherIndex = navSections.findIndex((section) => section.id === 'courseMatcher');
-  const activityIndex = navSections.findIndex((section) => section.id === 'activityFormats');
-  if (matcherIndex < 0 || activityIndex < 0 || matcherIndex === activityIndex + 1) return;
-
-  const [matcher] = navSections.splice(matcherIndex, 1);
-  if (matcher) navSections.splice(activityIndex + (matcherIndex < activityIndex ? 0 : 1), 0, matcher);
-}
-
-function placeLearningMethodAfterCourseMatcher(page: ActivePage): void {
-  if (page !== 'home') return;
-
-  const methodIndex = navSections.findIndex((section) => section.id === 'learningMethod');
-  const matcherIndex = navSections.findIndex((section) => section.id === 'courseMatcher');
-  if (methodIndex < 0 || matcherIndex < 0 || methodIndex === matcherIndex + 1) return;
-
-  const [method] = navSections.splice(methodIndex, 1);
-  if (method) navSections.splice(matcherIndex + (methodIndex < matcherIndex ? 0 : 1), 0, method);
-}
-
-function placeStudentProjectsAfterLearningMethod(page: ActivePage): void {
-  if (page !== 'home') return;
-
-  const projectsIndex = navSections.findIndex((section) => section.id === 'studentProjects');
-  const methodIndex = navSections.findIndex((section) => section.id === 'learningMethod');
-  if (projectsIndex < 0 || methodIndex < 0 || projectsIndex === methodIndex + 1) return;
-
-  const [projects] = navSections.splice(projectsIndex, 1);
-  if (projects) navSections.splice(methodIndex + (projectsIndex < methodIndex ? 0 : 1), 0, projects);
-}
-
-function placeParentProofAfterStudentProjects(page: ActivePage): void {
-  if (page !== 'home') return;
-
-  const proofIndex = navSections.findIndex((section) => section.id === 'parentProof');
-  const projectsIndex = navSections.findIndex((section) => section.id === 'studentProjects');
-  if (proofIndex < 0 || projectsIndex < 0 || proofIndex === projectsIndex + 1) return;
-
-  const [proof] = navSections.splice(proofIndex, 1);
-  if (proof) navSections.splice(projectsIndex + (proofIndex < projectsIndex ? 0 : 1), 0, proof);
-}
-
-function placeDiscoveryClassAfterParentProof(page: ActivePage): void {
-  if (page !== 'home') return;
-
-  const discoveryIndex = navSections.findIndex((section) => section.id === 'discoveryClass');
-  const proofIndex = navSections.findIndex((section) => section.id === 'parentProof');
-  if (discoveryIndex < 0 || proofIndex < 0 || discoveryIndex === proofIndex + 1) return;
-
-  const [discoveryClass] = navSections.splice(discoveryIndex, 1);
-  if (discoveryClass)
-    navSections.splice(proofIndex + (discoveryIndex < proofIndex ? 0 : 1), 0, discoveryClass);
-}
-
-function placeFaqBeforeCta(page: ActivePage): void {
-  if (page !== 'home') return;
-
-  const faqIndex = navSections.findIndex((section) => section.id === 'faq');
-  const ctaIndex = navSections.findIndex((section) => section.id === 'cta');
-  if (faqIndex < 0 || ctaIndex < 0 || faqIndex === ctaIndex - 1) return;
-
-  const [faq] = navSections.splice(faqIndex, 1);
-  if (faq) navSections.splice(ctaIndex - (faqIndex < ctaIndex ? 1 : 0), 0, faq);
-}
-
 export function useWebsiteEditor() {
   const fetchPageData = async (pageName?: string, locale?: string): Promise<void> => {
     const targetPage: ActivePage = (pageName as ActivePage) || activePage.value || 'home';
@@ -263,12 +197,7 @@ export function useWebsiteEditor() {
     }
     const initialSections = getFallbackNavSections(targetPage, targetLocale);
     navSections.splice(0, navSections.length, ...initialSections);
-    placeCourseMatcherAfterActivityFormats(targetPage);
-    placeLearningMethodAfterCourseMatcher(targetPage);
-    placeStudentProjectsAfterLearningMethod(targetPage);
-    placeParentProofAfterStudentProjects(targetPage);
-    placeDiscoveryClassAfterParentProof(targetPage);
-    placeFaqBeforeCta(targetPage);
+    applyHomeNavigationPolicy(targetPage, navSections);
     syncActiveContentToTarget(contentStateMap[targetLocale]);
 
     try {
@@ -298,12 +227,7 @@ export function useWebsiteEditor() {
             ...missingSections,
           );
         }
-        placeCourseMatcherAfterActivityFormats(targetPage);
-        placeLearningMethodAfterCourseMatcher(targetPage);
-        placeStudentProjectsAfterLearningMethod(targetPage);
-        placeParentProofAfterStudentProjects(targetPage);
-        placeDiscoveryClassAfterParentProof(targetPage);
-        placeFaqBeforeCta(targetPage);
+        applyHomeNavigationPolicy(targetPage, navSections);
       }
       if (data.themeSettings) {
         Object.assign(themeSettings, data.themeSettings);

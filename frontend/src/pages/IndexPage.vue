@@ -77,48 +77,7 @@
           class="section course-matcher course-matcher--interactive"
           id="course-matcher"
         >
-          <div class="course-matcher__photo" data-reveal>
-            <img
-              :src="resolveAssetUrl('/src/assets/landing/inside1.jpg')"
-              alt="เด็ก ๆ กำลังเรียนรู้และสร้างหุ่นยนต์"
-            />
-          </div>
-          <div class="course-matcher__content" data-reveal>
-            <p class="section-kicker">COURSE MATCHER</p>
-            <h2>ลูกควรเริ่มตรงไหน?</h2>
-            <p class="course-matcher__lead">
-              อายุเป็นเพียงจุดเริ่มต้น ระดับที่เหมาะจริงควรดูทั้งความสนใจ สมาธิ การสร้าง
-              การแก้ปัญหา และประสบการณ์ Coding เดิม
-            </p>
-            <div class="course-matcher__tabs" role="tablist" aria-label="เลือกช่วงอายุ">
-              <button
-                v-for="option in courseMatcherOptions"
-                :key="option.id"
-                type="button"
-                :class="{ 'is-active': selectedCourseMatcher === option.id }"
-                role="tab"
-                :aria-selected="selectedCourseMatcher === option.id"
-                @click="selectedCourseMatcher = option.id"
-              >
-                {{ option.age }}
-              </button>
-            </div>
-            <article class="course-matcher__result">
-              <p>{{ selectedCourseMatcherData.tag }}</p>
-              <h3>{{ selectedCourseMatcherData.title }}</h3>
-              <span>{{ selectedCourseMatcherData.description }}</span>
-              <div class="course-matcher__skills">
-                <span v-for="skill in selectedCourseMatcherData.skills" :key="skill">{{ skill }}</span>
-              </div>
-              <div class="course-matcher__path"><b>Learning path:</b> {{ selectedCourseMatcherData.path }}</div>
-              <AppButton
-                class="course-matcher__cta"
-                @click="scrollToDiscoveryClass"
-              >
-                ให้ครูช่วยประเมินจากการทดลองจริง
-              </AppButton>
-            </article>
-          </div>
+          <HomeCourseMatcherSection @request-assessment="scrollToDiscoveryClass" />
           <AdminSectionBlockLayer section-id="courseMatcher" />
         </section>
 
@@ -308,29 +267,7 @@
         </section>
 
         <section v-else-if="item.id === 'faq'" class="section faq" id="faq">
-          <div class="faq__intro" data-reveal>
-            <p class="section-kicker">PARENT FAQ</p>
-            <h2>คำถามก่อนเริ่มเรียน</h2>
-            <p>เรื่องที่ผู้ปกครองมักสงสัยก่อนพาเด็ก ๆ มาลองสร้าง คิด และเขียนโค้ดจริง</p>
-          </div>
-          <div class="faq__items" data-reveal>
-            <article class="faq__item" :class="{ 'is-open': openFaqIndex === 0 }">
-              <button type="button" class="faq__question" :aria-expanded="openFaqIndex === 0" @click="openFaqIndex = openFaqIndex === 0 ? null : 0"><strong>ลูกยังอ่านไม่คล่อง เริ่ม Coding ได้ไหม?</strong><i aria-hidden="true" /></button>
-              <div class="faq__answer"><p>ได้ครับ ระดับเริ่มต้นเรียนผ่านการสร้าง การเรียงลำดับ และ visual logic ก่อนเพิ่มความซับซ้อนของภาษาโปรแกรม</p></div>
-            </article>
-            <article class="faq__item" :class="{ 'is-open': openFaqIndex === 1 }">
-              <button type="button" class="faq__question" :aria-expanded="openFaqIndex === 1" @click="openFaqIndex = openFaqIndex === 1 ? null : 1"><strong>ต้องเก่งคณิตศาสตร์ก่อนหรือไม่?</strong><i aria-hidden="true" /></button>
-              <div class="faq__answer"><p>ไม่จำเป็น เราเริ่มจากการคิดเป็นขั้นตอน ทดลอง และแก้ปัญหา แล้วจึงค่อยเชื่อมความรู้ STEM เข้ากับภารกิจ</p></div>
-            </article>
-            <article class="faq__item" :class="{ 'is-open': openFaqIndex === 2 }">
-              <button type="button" class="faq__question" :aria-expanded="openFaqIndex === 2" @click="openFaqIndex = openFaqIndex === 2 ? null : 2"><strong>ต่างจากการต่อ LEGO เล่นอย่างไร?</strong><i aria-hidden="true" /></button>
-              <div class="faq__answer"><p>ทุกกิจกรรมมีโจทย์ การทดสอบ และการสะท้อนผล เด็กต้องทำให้สิ่งที่สร้างทำงานและอธิบายเหตุผลของตัวเองได้</p></div>
-            </article>
-            <article class="faq__item" :class="{ 'is-open': openFaqIndex === 3 }">
-              <button type="button" class="faq__question" :aria-expanded="openFaqIndex === 3" @click="openFaqIndex = openFaqIndex === 3 ? null : 3"><strong>ถ้าลูกเรียนเร็วกว่าอายุล่ะ?</strong><i aria-hidden="true" /></button>
-              <div class="faq__answer"><p>ครูจะเพิ่มความยากของโจทย์ โค้ด หรือฮาร์ดแวร์ตามความสามารถจริงของน้อง</p></div>
-            </article>
-          </div>
+          <HomeFaqSection />
           <AdminSectionBlockLayer section-id="faq" />
         </section>
 
@@ -447,9 +384,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import ActivityFormats from '@/components/landing/ActivityFormats.vue';
 import AppButton from '@/components/landing/AppButton.vue';
+import HomeCourseMatcherSection from '@/components/landing/home/home-course-matcher-section.vue';
+import HomeFaqSection from '@/components/landing/home/home-faq-section.vue';
 import QuizPanel from '@/components/landing/QuizPanel.vue';
 import SectionHeading from '@/components/landing/SectionHeading.vue';
 import SiteFooter from '@/components/landing/SiteFooter.vue';
@@ -481,55 +420,6 @@ function scrollToDiscoveryClass(): void {
 
 const pageRoot = ref<HTMLElement | null>(null);
 const quizOpen = ref(false);
-const openFaqIndex = ref<number | null>(null);
-const selectedCourseMatcher = ref('little');
-const courseMatcherOptions = [
-  {
-    id: 'little',
-    age: '3–5 ปี',
-    tag: 'LITTLE BUILDER',
-    title: 'เริ่มคิดแบบ Coding โดยไม่ต้องรอให้อ่านคล่อง',
-    description:
-      'ฝึกสมาธิ กล้ามเนื้อมัดเล็ก ลำดับ รูปทรง ทิศทาง และความสัมพันธ์ระหว่างเหตุ–ผล ผ่านการสร้างและเล่นอย่างมีเป้าหมาย',
-    skills: ['Fine Motor', 'Sequence', 'Focus', 'Cause & Effect'],
-    path: 'Beginner → Intermediate',
-  },
-  {
-    id: 'young',
-    age: '6–9 ปี',
-    tag: 'YOUNG CREATOR',
-    title: 'จากเด็กที่ชอบต่อของ สู่เด็กที่ควบคุมสิ่งที่สร้างได้',
-    description:
-      'เพิ่มความคิดสร้างสรรค์ การแก้ปัญหา และ Coding ผ่านหุ่นยนต์ที่เคลื่อนไหว ตอบสนอง และทำภารกิจได้จริง',
-    skills: ['Mechanism', 'Sensor', 'Block Coding', 'Creative Build'],
-    path: 'Intermediate → Creator',
-  },
-  {
-    id: 'challenge',
-    age: '10–12 ปี',
-    tag: 'ROBOT CHALLENGER',
-    title: 'ไม่ใช่แค่สร้างเสร็จ แต่ต้องทำให้หุ่นยนต์แก้ Mission ได้',
-    description: 'ฝึก Coding ที่เป็นระบบ การ Debug กลยุทธ์ภารกิจ และการนำเสนอ เพื่อรับโจทย์ที่ซับซ้อนขึ้น',
-    skills: ['Algorithm', 'Navigation', 'Automation', 'Presentation'],
-    path: 'Creator → Challenge → Competition',
-  },
-  {
-    id: 'future',
-    age: '13–16 ปี',
-    tag: 'FUTURE DEVELOPER',
-    title: 'เชื่อมหุ่นยนต์กับ Computing และ Engineering จริง',
-    description:
-      'ต่อยอดสู่ Micro:bit, Sensor, Algorithm, Control, Python และ Project Portfolio ที่ซับซ้อนขึ้น',
-    skills: ['Micro:bit', 'Sensor', 'Control', 'Python'],
-    path: 'Challenge → Micro:bit → Python / Portfolio',
-  },
-];
-const defaultCourseMatcher = courseMatcherOptions[0]!;
-const selectedCourseMatcherData = computed(
-  () =>
-    courseMatcherOptions.find((option) => option.id === selectedCourseMatcher.value) ||
-    defaultCourseMatcher,
-);
 
 let revealObserver: IntersectionObserver | undefined;
 
