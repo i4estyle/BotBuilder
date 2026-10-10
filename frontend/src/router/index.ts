@@ -40,12 +40,10 @@ export default defineRouter((/* { store, ssrContext } */) => {
     await authStore.initialize();
 
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-      return { path: '/login', query: { redirect: to.fullPath } };
+      return { path: '/admin/login', query: { redirect: to.fullPath } };
     }
-    if (to.meta.requiresAdmin && !authStore.isAdmin) return { path: '/home' };
-
     if (to.meta.guestOnly && authStore.isAuthenticated) {
-      return { path: authStore.isAdmin ? '/admin' : '/home' };
+      return { path: '/admin' };
     }
 
     return true;

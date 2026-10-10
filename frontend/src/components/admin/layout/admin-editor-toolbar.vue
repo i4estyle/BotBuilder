@@ -165,7 +165,7 @@ const {
 
 function handleLogout(): void {
   void authStore.logout();
-  void router.replace('/login');
+  void router.replace('/admin/login');
 }
 
 async function changeEditorLanguage(value: EditorLocale): Promise<void> {

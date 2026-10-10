@@ -29,7 +29,7 @@
           color="grey-8"
           icon="table_rows"
           label="ตารางบันทึกดิบ"
-          to="/evaluations"
+          to="/admin/evaluations"
           class="action-pill"
         />
 

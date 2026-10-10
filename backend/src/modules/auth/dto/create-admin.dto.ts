@@ -1,24 +1,26 @@
 import {
   IsEmail,
-  IsAlphanumeric,
   IsNotEmpty,
   IsString,
+  Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
 
-export class RegisterDto {
+export class CreateAdminDto {
+  @IsString()
+  @Matches(/^[A-Za-z0-9]{3,50}$/)
+  loginName!: string;
+
   @IsString()
   @IsNotEmpty()
-  @MaxLength(50)
-  @IsAlphanumeric()
-  @IsNotEmpty()
-  @MinLength(3)
-  @MaxLength(50)
-  loginName!: string;
+  @MaxLength(100)
+  displayName!: string;
+
   @IsEmail()
   @MaxLength(100)
   email!: string;
+
   @IsString()
   @MinLength(8)
   @MaxLength(255)

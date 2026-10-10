@@ -9,6 +9,133 @@
   min-height: 100vh;
 }
 
+.admin-app-nav {
+  background: #fff;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 24px 12px 16px;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 0 10px 24px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  &__logo {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+  }
+
+  &__product-name {
+    color: #0f172a;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  &__product-type,
+  &__section-label,
+  &__user-email {
+    color: #64748b;
+    font-size: 12px;
+  }
+
+  &__menu {
+    padding-top: 22px;
+  }
+
+  &__section-label {
+    padding: 0 12px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  &__item {
+    min-height: 48px;
+    margin: 3px 0;
+    border-radius: 9px;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 160ms ease, color 160ms ease;
+
+    .q-item__section--avatar {
+      min-width: 35px;
+      color: #64748b;
+    }
+
+    &:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    &--active {
+      background: #e8f5e9;
+      color: #006c0c;
+
+      .q-item__section--avatar {
+        color: #006c0c;
+      }
+    }
+  }
+
+  &__footer {
+    margin-top: auto;
+    padding: 14px 4px 0;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  &__website-link {
+    justify-content: flex-start;
+    margin-bottom: 14px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+  }
+
+  &__user-details {
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__user-name,
+  &__user-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__user-name {
+    color: #1e293b;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  &__mobile-toggle {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 3001;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+  }
+}
+
 .admin-page {
   display: flex;
   flex-direction: column;

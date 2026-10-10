@@ -11,12 +11,6 @@ export interface LoginResponse {
   admin: AuthAdmin;
 }
 
-export interface RegisterPayload {
-  loginName: string;
-  email: string;
-  password: string;
-}
-
 export const authApiService = {
   async login(loginName: string, password: string): Promise<LoginResponse> {
     const { data } = await apiClient.post<LoginResponse>('/auth/login', { loginName, password });
@@ -33,6 +27,5 @@ export const authApiService = {
   async logout(): Promise<void> { await apiClient.post('/auth/logout'); },
   async forgotPassword(email: string): Promise<void> { await apiClient.post('/auth/forgot-password', { email }); },
   async resetPassword(token: string, password: string): Promise<void> { await apiClient.post('/auth/reset-password', { token, password }); },
-  async verifyEmail(token: string): Promise<void> { await apiClient.post('/auth/verify-email', { token }); },
   async changePassword(currentPassword: string, newPassword: string): Promise<void> { await apiClient.post('/auth/change-password', { currentPassword, newPassword }); },
 };
