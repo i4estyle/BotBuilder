@@ -11,11 +11,14 @@
           <!-- Live Heartbeat Pulse Indicator -->
           <div class="live-badge row items-center q-px-sm q-py-xs rounded-borders q-ml-sm">
             <span class="live-pulse-dot q-mr-xs"></span>
-            <span class="text-caption text-weight-bold text-bb-green">เชื่อมต่อสด Google Sheets</span>
+            <span class="text-caption text-weight-bold text-bb-green"
+              >เชื่อมต่อสด Google Sheets</span
+            >
           </div>
         </div>
         <div class="text-caption text-grey-7 q-mt-xs">
-          วิเคราะห์สมรรถนะ 7 ด้าน: สมาธิ, กล้ามเนื้อ, การสร้างหุ่นยนต์, การเขียนโปรแกรม, การแก้ปัญหา, ความคิดสร้างสรรค์, การนำเสนอ
+          วิเคราะห์สมรรถนะ 7 ด้าน: สมาธิ, กล้ามเนื้อ, การสร้างหุ่นยนต์, การเขียนโปรแกรม,
+          การแก้ปัญหา, ความคิดสร้างสรรค์, การนำเสนอ
           <span v-if="store.lastUpdated" class="q-ml-sm text-grey-8">
             · ปรับปรุงล่าสุด: {{ formatTime(store.lastUpdated) }}
           </span>
@@ -136,8 +139,12 @@
                           เป้าหมายความสำเร็จหลักสูตร 7 บทเรียน
                         </div>
                         <div class="text-body2 text-grey-9 q-mt-xs">
-                          มีผู้เรียนสำเร็จครบ 7 บทเรียนแล้ว <span class="text-weight-bold text-bb-green">{{ store.overallStats.fullyCompletedChildren }} คน</span>
-                          จากทั้งหมด {{ store.overallStats.totalChildren }} คน (คิดเป็น {{ completionPercent }}% ของรุ่น)
+                          มีผู้เรียนสำเร็จครบ 7 บทเรียนแล้ว
+                          <span class="text-weight-bold text-bb-green"
+                            >{{ store.overallStats.fullyCompletedChildren }} คน</span
+                          >
+                          จากทั้งหมด {{ store.overallStats.totalChildren }} คน (คิดเป็น
+                          {{ completionPercent }}% ของรุ่น)
                         </div>
                       </div>
                       <q-btn
@@ -159,10 +166,7 @@
 
       <!-- 4. Children Table -->
       <div id="children-table" class="q-mt-lg">
-        <ChildrenTable
-          :children="store.childrenSummaries"
-          @select-child="openChildDetail"
-        />
+        <ChildrenTable :children="store.childrenSummaries" @select-child="openChildDetail" />
       </div>
     </div>
 

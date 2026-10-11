@@ -6,7 +6,6 @@ export const DEFAULT_NAV_SECTIONS: Record<string, unknown>[] = [
     icon: 'auto_awesome',
     color: 'green',
   },
-  { id: 'benefits', title: 'จุดเด่นบริการ', icon: 'verified', color: 'green' },
   {
     id: 'activityFormats',
     title: 'รูปแบบกิจกรรม',
@@ -14,13 +13,43 @@ export const DEFAULT_NAV_SECTIONS: Record<string, unknown>[] = [
     color: 'green',
   },
   {
-    id: 'gallery',
-    title: 'ผลงานและประกาศ',
-    icon: 'workspace_premium',
+    id: 'courseMatcher',
+    title: 'เลือกจุดเริ่มต้น',
+    icon: 'psychology',
     color: 'green',
+  },
+  {
+    id: 'learningMethod',
+    title: 'กระบวนการเรียนรู้',
+    icon: 'engineering',
+    color: 'green',
+  },
+  {
+    id: 'studentProjects',
+    title: 'ผลงานเด็ก',
+    icon: 'emoji_events',
+    color: 'green',
+  },
+  {
+    id: 'parentProof',
+    title: 'ผลลัพธ์ที่ผู้ปกครองเห็น',
+    icon: 'visibility',
+    color: 'green',
+  },
+  {
+    id: 'discoveryClass',
+    title: 'ทดลองเรียนจริง',
+    icon: 'science',
+    color: 'red',
   },
   { id: 'quiz', title: 'แบบทดสอบสั้น', icon: 'quiz', color: 'green' },
   { id: 'branches', title: 'สาขาของเรา', icon: 'storefront', color: 'green' },
+  {
+    id: 'faq',
+    title: 'คำถามที่พบบ่อย',
+    icon: 'help_outline',
+    color: 'green',
+  },
   {
     id: 'cta',
     title: 'ส่วนลงทะเบียน',
@@ -217,20 +246,17 @@ export const DEFAULT_SECTIONS_TH: Record<
         {
           image: '/src/assets/landing/playlearn.png',
           title: 'Mission-based learning',
-          description:
-            'มีโจทย์ให้ลงมือและเห็นผลจริง',
+          description: 'มีโจทย์ให้ลงมือและเห็นผลจริง',
         },
         {
           image: '/src/assets/landing/roboticcamp.png',
           title: 'Teacher as coach',
-          description:
-            'ครูช่วยให้เด็กคิด ไม่ใช่บอกทุกคำตอบ',
+          description: 'ครูช่วยให้เด็กคิด ไม่ใช่บอกทุกคำตอบ',
         },
         {
           image: '/src/assets/landing/precompete.png',
           title: 'Hands-on',
-          description:
-            'เด็กต้องจับ สร้าง ปรับ และทดลองด้วยตัวเอง',
+          description: 'เด็กต้องจับ สร้าง ปรับ และทดลองด้วยตัวเอง',
         },
       ],
     },
@@ -611,8 +637,7 @@ export const DEFAULT_SECTIONS_EN: Record<
         {
           image: '/src/assets/landing/playlearn.png',
           title: 'Mission-based learning',
-          description:
-            'Hands-on challenges with real, visible results.',
+          description: 'Hands-on challenges with real, visible results.',
         },
         {
           image: '/src/assets/landing/roboticcamp.png',
@@ -623,8 +648,7 @@ export const DEFAULT_SECTIONS_EN: Record<
         {
           image: '/src/assets/landing/precompete.png',
           title: 'Hands-on',
-          description:
-            'Children build, adjust, and experiment for themselves.',
+          description: 'Children build, adjust, and experiment for themselves.',
         },
       ],
     },

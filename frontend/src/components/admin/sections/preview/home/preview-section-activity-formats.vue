@@ -1,26 +1,30 @@
 <template>
   <section
     id="preview-section-activityFormats"
-    class="section admin-preview-section"
+    class="section activity-experience admin-preview-section"
     :class="{ 'admin-preview-section--active': isActive }"
     @click="$emit('select', 'activityFormats')"
   >
     <div class="activity-experience__intro">
       <p class="section-kicker">WHAT LEARNING REALLY LOOKS LIKE</p>
       <div class="section-heading">
-      <h2
-        data-style-key="activityFormats.heading"
-        contenteditable="true"
-        class="admin-inline-editable"
-        :style="getStyleOverride('activityFormats.heading')"
-        @blur="(e) => onTextChange(e, (val) => (activityFormatsData.heading = val))"
-      >
-        {{ activityFormatsData.heading }}
-      </h2>
-      <span class="section-heading__line" />
+        <h2
+          data-style-key="activityFormats.heading"
+          contenteditable="true"
+          class="admin-inline-editable"
+          :style="getStyleOverride('activityFormats.heading')"
+          @blur="(e) => onTextChange(e, (val) => (activityFormatsData.heading = val))"
+        >
+          {{ activityFormatsData.heading }}
+        </h2>
+        <span class="section-heading__line" />
       </div>
-      <p>เด็กไม่ได้ถูกวางให้นั่งดูครูสาธิต แต่ได้ลงมือกับโมเดล สนาม ภารกิจ และโปรแกรมของตัวเอง</p>
+      <p>
+        เด็กไม่ได้ถูกวางให้นั่งดูครูสาธิต แต่ได้ลงมือกับโมเดล สนาม ภารกิจ และโปรแกรมของตัวเอง
+        ครูทำหน้าที่ช่วยตั้งคำถามและช่วยให้เด็กคิดต่อ
+      </p>
     </div>
+
     <div class="activities activities--photo-strip">
       <figure
         v-for="(actItem, index) in activityFormatsData.items"
@@ -62,6 +66,7 @@
         </figcaption>
       </figure>
     </div>
+
     <AdminSectionBlockLayer section-id="activityFormats" />
   </section>
 </template>

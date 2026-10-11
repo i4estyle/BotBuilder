@@ -88,20 +88,17 @@ export const createInitialState = () => ({
       {
         image: starterImageDefault,
         title: 'Mission-based learning',
-        description:
-          'มีโจทย์ให้ลงมือและเห็นผลจริง',
+        description: 'มีโจทย์ให้ลงมือและเห็นผลจริง',
       },
       {
         image: explorerImageDefault,
         title: 'Teacher as coach',
-        description:
-          'ครูช่วยให้เด็กคิด ไม่ใช่บอกทุกคำตอบ',
+        description: 'ครูช่วยให้เด็กคิด ไม่ใช่บอกทุกคำตอบ',
       },
       {
         image: masterImageDefault,
         title: 'Hands-on',
-        description:
-          'เด็กต้องจับ สร้าง ปรับ และทดลองด้วยตัวเอง',
+        description: 'เด็กต้องจับ สร้าง ปรับ และทดลองด้วยตัวเอง',
       },
     ],
   }),
@@ -423,20 +420,17 @@ export const createInitialEnState = () => ({
       {
         image: starterImageDefault,
         title: 'Mission-based learning',
-        description:
-          'Hands-on challenges with real, visible results.',
+        description: 'Hands-on challenges with real, visible results.',
       },
       {
         image: explorerImageDefault,
         title: 'Teacher as coach',
-        description:
-          'Teachers help children think rather than provide every answer.',
+        description: 'Teachers help children think rather than provide every answer.',
       },
       {
         image: masterImageDefault,
         title: 'Hands-on',
-        description:
-          'Children build, adjust, and experiment for themselves.',
+        description: 'Children build, adjust, and experiment for themselves.',
       },
     ],
   }),
@@ -720,17 +714,32 @@ export const SECTION_TITLE_MAP: Record<string, string> = {
   header: 'ส่วนหัวเว็บไซต์ (Header)',
   hero: 'ส่วนต้อนรับหลัก (Hero)',
   activityFormats: 'รูปแบบกิจกรรม (Activity Formats)',
-  activityGallery: 'คลังภาพกิจกรรม (Activity Gallery)',
+  courseMatcher: 'เลือกจุดเริ่มต้น (Course Matcher)',
+  learningMethod: 'กระบวนการเรียนรู้ (Learning Method)',
+  studentProjects: 'ผลงานเด็ก (Student Projects)',
+  parentProof: 'ผลลัพธ์ที่ผู้ปกครองเห็น (Parent Proof)',
+  discoveryClass: 'ทดลองเรียนจริง (Discovery Class)',
   quiz: 'แบบทดสอบสั้น (Quiz)',
   branches: 'สาขาของเรา (Branches)',
+  faq: 'คำถามที่พบบ่อย (FAQ)',
   cta: 'ส่วนลงทะเบียน (CTA)',
   footer: 'ส่วนท้ายเว็บไซต์ (Footer)',
+  activityGallery: 'คลังภาพกิจกรรม (Activity Gallery)',
 };
 
 export const IMAGE_BLOCK_SIZES: Record<string, ImageSizeSpec> = {
   'header.logo': { width: 200, height: 80, label: 'โลโก้เว็บไซต์' },
   'hero.image': { width: 1200, height: 800, label: 'รูปภาพหลัก (Hero)' },
   'activityFormats.item': { width: 800, height: 600, label: 'รูปแบบกิจกรรม' },
+  'courseMatcher.photo': { width: 800, height: 600, label: 'รูปภาพ Course Matcher' },
+  'learningMethod.photo': { width: 800, height: 600, label: 'รูปภาพ Learning Method' },
+  'studentProjects.feature': { width: 800, height: 600, label: 'รูปภาพ Student Projects (หลัก)' },
+  'studentProjects.stack1': { width: 600, height: 400, label: 'รูปภาพ Student Projects 1' },
+  'studentProjects.stack2': { width: 600, height: 400, label: 'รูปภาพ Student Projects 2' },
+  'parentProof.photo1': { width: 400, height: 400, label: 'รูปภาพ Parent Proof 1' },
+  'parentProof.photo2': { width: 400, height: 400, label: 'รูปภาพ Parent Proof 2' },
+  'parentProof.photo3': { width: 400, height: 400, label: 'รูปภาพ Parent Proof 3' },
+  'discoveryClass.photo': { width: 800, height: 600, label: 'รูปภาพ Discovery Class' },
   'gallery.certificateImage': { width: 600, height: 800, label: 'รูปใบประกาศนียบัตร' },
   'activityGallery.photo': { width: 400, height: 300, label: 'ภาพกิจกรรม' },
   'promotionsPage.item': { width: 800, height: 600, label: 'รูปโปรโมชั่น' },

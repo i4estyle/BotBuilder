@@ -1,4 +1,9 @@
-import { Injectable, Logger, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google, sheets_v4 } from 'googleapis';
 import type {
@@ -19,11 +24,15 @@ export class GoogleSheetsService {
       return this.sheetsClient;
     }
 
-    const email = this.configService.get<string>('GOOGLE_SERVICE_ACCOUNT_EMAIL');
+    const email = this.configService.get<string>(
+      'GOOGLE_SERVICE_ACCOUNT_EMAIL',
+    );
     const rawKey = this.configService.get<string>('GOOGLE_PRIVATE_KEY');
 
     if (!email || !rawKey) {
-      this.logger.error('Missing GOOGLE_SERVICE_ACCOUNT_EMAIL or GOOGLE_PRIVATE_KEY in .env');
+      this.logger.error(
+        'Missing GOOGLE_SERVICE_ACCOUNT_EMAIL or GOOGLE_PRIVATE_KEY in .env',
+      );
       throw new InternalServerErrorException(
         'Google Sheets credentials are not configured in environment variables.',
       );
@@ -44,17 +53,27 @@ export class GoogleSheetsService {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       this.logger.error(`Failed to initialize Google Sheets Auth: ${message}`);
-      throw new InternalServerErrorException(`Google Sheets Auth Initialization Failed: ${message}`);
+      throw new InternalServerErrorException(
+        `Google Sheets Auth Initialization Failed: ${message}`,
+      );
     }
   }
 
-  async getEvaluations(customSheetName?: string): Promise<GoogleSheetsEvaluationsResponse> {
-    const spreadsheetId = this.configService.get<string>('GOOGLE_SPREADSHEET_ID');
+  async getEvaluations(
+    customSheetName?: string,
+  ): Promise<GoogleSheetsEvaluationsResponse> {
+    const spreadsheetId = this.configService.get<string>(
+      'GOOGLE_SPREADSHEET_ID',
+    );
     const sheetName =
-      customSheetName || this.configService.get<string>('GOOGLE_SHEET_NAME') || 'Sheet1';
+      customSheetName ||
+      this.configService.get<string>('GOOGLE_SHEET_NAME') ||
+      'Sheet1';
 
     if (!spreadsheetId) {
-      throw new InternalServerErrorException('GOOGLE_SPREADSHEET_ID is not configured in .env');
+      throw new InternalServerErrorException(
+        'GOOGLE_SPREADSHEET_ID is not configured in .env',
+      );
     }
 
     const sheets = this.getSheetsClient();
@@ -81,7 +100,9 @@ export class GoogleSheetsService {
       const dataRows = rows.slice(1);
 
       const records: EvaluationRecord[] = dataRows
-        .filter((row) => row && row.length > 0 && Boolean(row[0]?.toString().trim()))
+        .filter(
+          (row) => row && row.length > 0 && Boolean(row[0]?.toString().trim()),
+        )
         .map((row) => {
           const parseScore = (val: unknown): number | null => {
             if (val === undefined || val === null || val === '') return null;
@@ -102,7 +123,9 @@ export class GoogleSheetsService {
           );
           const totalScore = validScores.reduce((acc, curr) => acc + curr, 0);
           const averageScore =
-            validScores.length > 0 ? Number((totalScore / validScores.length).toFixed(2)) : 0;
+            validScores.length > 0
+              ? Number((totalScore / validScores.length).toFixed(2))
+              : 0;
 
           const scores: EvaluationScores = {
             score1: s1,
@@ -143,11 +166,20 @@ export class GoogleSheetsService {
         records,
       };
     } catch (err: unknown) {
-      const errorObj = err as { code?: number; message?: string; response?: { data?: unknown } };
-      this.logger.error(`Error reading Google Sheet: ${errorObj.message}`, errorObj.response?.data);
+      const errorObj = err as {
+        code?: number;
+        message?: string;
+        response?: { data?: unknown };
+      };
+      this.logger.error(
+        `Error reading Google Sheet: ${errorObj.message}`,
+        errorObj.response?.data,
+      );
 
       if (errorObj.code === 404) {
-        throw new NotFoundException(`Google Spreadsheet not found with ID: ${spreadsheetId}`);
+        throw new NotFoundException(
+          `Google Spreadsheet not found with ID: ${spreadsheetId}`,
+        );
       }
       if (errorObj.code === 403) {
         throw new InternalServerErrorException(
@@ -161,4 +193,3 @@ export class GoogleSheetsService {
     }
   }
 }
-

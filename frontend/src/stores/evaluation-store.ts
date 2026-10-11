@@ -77,9 +77,7 @@ export const useEvaluationStore = defineStore('evaluation', {
           return (a.sessionNumber ?? 0) - (b.sessionNumber ?? 0);
         });
 
-        const completedRecords = sortedRecords.filter(
-          (r) => r.status.toLowerCase() === 'complete',
-        );
+        const completedRecords = sortedRecords.filter((r) => r.status.toLowerCase() === 'complete');
 
         const totalSessions = sortedRecords.length;
         const completedSessions = completedRecords.length;
@@ -146,7 +144,9 @@ export const useEvaluationStore = defineStore('evaluation', {
           .map((r) => r.scores[skill.key])
           .filter((s): s is number => s !== null && s > 0);
         skillAverages[skill.key] =
-          scores.length > 0 ? Number((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2)) : 0;
+          scores.length > 0
+            ? Number((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2))
+            : 0;
       });
 
       // Children summary
@@ -186,8 +186,10 @@ export const useEvaluationStore = defineStore('evaluation', {
         fullyCompletedChildren: fullyCompletedCount,
         inProgressChildren: Math.max(0, totalChildren - fullyCompletedCount),
         totalEvaluations: state.records.length,
-        completedEvaluations: state.records.filter((r) => r.status.toLowerCase() === 'complete').length,
-        pendingEvaluations: state.records.filter((r) => r.status.toLowerCase() === 'pending').length,
+        completedEvaluations: state.records.filter((r) => r.status.toLowerCase() === 'complete')
+          .length,
+        pendingEvaluations: state.records.filter((r) => r.status.toLowerCase() === 'pending')
+          .length,
         systemOverallAverage:
           state.records.length > 0
             ? Number(

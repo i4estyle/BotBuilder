@@ -9,11 +9,14 @@ export class GoogleSheetsController {
   constructor(private readonly googleSheetsService: GoogleSheetsService) {}
 
   @Get('evaluations')
-  @ApiOperation({ summary: 'Fetch children evaluation data from Google Sheets' })
+  @ApiOperation({
+    summary: 'Fetch children evaluation data from Google Sheets',
+  })
   @ApiQuery({
     name: 'sheetName',
     required: false,
-    description: 'Name of the sheet tab (defaults to GOOGLE_SHEET_NAME in .env)',
+    description:
+      'Name of the sheet tab (defaults to GOOGLE_SHEET_NAME in .env)',
   })
   @ApiResponse({
     status: 200,
@@ -25,4 +28,3 @@ export class GoogleSheetsController {
     return this.googleSheetsService.getEvaluations(sheetName);
   }
 }
-

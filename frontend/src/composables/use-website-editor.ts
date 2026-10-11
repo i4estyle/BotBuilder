@@ -35,6 +35,7 @@ import {
   isLoading,
   isSaving,
   error,
+  isMobileNavOpen,
 } from './website-editor/state';
 import {
   styleOverrides,
@@ -209,7 +210,12 @@ export function useWebsiteEditor() {
         }
       }
       if (data.navSections && Array.isArray(data.navSections) && data.navSections.length > 0) {
-        const retiredSectionIds = new Set(['benefits', 'gallery', 'learningJourney', 'activityGallery']);
+        const retiredSectionIds = new Set([
+          'benefits',
+          'gallery',
+          'learningJourney',
+          'activityGallery',
+        ]);
         navSections.splice(
           0,
           navSections.length,
@@ -350,7 +356,13 @@ export function useWebsiteEditor() {
     await fetchPageData(page, editorLocale.value);
   };
 
+  const toggleMobileNav = (): void => {
+    isMobileNavOpen.value = !isMobileNavOpen.value;
+  };
+
   return {
+    isMobileNavOpen,
+    toggleMobileNav,
     activePage,
     setActivePage: selectActivePage,
     header: contentState.header,

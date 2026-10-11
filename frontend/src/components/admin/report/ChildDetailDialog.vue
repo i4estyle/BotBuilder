@@ -17,8 +17,16 @@
               :color="child.isCompleted7 ? 'positive' : 'warning'"
               class="q-px-sm q-py-xs text-weight-medium"
             >
-              <q-icon :name="child.isCompleted7 ? 'check_circle' : 'schedule'" size="14px" class="q-mr-xs" />
-              {{ child.isCompleted7 ? 'ผ่านครบหลักสูตร 7 ครั้ง' : `กำลังเรียน (${child.completedSessions}/7 ครั้ง)` }}
+              <q-icon
+                :name="child.isCompleted7 ? 'check_circle' : 'schedule'"
+                size="14px"
+                class="q-mr-xs"
+              />
+              {{
+                child.isCompleted7
+                  ? 'ผ่านครบหลักสูตร 7 ครั้ง'
+                  : `กำลังเรียน (${child.completedSessions}/7 ครั้ง)`
+              }}
             </q-badge>
           </div>
           <div class="text-caption text-grey-3 q-mt-xs">
@@ -40,7 +48,10 @@
         <q-separator vertical />
         <div>
           <div class="text-caption text-grey-7">ความคืบหน้าหลักสูตร</div>
-          <div class="text-subtitle1 text-weight-bolder" :class="child.isCompleted7 ? 'text-positive' : 'text-warning'">
+          <div
+            class="text-subtitle1 text-weight-bolder"
+            :class="child.isCompleted7 ? 'text-positive' : 'text-warning'"
+          >
             {{ child.completionRate }}%
           </div>
         </div>
@@ -87,11 +98,7 @@
                 </div>
                 <!-- Controlled mount when dialog is ready -->
                 <div v-if="isDialogReady" class="radar-box">
-                  <ChildRadarChart
-                    :child="child"
-                    :overall-stats="overallStats"
-                    :height="380"
-                  />
+                  <ChildRadarChart :child="child" :overall-stats="overallStats" :height="380" />
                 </div>
                 <div v-else class="radar-placeholder flex flex-center">
                   <q-spinner-dots size="40px" color="primary" />
@@ -117,7 +124,10 @@
                         <q-icon :name="skill.icon" size="16px" class="q-mr-xs text-grey-7" />
                         {{ idx + 1 }}. {{ skill.label }}
                       </span>
-                      <span class="text-weight-bold" :class="getScoreBadgeClass(child.skillAverages[skill.key])">
+                      <span
+                        class="text-weight-bold"
+                        :class="getScoreBadgeClass(child.skillAverages[skill.key])"
+                      >
                         {{ child.skillAverages[skill.key] || 0 }} / 5.0
                       </span>
                     </div>
@@ -238,16 +248,24 @@
 
               <!-- Comment -->
               <div v-if="rec.comment" class="q-mb-sm">
-                <div class="text-caption text-weight-bold text-grey-8">บันทึกผลการประเมินจากผู้สอน:</div>
-                <div class="text-body2 text-grey-9 q-mt-xs text-preline q-pa-sm bg-grey-1 rounded-borders">
+                <div class="text-caption text-weight-bold text-grey-8">
+                  บันทึกผลการประเมินจากผู้สอน:
+                </div>
+                <div
+                  class="text-body2 text-grey-9 q-mt-xs text-preline q-pa-sm bg-grey-1 rounded-borders"
+                >
                   {{ rec.comment }}
                 </div>
               </div>
 
               <!-- AI Message -->
               <div v-if="rec.aiMessage" class="q-mt-sm">
-                <div class="text-caption text-weight-bold text-grey-8">ข้อความสรุปสำหรับผู้ปกครอง:</div>
-                <div class="text-body2 text-grey-9 q-mt-xs text-preline q-pa-sm bg-blue-1 rounded-borders border-blue">
+                <div class="text-caption text-weight-bold text-grey-8">
+                  ข้อความสรุปสำหรับผู้ปกครอง:
+                </div>
+                <div
+                  class="text-body2 text-grey-9 q-mt-xs text-preline q-pa-sm bg-blue-1 rounded-borders border-blue"
+                >
                   {{ rec.aiMessage }}
                 </div>
               </div>

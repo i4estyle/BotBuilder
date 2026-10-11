@@ -5,7 +5,9 @@
       <q-card flat bordered class="kpi-card kpi-card--primary">
         <q-card-section class="row items-center justify-between no-wrap">
           <div>
-            <div class="text-caption text-weight-medium text-grey-8">จำนวนผู้เรียนทั้งหมด (Students)</div>
+            <div class="text-caption text-weight-medium text-grey-8">
+              จำนวนผู้เรียนทั้งหมด (Students)
+            </div>
             <div class="text-h4 text-weight-bolder text-grey-10 q-mt-xs">
               {{ stats.totalChildren.toLocaleString() }}
               <span class="text-caption text-weight-regular text-grey-6">คน</span>
@@ -26,7 +28,9 @@
       <q-card flat bordered class="kpi-card kpi-card--success">
         <q-card-section class="row items-center justify-between no-wrap">
           <div>
-            <div class="text-caption text-weight-medium text-bb-green">สำเร็จครบหลักสูตร (7/7 ครั้ง)</div>
+            <div class="text-caption text-weight-medium text-bb-green">
+              สำเร็จครบหลักสูตร (7/7 ครั้ง)
+            </div>
             <div class="text-h4 text-weight-bolder text-bb-green q-mt-xs">
               {{ stats.fullyCompletedChildren.toLocaleString() }}
               <span class="text-caption text-weight-regular text-grey-6">คน</span>

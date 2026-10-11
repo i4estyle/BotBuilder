@@ -283,9 +283,14 @@
   padding: 10px 14px;
   background: #fff;
   color: var(--green);
-  font: 800 14px 'Noto Sans Thai', sans-serif;
+  font:
+    800 14px 'Noto Sans Thai',
+    sans-serif;
   cursor: pointer;
-  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
 }
 .course-matcher__tabs button:hover {
   transform: translateY(-2px);
@@ -619,7 +624,9 @@
 }
 .discovery-class__photo-caption span {
   color: #ffdf5c;
-  font: 800 10px Montserrat, sans-serif;
+  font:
+    800 10px Montserrat,
+    sans-serif;
   letter-spacing: 0.14em;
 }
 .discovery-class__photo-caption strong {
@@ -689,7 +696,9 @@
   padding: 10px 13px;
   background: #f8faf8;
   color: #263628;
-  font: 400 15px 'Noto Sans Thai', sans-serif;
+  font:
+    400 15px 'Noto Sans Thai',
+    sans-serif;
 }
 .discovery-class__form input:focus,
 .discovery-class__form select:focus {
@@ -793,7 +802,9 @@
   line-height: 1.75;
   opacity: 0;
   text-align: center;
-  transition: opacity 200ms ease, padding 280ms ease;
+  transition:
+    opacity 200ms ease,
+    padding 280ms ease;
 }
 .faq__item.is-open .faq__answer {
   grid-template-rows: 1fr;

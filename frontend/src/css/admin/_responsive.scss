@@ -1,30 +1,49 @@
-@media (max-width: 1024px) {
-  .admin-page {
-    &__workspace {
-      flex-direction: column;
+@media (max-width: 1023px) {
+  .admin-toolbar {
+    padding: 0 12px;
+    height: 52px;
+
+    &__brand {
+      gap: 6px;
     }
 
-    &__editor-sidebar {
-      width: 100%;
-      max-width: 100%;
-      height: auto;
-      flex-direction: row;
-      overflow-x: auto;
+    &__logo {
+      height: 24px;
     }
 
-    &__preview-pane {
-      height: calc(100vh - 120px);
-      padding: 12px;
+    &__title-group {
+      display: none;
+    }
+
+    &__actions {
+      gap: 4px;
+    }
+
+    &__history-controls {
+      display: none;
+    }
+
+    &__commit-btn--reset {
+      .q-btn__content span {
+        display: none;
+      }
     }
   }
 
-  .admin-toolbar {
-    padding: 8px 12px;
-    height: auto;
-    flex-wrap: wrap;
-    gap: 8px;
+  .admin-page {
+    &__preview-pane {
+      padding: 8px;
+    }
+  }
+}
 
-    &__status-pill {
+@media (max-width: 599px) {
+  .admin-toolbar {
+    &__viewports {
+      display: none;
+    }
+
+    &__lang {
       display: none;
     }
   }

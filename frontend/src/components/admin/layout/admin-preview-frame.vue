@@ -76,6 +76,31 @@
             :is-active="activeSectionId === 'activityFormats'"
             @select="selectSection"
           />
+          <PreviewSectionCourseMatcher
+            v-else-if="item.id === 'courseMatcher'"
+            :is-active="activeSectionId === 'courseMatcher'"
+            @select="selectSection"
+          />
+          <PreviewSectionLearningMethod
+            v-else-if="item.id === 'learningMethod'"
+            :is-active="activeSectionId === 'learningMethod'"
+            @select="selectSection"
+          />
+          <PreviewSectionStudentProjects
+            v-else-if="item.id === 'studentProjects'"
+            :is-active="activeSectionId === 'studentProjects'"
+            @select="selectSection"
+          />
+          <PreviewSectionParentProof
+            v-else-if="item.id === 'parentProof'"
+            :is-active="activeSectionId === 'parentProof'"
+            @select="selectSection"
+          />
+          <PreviewSectionDiscoveryClass
+            v-else-if="item.id === 'discoveryClass'"
+            :is-active="activeSectionId === 'discoveryClass'"
+            @select="selectSection"
+          />
           <PreviewSectionGallery
             v-else-if="item.id === 'gallery'"
             :is-active="activeSectionId === 'gallery'"
@@ -94,6 +119,11 @@
           <PreviewSectionBranches
             v-else-if="item.id === 'branches'"
             :is-active="activeSectionId === 'branches'"
+            @select="selectSection"
+          />
+          <PreviewSectionFaq
+            v-else-if="item.id === 'faq'"
+            :is-active="activeSectionId === 'faq'"
             @select="selectSection"
           />
           <PreviewSectionCta
@@ -383,10 +413,16 @@ import PreviewSectionHeader from '@/components/admin/sections/preview/home/previ
 import PreviewSectionHero from '@/components/admin/sections/preview/home/preview-section-hero.vue';
 import PreviewSectionBenefits from '@/components/admin/sections/preview/home/preview-section-benefits.vue';
 import PreviewSectionActivityFormats from '@/components/admin/sections/preview/home/preview-section-activity-formats.vue';
+import PreviewSectionCourseMatcher from '@/components/admin/sections/preview/home/preview-section-course-matcher.vue';
+import PreviewSectionLearningMethod from '@/components/admin/sections/preview/home/preview-section-learning-method.vue';
+import PreviewSectionStudentProjects from '@/components/admin/sections/preview/home/preview-section-student-projects.vue';
+import PreviewSectionParentProof from '@/components/admin/sections/preview/home/preview-section-parent-proof.vue';
+import PreviewSectionDiscoveryClass from '@/components/admin/sections/preview/home/preview-section-discovery-class.vue';
 import PreviewSectionGallery from '@/components/admin/sections/preview/home/preview-section-gallery.vue';
 import PreviewSectionActivityGallery from '@/components/admin/sections/preview/home/preview-section-activity-gallery.vue';
 import PreviewSectionQuiz from '@/components/admin/sections/preview/home/preview-section-quiz.vue';
 import PreviewSectionBranches from '@/components/admin/sections/preview/home/preview-section-branches.vue';
+import PreviewSectionFaq from '@/components/admin/sections/preview/home/preview-section-faq.vue';
 import PreviewSectionCta from '@/components/admin/sections/preview/home/preview-section-cta.vue';
 import PreviewSectionPromotionsHero from '@/components/admin/sections/preview/promotions/preview-section-promotions-hero.vue';
 import PreviewSectionPromotionsList from '@/components/admin/sections/preview/promotions/preview-section-promotions-list.vue';

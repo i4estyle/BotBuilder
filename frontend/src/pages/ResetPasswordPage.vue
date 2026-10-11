@@ -1,2 +1,55 @@
-<template><div class="login-page flex flex-center"><q-card class="login-card"><div class="login-card__brand"><h1 class="login-card__title">ตั้งรหัสผ่านใหม่</h1></div><q-form class="login-card__form" @submit.prevent="submit"><q-input v-model="password" type="password" label="รหัสผ่านใหม่" outlined /><q-input v-model="confirm" type="password" label="ยืนยันรหัสผ่าน" outlined /><q-banner v-if="message" dense rounded :class="success?'bg-positive text-white':'login-card__error'">{{ message }}</q-banner><q-btn type="submit" unelevated no-caps label="บันทึก" :loading="loading" class="login-card__submit" /></q-form></q-card></div></template>
-<script setup lang="ts">import { ref } from 'vue'; import { useRoute,useRouter } from 'vue-router'; import { authApiService } from '@/services/auth-api.service'; const route=useRoute(),router=useRouter(),password=ref(''),confirm=ref(''),loading=ref(false),message=ref(''),success=ref(false); async function submit(){const token=String(route.query.token||'');if(!token||password.value.length<8||password.value!==confirm.value){message.value='รหัสผ่านต้องตรงกันและมีอย่างน้อย 8 ตัวอักษร';return;}loading.value=true;try{await authApiService.resetPassword(token,password.value);success.value=true;message.value='สำเร็จ กำลังไปหน้าเข้าสู่ระบบ';setTimeout(()=>void router.replace('/admin/login'),1000);}catch{message.value='ลิงก์ไม่ถูกต้องหรือหมดอายุ';}finally{loading.value=false;}}</script>
+<template>
+  <div class="login-page flex flex-center">
+    <q-card class="login-card"
+      ><div class="login-card__brand"><h1 class="login-card__title">ตั้งรหัสผ่านใหม่</h1></div>
+      <q-form class="login-card__form" @submit.prevent="submit"
+        ><q-input v-model="password" type="password" label="รหัสผ่านใหม่" outlined /><q-input
+          v-model="confirm"
+          type="password"
+          label="ยืนยันรหัสผ่าน"
+          outlined /><q-banner
+          v-if="message"
+          dense
+          rounded
+          :class="success ? 'bg-positive text-white' : 'login-card__error'"
+          >{{ message }}</q-banner
+        ><q-btn
+          type="submit"
+          unelevated
+          no-caps
+          label="บันทึก"
+          :loading="loading"
+          class="login-card__submit" /></q-form
+    ></q-card>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { authApiService } from '@/services/auth-api.service';
+const route = useRoute(),
+  router = useRouter(),
+  password = ref(''),
+  confirm = ref(''),
+  loading = ref(false),
+  message = ref(''),
+  success = ref(false);
+async function submit() {
+  const token = String(route.query.token || '');
+  if (!token || password.value.length < 8 || password.value !== confirm.value) {
+    message.value = 'รหัสผ่านต้องตรงกันและมีอย่างน้อย 8 ตัวอักษร';
+    return;
+  }
+  loading.value = true;
+  try {
+    await authApiService.resetPassword(token, password.value);
+    success.value = true;
+    message.value = 'สำเร็จ กำลังไปหน้าเข้าสู่ระบบ';
+    setTimeout(() => void router.replace('/admin/login'), 1000);
+  } catch {
+    message.value = 'ลิงก์ไม่ถูกต้องหรือหมดอายุ';
+  } finally {
+    loading.value = false;
+  }
+}
+</script>

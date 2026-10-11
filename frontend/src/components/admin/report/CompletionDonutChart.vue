@@ -14,12 +14,7 @@
 
     <q-card-section class="chart-section flex flex-center">
       <div v-if="stats.totalChildren > 0" class="full-width">
-        <apexchart
-          type="donut"
-          height="340"
-          :options="chartOptions"
-          :series="series"
-        />
+        <apexchart type="donut" height="340" :options="chartOptions" :series="series" />
         <div class="row justify-around q-mt-md text-center border-top q-pt-sm">
           <div>
             <div class="text-caption text-grey-7">สำเร็จครบ 7 ครั้ง</div>

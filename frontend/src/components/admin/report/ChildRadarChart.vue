@@ -36,9 +36,7 @@ const chartKey = computed(() => {
 });
 
 const series = computed(() => {
-  const childData = SKILL_DEFINITIONS.map(
-    (skill) => props.child.skillAverages?.[skill.key] || 0,
-  );
+  const childData = SKILL_DEFINITIONS.map((skill) => props.child.skillAverages?.[skill.key] || 0);
 
   const groupData = SKILL_DEFINITIONS.map(
     (skill) => props.overallStats?.skillAverages?.[skill.key] || 0,

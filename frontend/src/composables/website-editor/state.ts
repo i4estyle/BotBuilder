@@ -32,6 +32,7 @@ export const activeSectionId = ref<string>('');
 export const selectedBlockId = ref<string>('');
 export const viewportMode = ref<ViewportMode>('desktop');
 export const editMode = ref<EditMode>('edit');
+export const isMobileNavOpen = ref(false);
 
 export const themeSettings = reactive<ThemeSettings>({
   primaryColor: '#c00000',

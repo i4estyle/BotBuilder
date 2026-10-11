@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { UserStatus } from '../../../common/enums/user-status.enum.js';
 
 @Entity('BB_ADMIN')
@@ -15,10 +22,20 @@ export class Admin {
   @Column({ name: 'EMAIL', type: 'varchar', length: 100, unique: true })
   email!: string;
 
-  @Column({ name: 'PASSWORD_HASH', type: 'varchar', length: 255, select: false })
+  @Column({
+    name: 'PASSWORD_HASH',
+    type: 'varchar',
+    length: 255,
+    select: false,
+  })
   passwordHash?: string;
 
-  @Column({ name: 'STATUS', type: 'enum', enum: UserStatus, default: UserStatus.ACTIVE })
+  @Column({
+    name: 'STATUS',
+    type: 'enum',
+    enum: UserStatus,
+    default: UserStatus.ACTIVE,
+  })
   status!: UserStatus;
 
   @Column({ name: 'AUTH_VERSION', type: 'int', default: 0 })

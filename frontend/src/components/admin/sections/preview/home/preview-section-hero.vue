@@ -5,20 +5,6 @@
     :class="{ 'admin-preview-section--active': isActive }"
     @click="$emit('select', 'hero')"
   >
-    <div class="hero__image-frame">
-      <div
-        class="hero__image-inner admin-image-hover-trigger"
-        data-image-key="hero.image"
-        data-style-key="hero.image"
-        :style="getStyleOverride('hero.image')"
-      >
-        <img :src="resolveAssetUrl(heroData.image)" :alt="heroData.imageAlt" />
-        <div class="admin-image-hover-overlay">
-          <q-icon name="photo_camera" size="32px" />
-          <span>คลิกปรับแต่งรูป Hero</span>
-        </div>
-      </div>
-    </div>
     <div class="hero__copy">
       <p class="hero__kicker">Robotics Design Studio for Kids</p>
       <h1>
@@ -47,30 +33,6 @@
         @blur="(e) => onTextChange(e, (val) => (heroData.paragraph = val))"
       >
         {{ heroData.paragraph }}
-      </p>
-      <ul class="hero__skills">
-        <li
-          v-for="(skill, index) in heroData.skills"
-          :key="index"
-          :data-style-key="`hero.skills.${index}`"
-          contenteditable="true"
-          class="admin-inline-editable"
-          :style="getStyleOverride(`hero.skills.${index}`)"
-          @blur="(e) => onTextChange(e, (val) => (heroData.skills[index] = val))"
-        >
-          {{ skill }}
-        </li>
-      </ul>
-      <p class="hero__booking-note">
-        <span
-          data-style-key="hero.bookingNote"
-          contenteditable="true"
-          class="admin-inline-editable"
-          :style="getStyleOverride('hero.bookingNote')"
-          @blur="(e) => onTextChange(e, (val) => (heroData.bookingNote = val))"
-          >{{ heroData.bookingNote }}</span
-        >
-        <a href="javascript:void(0)">@botbuilderthailand</a>
       </p>
       <div class="hero__actions">
         <AppButton class="app-button--stacked">
@@ -112,15 +74,33 @@
       </div>
     </div>
 
-    <div class="hero__brandline">
+    <div class="hero__image-frame">
+      <div
+        class="hero__image-inner admin-image-hover-trigger"
+        data-image-key="hero.image"
+        data-style-key="hero.image"
+        :style="getStyleOverride('hero.image')"
+      >
+        <img :src="resolveAssetUrl(heroData.image)" :alt="heroData.imageAlt" />
+        <p class="hero__image-caption">พื้นที่ให้เด็กได้สร้าง ทดลอง และแก้ปัญหาด้วยตัวเอง</p>
+        <div class="admin-image-hover-overlay">
+          <q-icon name="photo_camera" size="32px" />
+          <span>คลิกปรับแต่งรูป Hero</span>
+        </div>
+      </div>
+    </div>
+
+    <AdminSectionBlockLayer section-id="hero" />
+  </section>
+
+  <div class="hero__brandline" aria-label="BotBuilder highlights">
+    <div class="hero__brandline-grid">
       <div><strong>Hands-on Learning</strong><span>สร้าง ทดลอง และเรียนรู้จากของจริง</span></div>
       <div><strong>Age 3–16</strong><span>เส้นทางการเรียนรู้ตามวัยและทักษะ</span></div>
       <div><strong>Build + Code</strong><span>เชื่อมการสร้าง กลไก และการเขียนโปรแกรม</span></div>
       <div><strong>Think + Explain</strong><span>ฝึกคิด แก้ปัญหา และอธิบายสิ่งที่ทำ</span></div>
     </div>
-
-    <AdminSectionBlockLayer section-id="hero" />
-  </section>
+  </div>
 </template>
 
 <script setup lang="ts">

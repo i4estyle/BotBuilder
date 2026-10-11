@@ -24,7 +24,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload): Promise<AuthenticatedAdmin> {
-    const admin = await this.authService.validateAdminById(payload.sub, payload.ver);
+    const admin = await this.authService.validateAdminById(
+      payload.sub,
+      payload.ver,
+    );
     if (!admin) {
       throw new UnauthorizedException('บัญชีผู้ใช้ไม่ถูกต้องหรือถูกระงับ');
     }

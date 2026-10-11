@@ -40,17 +40,25 @@
             <div class="hero__image-frame">
               <div class="hero__image-inner" :style="getStyleOverride('hero.image')">
                 <img :src="resolveAssetUrl(heroData.image)" :alt="heroData.imageAlt" />
-                <p class="hero__image-caption">พื้นที่ให้เด็กได้สร้าง ทดลอง และแก้ปัญหาด้วยตัวเอง</p>
+                <p class="hero__image-caption">
+                  พื้นที่ให้เด็กได้สร้าง ทดลอง และแก้ปัญหาด้วยตัวเอง
+                </p>
               </div>
             </div>
             <AdminSectionBlockLayer section-id="hero" />
           </section>
           <div class="hero__brandline" aria-label="BotBuilder highlights">
             <div class="hero__brandline-grid">
-              <div><strong>Hands-on Learning</strong><span>สร้าง ทดลอง และเรียนรู้จากของจริง</span></div>
+              <div>
+                <strong>Hands-on Learning</strong><span>สร้าง ทดลอง และเรียนรู้จากของจริง</span>
+              </div>
               <div><strong>Age 3–16</strong><span>เส้นทางการเรียนรู้ตามวัยและทักษะ</span></div>
-              <div><strong>Build + Code</strong><span>เชื่อมการสร้าง กลไก และการเขียนโปรแกรม</span></div>
-              <div><strong>Think + Explain</strong><span>ฝึกคิด แก้ปัญหา และอธิบายสิ่งที่ทำ</span></div>
+              <div>
+                <strong>Build + Code</strong><span>เชื่อมการสร้าง กลไก และการเขียนโปรแกรม</span>
+              </div>
+              <div>
+                <strong>Think + Explain</strong><span>ฝึกคิด แก้ปัญหา และอธิบายสิ่งที่ทำ</span>
+              </div>
             </div>
           </div>
         </template>
@@ -68,8 +76,8 @@
               :centered="false"
             />
             <p>
-              เด็กไม่ได้ถูกวางให้นั่งดูครูสาธิต แต่ได้ลงมือกับโมเดล สนาม ภารกิจ
-              และโปรแกรมของตัวเอง ครูทำหน้าที่ช่วยตั้งคำถามและช่วยให้เด็กคิดต่อ
+              เด็กไม่ได้ถูกวางให้นั่งดูครูสาธิต แต่ได้ลงมือกับโมเดล สนาม ภารกิจ และโปรแกรมของตัวเอง
+              ครูทำหน้าที่ช่วยตั้งคำถามและช่วยให้เด็กคิดต่อ
             </p>
           </div>
           <ActivityFormats :items="activityFormatsData.items" />
@@ -89,129 +97,17 @@
           v-else-if="item.id === 'learningMethod'"
           class="section learning-method section--muted"
         >
-          <div class="learning-method__content">
-            <div class="learning-method__copy" data-reveal>
-              <p class="section-kicker">HOW BOTBUILDER TEACHES</p>
-              <h2>Build. Code. Solve. Present.</h2>
-              <p>
-                เป้าหมายของหนึ่งคลาสไม่ใช่ “ต่อเสร็จ” แต่คือเด็กเข้าใจว่าทำไมมันจึงทำงาน
-                และรู้ว่าจะทำอย่างไรเมื่อครั้งแรกยังไม่สำเร็จ
-              </p>
-            </div>
-            <ol class="learning-method__steps" data-reveal>
-              <li>
-                <span>01</span><h3>Build</h3>
-                <p>เข้าใจโครงสร้าง กลไก เฟือง คาน ล้อ และการเคลื่อนไหวจากของจริง</p>
-              </li>
-              <li>
-                <span>02</span><h3>Code</h3>
-                <p>ใช้ Event, Input, Decision และ Action เพื่อควบคุมสิ่งที่ตัวเองสร้าง</p>
-              </li>
-              <li>
-                <span>03</span><h3>Solve</h3>
-                <p>Test → Fail → Fix เปลี่ยนทีละตัวแปร ทดลองซ้ำ และหาคำตอบจากผลจริง</p>
-              </li>
-              <li>
-                <span>04</span><h3>Present</h3>
-                <p>อธิบายโจทย์ วิธีทำ ปัญหาที่เจอ และสิ่งที่ปรับแก้ด้วยเหตุผลของตัวเอง</p>
-              </li>
-            </ol>
-          </div>
-          <div class="learning-method__photo" data-reveal>
-            <img
-              :src="resolveAssetUrl('/src/assets/landing/Bot Builder-390.jpg')"
-              alt="โปรโมชั่น Happy Play Time ของ BotBuilder"
-            />
-          </div>
+          <HomeLearningMethodSection />
           <AdminSectionBlockLayer section-id="learningMethod" />
         </section>
 
         <section v-else-if="item.id === 'studentProjects'" class="section student-projects">
-          <div class="student-projects__intro" data-reveal>
-            <p class="section-kicker">STUDENT WORK AS EVIDENCE</p>
-            <h2>ผลงานไม่ใช่แค่ “ของที่ทำเสร็จ” แต่คือหลักฐานของวิธีคิด</h2>
-            <p>
-              ภาพเด็กและผลงานจริงควรเล่าโจทย์ การทดลอง และสิ่งที่เด็กแก้ไข
-              มากกว่าการวางภาพโมเดลแบบ catalog
-            </p>
-          </div>
-          <div class="student-projects__grid" data-reveal>
-            <article class="student-projects__feature">
-              <img
-                :src="resolveAssetUrl('/src/assets/landing/exploringspace.png')"
-                alt="เด็กกำลังโชว์ผลงานหุ่นยนต์"
-              />
-              <div class="student-projects__overlay">
-                <span>STUDENT PROJECT</span>
-                <h3>Build something you can explain</h3>
-                <p>เด็กควรรู้ว่าชิ้นส่วนแต่ละส่วนทำอะไร และอธิบายเหตุผลของวิธีสร้างตัวเองได้</p>
-              </div>
-            </article>
-            <div class="student-projects__stack">
-              <article>
-                <img
-                  :src="resolveAssetUrl('/src/assets/landing/playlearn.png')"
-                  alt="เด็กกำลังประกอบโมเดล"
-                />
-                <div class="student-projects__overlay">
-                  <span>PROCESS</span><h3>From parts to idea</h3>
-                </div>
-              </article>
-              <article>
-                <img
-                  :src="resolveAssetUrl('/src/assets/landing/roboticcamp.png')"
-                  alt="บรรยากาศสนามหุ่นยนต์"
-                />
-                <div class="student-projects__overlay">
-                  <span>MISSION</span><h3>Make it work in the real field</h3>
-                </div>
-              </article>
-            </div>
-          </div>
+          <HomeStudentProjectsSection />
           <AdminSectionBlockLayer section-id="studentProjects" />
         </section>
 
         <section v-else-if="item.id === 'parentProof'" class="section parent-proof section--muted">
-          <div class="parent-proof__photos" data-reveal>
-            <img
-              :src="resolveAssetUrl('/src/assets/landing/inside1.jpg')"
-              alt="ครูและนักเรียนในคลาส BotBuilder"
-            />
-            <img
-              :src="resolveAssetUrl('/src/assets/landing/exploringspace.png')"
-              alt="เด็กกับผลงานหุ่นยนต์"
-            />
-            <img
-              :src="resolveAssetUrl('/src/assets/landing/roboticcamp.png')"
-              alt="เด็กทดลองหุ่นยนต์บนสนาม"
-            />
-          </div>
-          <div class="parent-proof__copy" data-reveal>
-            <p class="section-kicker">PROOF OVER CLAIMS</p>
-            <h2>สิ่งที่ผู้ปกครองควรเห็นหลังเรียน</h2>
-            <p class="parent-proof__lead">
-              แทนคำว่า “พัฒนาความคิดสร้างสรรค์” เว็บไซต์ควรแสดงหลักฐานของพัฒนาการ
-              เป็นเรื่องราวที่ดูได้จริง
-            </p>
-            <ul class="parent-proof__list">
-              <li>
-                <b>01</b>
-                <span><strong>Student Project Case</strong><br />โจทย์ → วิธีออกแบบ → ปัญหา → วิธีแก้ → ผลลัพธ์</span>
-              </li>
-              <li>
-                <b>02</b>
-                <span><strong>Progress Feedback</strong><br />Focus · Sequence · Problem Solving · Creativity · Coding Level</span>
-              </li>
-              <li>
-                <b>03</b>
-                <span><strong>Before / After</strong><br />เทียบผลงานแรกกับผลงานปัจจุบัน เพื่อให้เห็นพัฒนาการจริง</span>
-              </li>
-              <li>
-                <b>04</b>
-                <span><strong>Student Voice</strong><br />ให้เด็กเป็นคนอธิบายผลงาน ไม่ใช่ให้แบรนด์พูดแทนทั้งหมด</span>
-              </li>
-            </ul>
-          </div>
+          <HomeParentProofSection />
           <AdminSectionBlockLayer section-id="parentProof" />
         </section>
 
@@ -220,53 +116,7 @@
           id="discovery-class"
           class="section discovery-class"
         >
-          <div class="discovery-class__photo" data-reveal>
-            <img
-              :src="resolveAssetUrl('/src/assets/landing/playlearn.png')"
-              alt="เด็กกำลังทดลองเรียนหุ่นยนต์ที่ BotBuilder"
-            />
-            <div class="discovery-class__photo-caption">
-              <span>ROBOTICS DISCOVERY CLASS</span>
-              <strong>ให้เด็กได้สร้าง ลอง และอธิบายด้วยตัวเอง</strong>
-            </div>
-          </div>
-          <div class="discovery-class__panel" data-reveal>
-            <p class="section-kicker">ROBOTICS DISCOVERY CLASS</p>
-            <h2>อย่าเดาว่าลูกเหมาะกับระดับไหน ให้เด็กได้ลองจริงก่อน</h2>
-            <p class="discovery-class__lead">
-              หลังทดลอง ผู้ปกครองจะได้รับ Feedback สั้น ๆ ว่าน้องสนใจอะไร ทำงานแบบไหน
-              และ Learning Path ใดเหมาะที่สุด
-            </p>
-            <form class="discovery-class__form">
-              <div class="discovery-class__form-grid">
-                <label>
-                  อายุของน้อง
-                  <select aria-label="อายุของน้อง">
-                    <option>3–5 ปี</option><option>6–9 ปี</option><option>10–12 ปี</option><option>13–16 ปี</option>
-                  </select>
-                </label>
-                <label>
-                  น้องสนใจอะไรที่สุด?
-                  <select aria-label="สิ่งที่น้องสนใจ">
-                    <option>ต่อของ / สร้างของ</option><option>หุ่นยนต์ / เครื่องจักร</option>
-                    <option>เกม / Coding</option><option>การแข่งขัน / ภารกิจ</option><option>ยังไม่แน่ใจ</option>
-                  </select>
-                </label>
-                <label>
-                  ชื่อผู้ปกครอง
-                  <input type="text" placeholder="ชื่อ" />
-                </label>
-                <label>
-                  LINE / เบอร์โทร
-                  <input type="text" placeholder="@LINE หรือเบอร์โทร" />
-                </label>
-              </div>
-              <AppButton href="https://line.me/R/ti/p/@botbuilderthailand" class="discovery-class__cta">
-                รับคำแนะนำ + จอง Discovery Class
-              </AppButton>
-              <small>ทีมครูจะช่วยแนะนำจากสิ่งที่น้องได้ลองทำจริง</small>
-            </form>
-          </div>
+          <HomeDiscoveryClassSection />
           <AdminSectionBlockLayer section-id="discoveryClass" />
         </section>
 
@@ -383,7 +233,6 @@
     </main>
 
     <QuizPanel v-model="quizOpen" />
-
   </q-page>
 </template>
 
@@ -392,6 +241,10 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import ActivityFormats from '@/components/landing/ActivityFormats.vue';
 import AppButton from '@/components/landing/AppButton.vue';
 import HomeCourseMatcherSection from '@/components/landing/home/home-course-matcher-section.vue';
+import HomeLearningMethodSection from '@/components/landing/home/home-learning-method-section.vue';
+import HomeStudentProjectsSection from '@/components/landing/home/home-student-projects-section.vue';
+import HomeParentProofSection from '@/components/landing/home/home-parent-proof-section.vue';
+import HomeDiscoveryClassSection from '@/components/landing/home/home-discovery-class-section.vue';
 import HomeFaqSection from '@/components/landing/home/home-faq-section.vue';
 import QuizPanel from '@/components/landing/QuizPanel.vue';
 import SectionHeading from '@/components/landing/SectionHeading.vue';
@@ -419,7 +272,9 @@ function getCustomBlock(id: string) {
 }
 
 function scrollToDiscoveryClass(): void {
-  document.getElementById('discovery-class')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document
+    .getElementById('discovery-class')
+    ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 const pageRoot = ref<HTMLElement | null>(null);

@@ -14,7 +14,9 @@
         <img :src="resolveAssetUrl(item.image)" :alt="item.title" />
       </div>
       <figcaption class="activities__copy">
-        <strong :style="getStyleOverride(`activityFormats.items.${index}.title`)">{{ item.title }}</strong>
+        <strong :style="getStyleOverride(`activityFormats.items.${index}.title`)">{{
+          item.title
+        }}</strong>
         <span :style="getStyleOverride(`activityFormats.items.${index}.description`)">{{
           item.description
         }}</span>

@@ -176,12 +176,7 @@
             <div class="row items-center">
               <span class="text-weight-bold q-mr-xs">{{ props.row.averageScore }}</span>
               <span class="text-caption text-grey">/ 5</span>
-              <q-badge
-                v-if="props.row.totalScore > 0"
-                color="primary"
-                outline
-                class="q-ml-sm"
-              >
+              <q-badge v-if="props.row.totalScore > 0" color="primary" outline class="q-ml-sm">
                 รวม {{ props.row.totalScore }}
               </q-badge>
             </div>
@@ -235,9 +230,7 @@
     <q-dialog v-model="showDetailDialog">
       <q-card style="min-width: 650px; max-width: 90vw">
         <q-card-section class="row items-center justify-between bg-primary text-white">
-          <div class="text-h6 text-weight-bold">
-            รายละเอียดผลการประเมิน
-          </div>
+          <div class="text-h6 text-weight-bold">รายละเอียดผลการประเมิน</div>
           <q-btn flat round dense icon="close" v-close-popup />
         </q-card-section>
 
@@ -253,7 +246,9 @@
             </div>
             <q-chip
               :color="selectedRecord.status.toLowerCase() === 'complete' ? 'green-1' : 'orange-1'"
-              :text-color="selectedRecord.status.toLowerCase() === 'complete' ? 'green-9' : 'orange-9'"
+              :text-color="
+                selectedRecord.status.toLowerCase() === 'complete' ? 'green-9' : 'orange-9'
+              "
             >
               {{ selectedRecord.status }}
             </q-chip>
@@ -264,11 +259,7 @@
           <!-- Score Breakdown -->
           <div class="text-subtitle2 text-weight-bold q-mb-xs">คะแนนแต่ละทักษะ (1 - 5):</div>
           <div class="row q-col-gutter-sm q-mb-md">
-            <div
-              v-for="(skill, index) in skillLabels"
-              :key="index"
-              class="col-12 col-sm-6"
-            >
+            <div v-for="(skill, index) in skillLabels" :key="index" class="col-12 col-sm-6">
               <q-card flat bordered class="q-pa-xs bg-grey-1">
                 <div class="text-caption text-grey-8">{{ index + 1 }}. {{ skill.label }}</div>
                 <div class="text-weight-bold text-primary">
@@ -284,14 +275,22 @@
               คะแนนรวม: <span class="text-weight-bold">{{ selectedRecord.totalScore }} / 35</span>
             </div>
             <div class="text-body2">
-              คะแนนเฉลี่ย: <span class="text-weight-bold text-primary">{{ selectedRecord.averageScore }} / 5.0</span>
+              คะแนนเฉลี่ย:
+              <span class="text-weight-bold text-primary"
+                >{{ selectedRecord.averageScore }} / 5.0</span
+              >
             </div>
           </div>
 
           <!-- Comment / Evaluation Details -->
           <div v-if="selectedRecord.comment" class="q-mb-md">
             <div class="text-subtitle2 text-weight-bold q-mb-xs">ผลการประเมินและข้อคิดเห็น:</div>
-            <q-card flat bordered class="q-pa-sm bg-grey-1 text-body2" style="white-space: pre-line">
+            <q-card
+              flat
+              bordered
+              class="q-pa-sm bg-grey-1 text-body2"
+              style="white-space: pre-line"
+            >
               {{ selectedRecord.comment }}
             </q-card>
           </div>
@@ -299,7 +298,12 @@
           <!-- AI Message -->
           <div v-if="selectedRecord.aiMessage" class="q-mb-md">
             <div class="text-subtitle2 text-weight-bold q-mb-xs">ข้อความสรุปสำหรับผู้ปกครอง:</div>
-            <q-card flat bordered class="q-pa-sm bg-amber-1 text-body2" style="white-space: pre-line">
+            <q-card
+              flat
+              bordered
+              class="q-pa-sm bg-amber-1 text-body2"
+              style="white-space: pre-line"
+            >
               {{ selectedRecord.aiMessage }}
             </q-card>
           </div>
@@ -423,9 +427,7 @@ const filteredRecords = computed(() => {
   let list = store.records;
 
   if (selectedStatus.value !== 'ALL') {
-    list = list.filter(
-      (r) => r.status.toLowerCase() === selectedStatus.value.toLowerCase(),
-    );
+    list = list.filter((r) => r.status.toLowerCase() === selectedStatus.value.toLowerCase());
   }
 
   if (searchQuery.value && searchQuery.value.trim() !== '') {
@@ -474,4 +476,3 @@ onUnmounted(() => {
   transform: translateY(-2px);
 }
 </style>
-

@@ -10,6 +10,8 @@ export class AddGuardianRelationToUser1785400000000 implements MigrationInterfac
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('ALTER TABLE `BB_USER` DROP COLUMN `GUARDIAN_RELATION`');
+    await queryRunner.query(
+      'ALTER TABLE `BB_USER` DROP COLUMN `GUARDIAN_RELATION`',
+    );
   }
 }

@@ -13,12 +13,7 @@
     </q-card-section>
 
     <q-card-section class="chart-section">
-      <apexchart
-        type="bar"
-        height="380"
-        :options="chartOptions"
-        :series="series"
-      />
+      <apexchart type="bar" height="380" :options="chartOptions" :series="series" />
     </q-card-section>
   </q-card>
 </template>

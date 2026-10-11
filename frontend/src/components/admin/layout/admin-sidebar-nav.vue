@@ -1,7 +1,13 @@
 <template>
-  <aside class="admin-page__editor-sidebar">
+  <aside
+    class="admin-page__editor-sidebar"
+    :class="{ 'admin-page__editor-sidebar--mobile-open': isMobileNavOpen }"
+  >
+    <div class="admin-sidebar-header">
+      <span class="admin-sidebar-header__title">โครงสร้างหน้า</span>
+    </div>
+
     <div class="admin-sidebar-page-switcher">
-      <span class="admin-sidebar-page-switcher__title">เลือกหน้าที่จะจัดการ</span>
       <div class="admin-sidebar-page-switcher__grid">
         <button
           v-for="pageItem in pagesList"
@@ -41,11 +47,11 @@
           @pointercancel="showNavDragTooltip"
         >
           <q-icon name="drag_indicator" size="14px" />
-          <q-tooltip v-if="showNavDragTooltipValue">ลากเพื่อเปลี่ยนลำดับหน้า</q-tooltip>
+          <q-tooltip v-if="showNavDragTooltipValue">ลากเพื่อเปลี่ยนลำดับ</q-tooltip>
         </div>
 
         <div class="admin-nav-tree-item__icon-badge">
-          <q-icon :name="item.icon" />
+          <q-icon :name="item.icon" size="16px" />
         </div>
 
         <span class="admin-nav-tree-item__label">
@@ -90,15 +96,21 @@ defineEmits<{
   (e: 'openEditSection', item: SectionNavItem): void;
 }>();
 
-const { activePage, setActivePage, activeSectionId, navSections, reorderNavSections } =
-  useWebsiteEditor();
+const {
+  activePage,
+  setActivePage,
+  activeSectionId,
+  navSections,
+  reorderNavSections,
+  isMobileNavOpen,
+} = useWebsiteEditor();
 
-const pagesList = [
-  { id: 'home' as ActivePage, title: 'หน้าหลัก', icon: 'home' },
-  { id: 'promotions' as ActivePage, title: 'โปรโมชั่น', icon: 'local_offer' },
-  { id: 'courses' as ActivePage, title: 'คอร์สเรียน', icon: 'school' },
-  { id: 'resources' as ActivePage, title: 'คลังความรู้', icon: 'menu_book' },
-  { id: 'about' as ActivePage, title: 'เกี่ยวกับเรา', icon: 'info' },
+const pagesList: Array<{ id: ActivePage; title: string; icon: string }> = [
+  { id: 'home', title: 'หน้าหลัก', icon: 'home' },
+  { id: 'promotions', title: 'โปรโมชั่น', icon: 'local_offer' },
+  { id: 'courses', title: 'คอร์สเรียน', icon: 'school' },
+  { id: 'resources', title: 'คลังความรู้', icon: 'menu_book' },
+  { id: 'about', title: 'เกี่ยวกับเรา', icon: 'info' },
 ];
 
 const draggedNavIndex = ref<number | null>(null);

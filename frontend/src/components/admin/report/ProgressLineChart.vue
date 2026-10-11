@@ -1,12 +1,7 @@
 <template>
   <div class="progress-line-chart">
     <div v-if="hasMultipleSessions">
-      <apexchart
-        type="line"
-        height="280"
-        :options="chartOptions"
-        :series="series"
-      />
+      <apexchart type="line" height="280" :options="chartOptions" :series="series" />
     </div>
     <div v-else class="text-grey-6 text-center q-pa-md">
       <q-icon name="info" size="24px" class="q-mr-xs" />
@@ -91,4 +86,3 @@ const chartOptions = computed<ApexOptions>(() => {
   width: 100%;
 }
 </style>
-

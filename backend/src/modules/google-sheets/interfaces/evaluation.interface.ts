@@ -33,4 +33,3 @@ export interface GoogleSheetsEvaluationsResponse {
   lastUpdated: string;
   records: EvaluationRecord[];
 }
-

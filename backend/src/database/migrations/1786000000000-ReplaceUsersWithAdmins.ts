@@ -27,16 +27,26 @@ export class ReplaceUsersWithAdmins1786000000000 implements MigrationInterface {
       INNER JOIN \`BB_USER_ROLE\` ur ON ur.USER_ID = u.USER_ID
       INNER JOIN \`BB_ROLE\` r ON r.ROLE_ID = ur.ROLE_ID
       WHERE LOWER(r.ROLE_NAME) = 'admin' AND u.USER_EMAIL IS NOT NULL AND u.PASSWORD_HASH IS NOT NULL`);
-    await queryRunner.query('DROP INDEX `IDX_BB_AUTH_TOKEN_USER_PURPOSE` ON `BB_AUTH_TOKEN`');
-    await queryRunner.query('ALTER TABLE `BB_AUTH_TOKEN` CHANGE `USER_ID` `ADMIN_ID` char(8) NOT NULL');
-    await queryRunner.query('DELETE t FROM `BB_AUTH_TOKEN` t LEFT JOIN `BB_ADMIN` a ON a.`ADMIN_ID` = t.`ADMIN_ID` WHERE a.`ADMIN_ID` IS NULL');
-    await queryRunner.query('CREATE INDEX `IDX_BB_AUTH_TOKEN_ADMIN_PURPOSE` ON `BB_AUTH_TOKEN` (`ADMIN_ID`, `PURPOSE`)');
+    await queryRunner.query(
+      'DROP INDEX `IDX_BB_AUTH_TOKEN_USER_PURPOSE` ON `BB_AUTH_TOKEN`',
+    );
+    await queryRunner.query(
+      'ALTER TABLE `BB_AUTH_TOKEN` CHANGE `USER_ID` `ADMIN_ID` char(8) NOT NULL',
+    );
+    await queryRunner.query(
+      'DELETE t FROM `BB_AUTH_TOKEN` t LEFT JOIN `BB_ADMIN` a ON a.`ADMIN_ID` = t.`ADMIN_ID` WHERE a.`ADMIN_ID` IS NULL',
+    );
+    await queryRunner.query(
+      'CREATE INDEX `IDX_BB_AUTH_TOKEN_ADMIN_PURPOSE` ON `BB_AUTH_TOKEN` (`ADMIN_ID`, `PURPOSE`)',
+    );
     await queryRunner.query('DROP TABLE `BB_USER_ROLE`');
     await queryRunner.query('DROP TABLE `BB_ROLE`');
     await queryRunner.query('DROP TABLE `BB_USER`');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    throw new Error('This migration intentionally cannot be reversed after legacy user data is removed.');
+    throw new Error(
+      'This migration intentionally cannot be reversed after legacy user data is removed.',
+    );
   }
 }

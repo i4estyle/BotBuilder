@@ -61,7 +61,9 @@ export class AuthService {
   async loginWithGoogle(credential: string): Promise<LoginResult> {
     const clientId = this.config.get<string>('GOOGLE_CLIENT_ID');
     if (!clientId) {
-      throw new ServiceUnavailableException('Google Sign-In has not been configured');
+      throw new ServiceUnavailableException(
+        'Google Sign-In has not been configured',
+      );
     }
 
     let email: string | undefined;
@@ -71,12 +73,14 @@ export class AuthService {
         audience: clientId,
       });
       const payload = ticket.getPayload();
-      if (payload?.email_verified === true) email = payload.email?.toLowerCase();
+      if (payload?.email_verified === true)
+        email = payload.email?.toLowerCase();
     } catch {
       throw new UnauthorizedException('Google credential is invalid');
     }
 
-    if (!email) throw new UnauthorizedException('Google email has not been verified');
+    if (!email)
+      throw new UnauthorizedException('Google email has not been verified');
 
     const admin = await this.admins.findOneBy({ email });
     if (!admin || admin.status !== UserStatus.ACTIVE) {

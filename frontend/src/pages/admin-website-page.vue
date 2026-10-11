@@ -16,6 +16,19 @@
       <section class="admin-page__preview-pane">
         <AdminPreviewFrame />
       </section>
+
+      <div v-if="isMobileNavOpen" class="admin-page__mobile-backdrop" @click="toggleMobileNav" />
+
+      <q-btn
+        round
+        color="primary"
+        icon="layers"
+        class="admin-page__mobile-floating-btn lt-md"
+        aria-label="Toggle section navigation"
+        @click="toggleMobileNav"
+      >
+        <q-tooltip anchor="top middle" self="bottom middle">โครงสร้างหน้าเว็บ</q-tooltip>
+      </q-btn>
     </div>
 
     <q-inner-loading :showing="isLoading">
@@ -33,8 +46,16 @@ import AdminEditSectionModal from '@/components/admin/modals/admin-edit-section-
 import AdminQuizModal from '@/components/admin/modals/admin-quiz-modal.vue';
 import { useWebsiteEditor, type SectionNavItem } from '@/composables/use-website-editor';
 
-const { ghostBlockType, cancelPlacingBlock, fetchPageData, activePage, editorLocale, isLoading } =
-  useWebsiteEditor();
+const {
+  ghostBlockType,
+  cancelPlacingBlock,
+  fetchPageData,
+  activePage,
+  editorLocale,
+  isLoading,
+  isMobileNavOpen,
+  toggleMobileNav,
+} = useWebsiteEditor();
 
 const showEditSectionModal = ref(false);
 const editingSection = ref<SectionNavItem | null>(null);
@@ -51,8 +72,13 @@ function openQuizModal(): void {
 }
 
 function handleEscape(e: KeyboardEvent): void {
-  if (e.key === 'Escape' && ghostBlockType.value) {
-    cancelPlacingBlock();
+  if (e.key === 'Escape') {
+    if (isMobileNavOpen.value) {
+      toggleMobileNav();
+    }
+    if (ghostBlockType.value) {
+      cancelPlacingBlock();
+    }
   }
 }
 

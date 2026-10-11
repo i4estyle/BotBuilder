@@ -4,8 +4,12 @@ export class AddAuthTokens1785800000000 implements MigrationInterface {
   name = 'AddAuthTokens1785800000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('ALTER TABLE `BB_USER` ADD `AUTH_VERSION` int NOT NULL DEFAULT 0, ADD `EMAIL_VERIFIED_AT` timestamp NULL');
-    await queryRunner.query('UPDATE `BB_USER` SET `EMAIL_VERIFIED_AT` = CURRENT_TIMESTAMP WHERE `USER_EMAIL` IS NOT NULL');
+    await queryRunner.query(
+      'ALTER TABLE `BB_USER` ADD `AUTH_VERSION` int NOT NULL DEFAULT 0, ADD `EMAIL_VERIFIED_AT` timestamp NULL',
+    );
+    await queryRunner.query(
+      'UPDATE `BB_USER` SET `EMAIL_VERIFIED_AT` = CURRENT_TIMESTAMP WHERE `USER_EMAIL` IS NOT NULL',
+    );
     await queryRunner.query(`CREATE TABLE \`BB_AUTH_TOKEN\` (
       \`AUTH_TOKEN_ID\` int NOT NULL AUTO_INCREMENT,
       \`USER_ID\` char(8) NOT NULL,
@@ -22,6 +26,8 @@ export class AddAuthTokens1785800000000 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query('DROP TABLE `BB_AUTH_TOKEN`');
-    await queryRunner.query('ALTER TABLE `BB_USER` DROP COLUMN `AUTH_VERSION`, DROP COLUMN `EMAIL_VERIFIED_AT`');
+    await queryRunner.query(
+      'ALTER TABLE `BB_USER` DROP COLUMN `AUTH_VERSION`, DROP COLUMN `EMAIL_VERIFIED_AT`',
+    );
   }
 }

@@ -1,17 +1,23 @@
 <template>
   <header class="admin-toolbar">
     <div class="admin-toolbar__brand">
-      <RouterLink to="/home" class="admin-toolbar__home-link" aria-label="Go to main website">
-        <q-icon name="arrow_back" size="18px" />
-        <q-tooltip>กลับหน้าหลัก</q-tooltip>
-      </RouterLink>
-      <img
-        :src="resolveAssetUrl(headerData.logo)"
-        alt="BotBuilder Logo"
-        class="admin-toolbar__logo"
-      />
+      <q-btn
+        flat
+        round
+        dense
+        size="md"
+        :icon="isDrawerMini ? 'menu' : 'menu_open'"
+        class="admin-toolbar__sidebar-toggle"
+        :aria-label="isDrawerMini ? 'ขยายเมนูหลัก' : 'ย่อเมนูหลัก'"
+        @click="toggleDrawer($q.screen.lt.lg)"
+      >
+        <q-tooltip anchor="bottom left" self="top left" :offset="[0, 8]">
+          {{ isDrawerMini ? 'ขยายเมนูหลัก (Ctrl+B)' : 'ย่อเมนูหลัก (Ctrl+B)' }}
+        </q-tooltip>
+      </q-btn>
+
       <div class="admin-toolbar__title-group">
-        <h1 class="admin-toolbar__title">ระบบจัดการเนื้อหาเว็บไซต์</h1>
+        <h1 class="admin-toolbar__title">จัดการเว็บไซต์</h1>
       </div>
     </div>
 
@@ -26,7 +32,7 @@
           aria-label="Undo action (Ctrl+Z)"
           @click="undo"
         >
-          <q-tooltip>ย้อนกลับ</q-tooltip>
+          <q-tooltip>ย้อนกลับ (Ctrl+Z)</q-tooltip>
         </q-btn>
         <q-btn
           flat
@@ -37,7 +43,7 @@
           aria-label="Redo action (Ctrl+Y)"
           @click="redo"
         >
-          <q-tooltip>ทำซ้ำ</q-tooltip>
+          <q-tooltip>ทำซ้ำ (Ctrl+Y)</q-tooltip>
         </q-btn>
       </div>
 
@@ -103,15 +109,15 @@
 
       <div class="admin-toolbar__commit-actions" role="group" aria-label="Save and reset actions">
         <q-btn
-          unelevated
-          icon="save"
-          label="บันทึกทั้งหมด"
-          class="admin-toolbar__commit-btn admin-toolbar__commit-btn--save"
-          :loading="isSaving"
-          no-caps
-          @click="handleSaveAll"
+          flat
+          dense
+          icon="open_in_new"
+          href="/home"
+          target="_blank"
+          class="admin-toolbar__btn admin-toolbar__preview-btn"
+          aria-label="Preview live site"
         >
-          <q-tooltip>บันทึก</q-tooltip>
+          <q-tooltip>เปิดดูเว็บไซต์จริง (แท็บใหม่)</q-tooltip>
         </q-btn>
         <q-btn
           unelevated
@@ -124,14 +130,15 @@
           <q-tooltip>คืนค่าเริ่มต้น</q-tooltip>
         </q-btn>
         <q-btn
-          flat
-          dense
-          icon="logout"
-          class="admin-toolbar__btn"
-          aria-label="Log out"
-          @click="handleLogout"
+          unelevated
+          icon="save"
+          label="บันทึกทั้งหมด"
+          class="admin-toolbar__commit-btn admin-toolbar__commit-btn--save"
+          :loading="isSaving"
+          no-caps
+          @click="handleSaveAll"
         >
-          <q-tooltip>ออกจากระบบ</q-tooltip>
+          <q-tooltip>บันทึก (Ctrl+S)</q-tooltip>
         </q-btn>
       </div>
     </div>
@@ -140,17 +147,14 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
-import { Notify } from 'quasar';
+import { Notify, useQuasar } from 'quasar';
 import { useWebsiteEditor, type EditorLocale } from '@/composables/use-website-editor';
-import { resolveAssetUrl } from '@/utils/asset-helper';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAdminDrawer } from '@/composables/use-admin-drawer';
 
-const router = useRouter();
-const authStore = useAuthStore();
+const $q = useQuasar();
+const { isDrawerMini, toggleDrawer } = useAdminDrawer();
 
 const {
-  header: headerData,
   viewportMode,
   editorLocale,
   setEditorLocale,
@@ -162,11 +166,6 @@ const {
   saveToBackend,
   isSaving,
 } = useWebsiteEditor();
-
-function handleLogout(): void {
-  void authStore.logout();
-  void router.replace('/admin/login');
-}
 
 async function changeEditorLanguage(value: EditorLocale): Promise<void> {
   await setEditorLocale(value);
@@ -199,7 +198,10 @@ async function handleSaveAll(): Promise<void> {
 }
 
 function handleKeydown(event: KeyboardEvent): void {
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'b') {
+    event.preventDefault();
+    toggleDrawer($q.screen.lt.lg);
+  } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
     event.preventDefault();
     void handleSaveAll();
   } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {

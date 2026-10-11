@@ -17,12 +17,7 @@
 
     <q-card-section class="chart-section flex flex-center">
       <div v-if="hasData" class="full-width">
-        <apexchart
-          type="radar"
-          height="400"
-          :options="chartOptions"
-          :series="series"
-        />
+        <apexchart type="radar" height="400" :options="chartOptions" :series="series" />
       </div>
       <div v-else class="text-grey-6 q-pa-xl text-center">
         <q-spinner-dots size="40px" color="primary" />
@@ -46,9 +41,7 @@ const hasData = computed(() => {
 });
 
 const series = computed(() => {
-  const allAvgValues = SKILL_DEFINITIONS.map(
-    (skill) => props.stats.skillAverages[skill.key] || 0,
-  );
+  const allAvgValues = SKILL_DEFINITIONS.map((skill) => props.stats.skillAverages[skill.key] || 0);
 
   const completedAvgValues = SKILL_DEFINITIONS.map(
     (skill) => props.stats.completedChildrenSkillAverages[skill.key] || 0,

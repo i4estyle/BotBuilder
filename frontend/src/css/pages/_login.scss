@@ -80,7 +80,7 @@
     align-items: center;
     gap: 12px;
     color: #6b7280;
-    font-size: .8rem;
+    font-size: 0.8rem;
 
     &::before,
     &::after {
@@ -98,6 +98,12 @@
     border-color: #d1d5db;
     font-weight: 600;
   }
-  &__switch { font-size: .9rem; margin: 4px 0 0; text-align: center; }
+  &__switch {
+    font-size: 0.9rem;
+    margin: 4px 0 0;
+    text-align: center;
+  }
 }
-.register-card { max-width: 560px; }
+.register-card {
+  max-width: 560px;
+}

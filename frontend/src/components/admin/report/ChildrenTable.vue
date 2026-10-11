@@ -88,9 +88,15 @@
                 'session-step-dot--pending': !hasCompletedSession(props.row, s),
               }"
             >
-              <q-tooltip>บทเรียนที่ {{ s }}: {{ hasCompletedSession(props.row, s) ? 'ประเมินแล้ว' : 'ยังไม่ประเมิน' }}</q-tooltip>
+              <q-tooltip
+                >บทเรียนที่ {{ s }}:
+                {{ hasCompletedSession(props.row, s) ? 'ประเมินแล้ว' : 'ยังไม่ประเมิน' }}</q-tooltip
+              >
             </span>
-            <span class="text-caption text-weight-bold q-ml-sm" :class="props.row.isCompleted7 ? 'text-bb-green' : 'text-grey-7'">
+            <span
+              class="text-caption text-weight-bold q-ml-sm"
+              :class="props.row.isCompleted7 ? 'text-bb-green' : 'text-grey-7'"
+            >
               {{ props.row.completedSessions }}/7
             </span>
           </div>
@@ -106,7 +112,11 @@
             :color="props.row.isCompleted7 ? 'green-1' : 'orange-1'"
             :text-color="props.row.isCompleted7 ? 'green-9' : 'orange-9'"
           >
-            <q-icon :name="props.row.isCompleted7 ? 'check' : 'schedule'" size="14px" class="q-mr-xs" />
+            <q-icon
+              :name="props.row.isCompleted7 ? 'check' : 'schedule'"
+              size="14px"
+              class="q-mr-xs"
+            />
             {{ props.row.isCompleted7 ? 'ครบ 7 บทเรียน' : 'กำลังเรียน' }}
           </q-chip>
         </q-td>

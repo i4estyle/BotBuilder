@@ -18,6 +18,8 @@ export class AddEmailVerifiedAtToUser1785900000000 implements MigrationInterface
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('ALTER TABLE `BB_USER` DROP COLUMN `EMAIL_VERIFIED_AT`');
+    await queryRunner.query(
+      'ALTER TABLE `BB_USER` DROP COLUMN `EMAIL_VERIFIED_AT`',
+    );
   }
 }

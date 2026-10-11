@@ -1,5 +1,17 @@
+.admin-sidebar-header {
+  padding: 12px 10px 8px;
+  border-bottom: 1px solid #e2e8f0;
+
+  &__title {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.2px;
+  }
+}
+
 .admin-sidebar-page-switcher {
-  padding: 12px;
+  padding: 8px 4px;
   background: #ffffff;
   border-bottom: 1px solid #e2e8f0;
 
@@ -8,7 +20,7 @@
     font-size: 10px;
     font-weight: 800;
     color: #64748b;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     text-transform: uppercase;
     letter-spacing: 0.6px;
   }
