@@ -2,12 +2,15 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { createHash, randomBytes } from 'crypto';
+import { google } from 'googleapis';
 import { Repository } from 'typeorm';
 import { UserStatus } from '../../common/enums/user-status.enum.js';
 import { LoginDto } from './dto/login.dto.js';
@@ -34,6 +37,7 @@ export class AuthService {
     @InjectRepository(AuthToken) private readonly tokens: Repository<AuthToken>,
     private readonly jwt: JwtService,
     private readonly email: AuthEmailService,
+    private readonly config: ConfigService,
   ) {}
 
   async login(dto: LoginDto): Promise<LoginResult> {
@@ -50,6 +54,34 @@ export class AuthService {
       !(await bcrypt.compare(dto.password, admin.passwordHash))
     )
       throw new UnauthorizedException('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
+    return this.createLoginResult(admin);
+  }
+
+  /** Verifies a Google ID token and signs in an already-authorized administrator. */
+  async loginWithGoogle(credential: string): Promise<LoginResult> {
+    const clientId = this.config.get<string>('GOOGLE_CLIENT_ID');
+    if (!clientId) {
+      throw new ServiceUnavailableException('Google Sign-In has not been configured');
+    }
+
+    let email: string | undefined;
+    try {
+      const ticket = await new google.auth.OAuth2().verifyIdToken({
+        idToken: credential,
+        audience: clientId,
+      });
+      const payload = ticket.getPayload();
+      if (payload?.email_verified === true) email = payload.email?.toLowerCase();
+    } catch {
+      throw new UnauthorizedException('Google credential is invalid');
+    }
+
+    if (!email) throw new UnauthorizedException('Google email has not been verified');
+
+    const admin = await this.admins.findOneBy({ email });
+    if (!admin || admin.status !== UserStatus.ACTIVE) {
+      throw new UnauthorizedException('This Google account is not authorized');
+    }
     return this.createLoginResult(admin);
   }
 

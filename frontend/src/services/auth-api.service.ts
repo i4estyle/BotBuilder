@@ -16,6 +16,10 @@ export const authApiService = {
     const { data } = await apiClient.post<LoginResponse>('/auth/login', { loginName, password });
     return data;
   },
+  async loginWithGoogle(credential: string): Promise<LoginResponse> {
+    const { data } = await apiClient.post<LoginResponse>('/auth/google', { credential });
+    return data;
+  },
   async me(): Promise<AuthAdmin> {
     const { data } = await apiClient.get<AuthAdmin>('/auth/me');
     return data;

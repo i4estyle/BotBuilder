@@ -68,6 +68,36 @@
       box-shadow: 0 6px 14px rgba(0, 108, 12, 0.3);
     }
   }
+
+  &__oauth {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #6b7280;
+    font-size: .8rem;
+
+    &::before,
+    &::after {
+      content: '';
+      height: 1px;
+      flex: 1;
+      background: #e5e7eb;
+    }
+  }
+
+  &__google {
+    height: 44px;
+    border-radius: 10px;
+    color: #374151;
+    border-color: #d1d5db;
+    font-weight: 600;
+  }
   &__switch { font-size: .9rem; margin: 4px 0 0; text-align: center; }
 }
 .register-card { max-width: 560px; }

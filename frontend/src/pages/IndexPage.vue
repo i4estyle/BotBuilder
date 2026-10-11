@@ -119,8 +119,8 @@
           </div>
           <div class="learning-method__photo" data-reveal>
             <img
-              :src="resolveAssetUrl('/src/assets/landing/happyplaytime.png')"
-              alt="ครูช่วยโค้ชนักเรียนระหว่างสร้างหุ่นยนต์"
+              :src="resolveAssetUrl('/src/assets/landing/Bot Builder-390.jpg')"
+              alt="โปรโมชั่น Happy Play Time ของ BotBuilder"
             />
           </div>
           <AdminSectionBlockLayer section-id="learningMethod" />

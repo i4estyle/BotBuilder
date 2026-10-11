@@ -22,6 +22,13 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async login(loginName: string, password: string): Promise<void> {
       const { accessToken, admin } = await authApiService.login(loginName, password);
+      this.saveSession(accessToken, admin);
+    },
+    async loginWithGoogle(credential: string): Promise<void> {
+      const { accessToken, admin } = await authApiService.loginWithGoogle(credential);
+      this.saveSession(accessToken, admin);
+    },
+    saveSession(accessToken: string, admin: AuthAdmin): void {
       this.token = accessToken;
       this.user = admin;
       localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, accessToken);

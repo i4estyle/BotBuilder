@@ -19,6 +19,7 @@ import { EmailDto } from './dto/email.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { CreateAdminDto } from './dto/create-admin.dto.js';
+import { GoogleLoginDto } from './dto/google-login.dto.js';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -32,6 +33,20 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<LoginResult> {
     const result = await this.authService.login(loginDto);
+    this.setRefreshCookie(
+      response,
+      await this.authService.issueRefreshToken(result.admin.adminId),
+    );
+    return result;
+  }
+
+  @Post('google')
+  @ApiOperation({ summary: 'Log in as an administrator with Google' })
+  async loginWithGoogle(
+    @Body() dto: GoogleLoginDto,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<LoginResult> {
+    const result = await this.authService.loginWithGoogle(dto.credential);
     this.setRefreshCookie(
       response,
       await this.authService.issueRefreshToken(result.admin.adminId),
