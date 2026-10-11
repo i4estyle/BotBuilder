@@ -1,4 +1,36 @@
 @mixin tablet-responsive-styles {
+  .site-header {
+    padding: calc(10px + var(--safe-top)) calc(20px + var(--safe-right)) 10px
+      calc(20px + var(--safe-left));
+  }
+  .site-header__nav {
+    display: none;
+  }
+  .site-header__menu {
+    display: inline-flex;
+  }
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: calc(24px + var(--safe-top)) calc(24px + var(--safe-right)) 0
+      calc(24px + var(--safe-left));
+  }
+  .hero__copy {
+    padding: 24px 0 12px;
+  }
+  .hero__image-frame {
+    height: clamp(340px, 45vw, 440px);
+  }
+  .hero__brandline-grid {
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+  .hero__brandline-grid > div:nth-child(2) {
+    border-right: 0;
+  }
+  .hero__brandline-grid > div:nth-child(-n + 2) {
+    border-bottom: 1px solid #e6e9ec;
+  }
   .activities__row,
   .activities__row--reverse {
     grid-template-columns: 1fr;
@@ -10,13 +42,66 @@
   .activities__media img {
     height: 260px;
   }
+  .discovery-class {
+    grid-template-columns: 1fr;
+    padding-right: calc(24px + var(--safe-right));
+    padding-left: calc(24px + var(--safe-left));
+  }
+  .discovery-class__photo {
+    height: 420px;
+  }
+  .parent-proof {
+    grid-template-columns: 1fr;
+    padding-right: calc(24px + var(--safe-right));
+    padding-left: calc(24px + var(--safe-left));
+  }
+  .student-projects {
+    padding-right: calc(24px + var(--safe-right));
+    padding-left: calc(24px + var(--safe-left));
+  }
+  .student-projects__grid {
+    grid-template-columns: 1fr;
+  }
+  .student-projects__feature {
+    height: 400px;
+  }
+  .student-projects__stack {
+    grid-template-columns: 1fr 1fr;
+  }
+  .learning-method {
+    grid-template-columns: 1fr;
+    padding-right: calc(24px + var(--safe-right));
+    padding-left: calc(24px + var(--safe-left));
+  }
+  .learning-method__photo {
+    height: 400px;
+  }
+  .course-matcher {
+    grid-template-columns: 1fr;
+    padding-right: calc(24px + var(--safe-right));
+    padding-left: calc(24px + var(--safe-left));
+  }
+  .course-matcher__photo {
+    height: 400px;
+  }
   .promotion-course {
-    padding: 56px 5%;
+    padding: 48px 5%;
 
     &__inner {
-      gap: 36px;
+      gap: 32px;
       grid-template-columns: 1fr;
     }
+  }
+  .resource-grid,
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+  .branches__grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .branches__map iframe {
+    height: 320px;
   }
 }
 
@@ -24,140 +109,187 @@
   @include tablet-responsive-styles;
 
   .site-header {
-    height: 91px;
-    padding: 10px 16px;
-  }
-  .site-header__nav {
-    display: none;
-  }
-  .site-header__menu {
-    display: block;
+    min-height: 72px;
+    padding: calc(8px + var(--safe-top)) calc(16px + var(--safe-right)) 8px
+      calc(16px + var(--safe-left));
   }
   .section {
-    padding: 48px 16px;
+    padding: clamp(36px, 8vw, 64px) calc(16px + var(--safe-right)) clamp(36px, 8vw, 64px)
+      calc(16px + var(--safe-left));
   }
   .section-heading {
     margin-bottom: 24px;
   }
   .section-heading h2 {
-    font-size: 24px;
+    font-size: clamp(22px, 5.5vw, 26px);
   }
   .hero {
-    grid-template-columns: 1fr;
-    padding: 48px 16px;
-    gap: 24px;
+    padding: calc(16px + var(--safe-top)) calc(16px + var(--safe-right)) 0
+      calc(16px + var(--safe-left));
+    gap: 20px;
   }
   .hero__image-frame {
-    height: 269px;
+    height: clamp(240px, 50vw, 320px);
     order: 0;
   }
   .hero__copy {
     order: 1;
+    padding: 16px 0 8px;
   }
   .hero__copy h1 {
-    font-size: 34px;
+    font-size: clamp(26px, 7vw, 36px);
+    line-height: 1.22;
   }
   .hero__copy p {
-    font-size: 16px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .hero__actions {
+    flex-direction: column;
+    gap: 12px;
   }
   .hero .app-button {
     width: 100%;
-    min-height: 80px;
+    min-height: 56px;
+  }
+  .hero__brandline-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero__brandline-grid > div {
+    border-right: 0;
+    border-bottom: 1px solid #e6e9ec;
+    padding: 16px;
+  }
+  .hero__brandline-grid > div:last-child {
+    border-bottom: 0;
   }
   .benefits__grid,
   .courses-grid {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
   }
   .activities {
     grid-template-columns: 1fr;
-    gap: 32px;
-  }
-  .benefit-card {
-    text-align: center;
-    padding: 25px;
-  }
-  .benefit-card .q-icon {
-    display: grid;
-    margin: auto;
-  }
-  .benefit-card h3 {
-    font-size: 18px;
-  }
-  .course-card__content {
-    min-height: 248px;
-  }
-  .gallery {
-    grid-template-columns: 1fr;
     gap: 24px;
   }
-  .gallery__image {
-    order: -1;
+  .discovery-class {
+    padding-right: calc(16px + var(--safe-right));
+    padding-left: calc(16px + var(--safe-left));
+  }
+  .discovery-class__photo {
+    height: 260px;
+  }
+  .discovery-class__panel {
+    padding: 24px 16px;
+  }
+  .discovery-class__panel h2 {
+    font-size: clamp(22px, 6vw, 30px);
+  }
+  .discovery-class__form-grid {
+    grid-template-columns: 1fr;
+  }
+  .parent-proof {
+    padding-right: calc(16px + var(--safe-right));
+    padding-left: calc(16px + var(--safe-left));
+  }
+  .parent-proof__copy h2 {
+    font-size: clamp(22px, 6vw, 30px);
+  }
+  .parent-proof__photos img,
+  .parent-proof__photos img:first-child {
+    height: 240px;
+  }
+  .student-projects {
+    padding-right: calc(16px + var(--safe-right));
+    padding-left: calc(16px + var(--safe-left));
+  }
+  .student-projects__intro h2 {
+    font-size: clamp(22px, 6vw, 30px);
+  }
+  .student-projects__feature,
+  .student-projects__stack article {
+    height: 260px;
+  }
+  .student-projects__stack {
+    grid-template-columns: 1fr;
+  }
+  .learning-method {
+    padding-right: calc(16px + var(--safe-right));
+    padding-left: calc(16px + var(--safe-left));
+  }
+  .learning-method__copy h2 {
+    font-size: clamp(22px, 6vw, 30px);
+  }
+  .learning-method__photo {
+    height: 260px;
+  }
+  .learning-method__steps li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    padding: 12px 0;
+  }
+  .learning-method__steps li p {
+    width: 100%;
+    margin: 4px 0 0;
+  }
+  .course-matcher {
+    padding-right: calc(16px + var(--safe-right));
+    padding-left: calc(16px + var(--safe-left));
+  }
+  .course-matcher__photo {
+    height: 260px;
+  }
+  .course-matcher__result {
+    padding: 18px 16px;
+  }
+  .faq {
+    padding-right: calc(16px + var(--safe-right));
+    padding-left: calc(16px + var(--safe-left));
+  }
+  .faq__intro h2 {
+    font-size: clamp(22px, 6vw, 30px);
+  }
+  .faq__question {
+    padding: 16px 4px;
+    font-size: 15px;
   }
   .quiz {
-    padding: 48px 16px;
+    padding: 48px calc(16px + var(--safe-right)) 48px calc(16px + var(--safe-left));
   }
   .quiz h2,
   .cta h2 {
-    font-size: 28px;
-  }
-  .branches__grid {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-  .branches__map iframe {
-    height: 300px;
+    font-size: clamp(22px, 6vw, 30px);
   }
   .cta {
-    padding: 48px 16px;
+    padding: 48px calc(16px + var(--safe-right)) 48px calc(16px + var(--safe-left));
   }
   .cta .app-button {
     width: 100%;
-    min-height: 72px;
+    min-height: 56px;
   }
-  .site-footer {
+  .branches__grid {
     grid-template-columns: 1fr;
-    padding: 48px 16px;
-    gap: 28px;
+    gap: 24px;
   }
-  .site-footer__copyright {
-    font-size: 13px;
+  .branches__map iframe {
+    height: 240px;
   }
   .page-hero {
-    padding: 64px 16px;
+    padding: 48px calc(16px + var(--safe-right)) 36px calc(16px + var(--safe-left));
   }
   .page-hero h1 {
-    font-size: 32px;
+    font-size: clamp(24px, 6vw, 32px);
   }
   .page-hero > p:last-child {
-    font-size: 16px;
-  }
-  .resource-grid,
-  .about-grid {
-    grid-template-columns: 1fr;
-  }
-  .content-card {
-    padding: 32px 20px;
-  }
-  .app-button {
-    font-size: 16px;
-  }
-  .gallery__stats {
-    flex-direction: column;
-  }
-  .activity-gallery__columns {
-    grid-template-columns: 1fr;
-    gap: 40px;
+    font-size: 15px;
   }
   .promotions-hero {
-    padding: 58px 16px;
-
-    > p:last-child {
-      font-size: 16px;
-    }
+    padding: 48px calc(16px + var(--safe-right)) 36px calc(16px + var(--safe-left));
   }
   .promotion-list {
-    padding: 48px 16px 28px;
+    padding: 36px calc(16px + var(--safe-right)) 24px calc(16px + var(--safe-left));
   }
 }
 
@@ -165,7 +297,7 @@
   @include tablet-responsive-styles;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 600px) {
   @include mobile-responsive-styles;
 }
 

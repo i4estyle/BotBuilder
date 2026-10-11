@@ -277,6 +277,18 @@
   gap: 8px;
   margin: 26px 0 18px;
 }
+@media (max-width: 480px) {
+  .course-matcher__tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .course-matcher__tabs button {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
 .course-matcher__tabs button {
   border: 1px solid #d6dfd7;
   border-radius: 8px;
@@ -697,7 +709,7 @@
   background: #f8faf8;
   color: #263628;
   font:
-    400 15px 'Noto Sans Thai',
+    400 16px 'Noto Sans Thai',
     sans-serif;
 }
 .discovery-class__form input:focus,
@@ -1289,201 +1301,5 @@
   [data-reveal] {
     opacity: 1;
     transform: none;
-  }
-}
-
-@media (max-width: 950px) {
-  .discovery-class {
-    grid-template-columns: 1fr;
-    padding-right: 24px;
-    padding-left: 24px;
-  }
-  .discovery-class__photo {
-    height: 500px;
-  }
-  .parent-proof {
-    grid-template-columns: 1fr;
-    padding-right: 24px;
-    padding-left: 24px;
-  }
-  .parent-proof__photos img:first-child {
-    height: 340px;
-  }
-  .student-projects {
-    padding-right: 24px;
-    padding-left: 24px;
-  }
-  .student-projects__grid {
-    grid-template-columns: 1fr;
-  }
-  .student-projects__feature {
-    height: 500px;
-  }
-  .student-projects__stack {
-    grid-template-columns: 1fr 1fr;
-  }
-  .learning-method {
-    grid-template-columns: 1fr;
-    padding-right: 24px;
-    padding-left: 24px;
-  }
-  .learning-method__photo {
-    height: 500px;
-  }
-  .course-matcher {
-    grid-template-columns: 1fr;
-    padding-right: 24px;
-    padding-left: 24px;
-  }
-  .course-matcher__photo {
-    height: 500px;
-  }
-  .hero {
-    grid-template-columns: 1fr;
-    gap: 28px;
-    padding: 20px 24px 0;
-  }
-  .hero__copy {
-    padding: 30px 0 10px;
-  }
-  .hero__image-frame {
-    height: 500px;
-  }
-  .hero__brandline-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  .hero__brandline-grid > div:nth-child(2) {
-    border-right: 0;
-  }
-  .hero__brandline-grid > div:nth-child(-n + 2) {
-    border-bottom: 1px solid #e6e9ec;
-  }
-}
-
-@media (max-width: 620px) {
-  .faq {
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-  .faq__intro h2 {
-    font-size: 40px;
-  }
-  .faq__intro > p:last-child {
-    font-size: 16px;
-  }
-  .faq__question {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 10px;
-    padding: 18px 4px;
-  }
-  .faq__question strong {
-    font-size: 16px;
-  }
-  .faq__answer > p {
-    padding-right: 18px;
-    padding-left: 18px;
-  }
-  .discovery-class {
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-  .discovery-class__photo {
-    height: 380px;
-  }
-  .discovery-class__panel {
-    padding: 28px 20px;
-  }
-  .discovery-class__panel h2 {
-    font-size: 40px;
-  }
-  .discovery-class__form-grid {
-    grid-template-columns: 1fr;
-  }
-  .discovery-class__photo-caption {
-    right: 20px;
-    bottom: 20px;
-    left: 20px;
-  }
-  .parent-proof {
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-  .parent-proof__copy h2 {
-    font-size: 40px;
-  }
-  .parent-proof__lead {
-    font-size: 16px;
-  }
-  .parent-proof__photos img,
-  .parent-proof__photos img:first-child {
-    height: 300px;
-  }
-  .student-projects {
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-  .student-projects__intro h2 {
-    font-size: 40px;
-  }
-  .student-projects__intro > p:last-child {
-    font-size: 16px;
-  }
-  .student-projects__feature,
-  .student-projects__stack article {
-    height: 360px;
-  }
-  .student-projects__stack {
-    grid-template-columns: 1fr;
-  }
-  .learning-method {
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-  .learning-method__copy h2 {
-    font-size: 40px;
-  }
-  .learning-method__copy > p:last-child {
-    font-size: 16px;
-  }
-  .learning-method__photo {
-    height: 420px;
-  }
-  .learning-method__steps li {
-    grid-template-columns: 36px 82px 1fr;
-    gap: 8px;
-  }
-  .course-matcher {
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-  .course-matcher__photo {
-    height: 420px;
-  }
-  .course-matcher__result {
-    padding: 22px;
-  }
-  .hero {
-    padding: 12px 12px 0;
-  }
-  .hero__copy h1 {
-    font-size: 49px;
-  }
-  .hero__image-frame {
-    height: 440px;
-  }
-  .hero__image-inner img {
-    object-position: 48% 50%;
-  }
-  .hero__brandline-grid {
-    grid-template-columns: 1fr;
-    width: min(1180px, calc(100% - 24px));
-  }
-  .hero__brandline-grid > div,
-  .hero__brandline-grid > div:nth-child(2) {
-    border-right: 0;
-    border-bottom: 1px solid #e6e9ec;
-  }
-  .hero__brandline-grid > div:last-child {
-    border-bottom: 0;
   }
 }

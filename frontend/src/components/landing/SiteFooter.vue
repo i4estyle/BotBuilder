@@ -1,6 +1,6 @@
 <template>
   <footer class="site-footer">
-    <div>
+    <div class="site-footer__brand">
       <h2 :style="getStyleOverride('footer.brandTitle')">
         {{ footerData.brandTitle || 'BOT BUILDER' }}
       </h2>

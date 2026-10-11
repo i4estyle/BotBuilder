@@ -4,6 +4,8 @@
   display: grid;
   gap: 48px;
   grid-template-columns: 1fr 1fr;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 .about-grid .section-heading {
   margin-bottom: 20px;
@@ -12,4 +14,13 @@
   border-radius: 12px;
   box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
   width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
 }

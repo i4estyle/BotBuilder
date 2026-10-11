@@ -1,15 +1,22 @@
 .login-page {
   min-height: 100vh;
+  min-height: 100dvh;
   background: linear-gradient(160deg, var(--surface) 0%, var(--muted) 100%);
-  padding: 24px;
+  padding: calc(24px + var(--safe-top)) calc(16px + var(--safe-right))
+    calc(24px + var(--safe-bottom)) calc(16px + var(--safe-left));
 }
 
 .login-card {
   width: 100%;
-  max-width: 380px;
+  max-width: 400px;
   padding: 32px 28px;
   border-radius: 16px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+
+  @media (max-width: 480px) {
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
 
   &__brand {
     display: flex;

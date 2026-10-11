@@ -1,14 +1,13 @@
 <template>
   <q-page class="q-pa-lg admin-report-page">
     <!-- Institutional Header -->
-    <div class="row items-center justify-between q-mb-lg header-wrap">
-      <div>
+    <div class="row items-start justify-between q-col-gutter-sm q-mb-lg header-wrap">
+      <div class="col-12 col-md">
         <div class="row items-center q-gutter-sm">
           <q-icon name="analytics" color="primary" size="28px" />
           <h1 class="text-h5 text-weight-bolder text-grey-10 q-my-none">
             รายงานและวิเคราะห์สมรรถนะผู้เรียน 7 ทักษะหลัก
           </h1>
-          <!-- Live Heartbeat Pulse Indicator -->
           <div class="live-badge row items-center q-px-sm q-py-xs rounded-borders q-ml-sm">
             <span class="live-pulse-dot q-mr-xs"></span>
             <span class="text-caption text-weight-bold text-bb-green"
@@ -25,8 +24,7 @@
         </div>
       </div>
 
-      <!-- Action Controls -->
-      <div class="row items-center q-gutter-sm">
+      <div class="col-12 col-md-auto row items-center q-gutter-sm q-mt-xs q-mt-md-none">
         <q-btn
           outline
           color="grey-8"

@@ -1,8 +1,8 @@
 <template>
   <q-page class="q-pa-md evaluation-dashboard-page">
     <!-- Header Section -->
-    <div class="row items-center justify-between q-mb-md">
-      <div>
+    <div class="row items-start justify-between q-col-gutter-sm q-mb-md">
+      <div class="col-12 col-sm">
         <h1 class="text-h5 text-weight-bold text-primary q-my-none">
           ระบบประเมินคะแนนเด็ก (Google Sheets Live Dashboard)
         </h1>
@@ -15,7 +15,7 @@
         </div>
       </div>
 
-      <div class="row items-center q-gutter-sm">
+      <div class="col-12 col-sm-auto row items-center q-gutter-sm q-mt-xs q-mt-sm-none">
         <q-btn
           outline
           color="primary"
