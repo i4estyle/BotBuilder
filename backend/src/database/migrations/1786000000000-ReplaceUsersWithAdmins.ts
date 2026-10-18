@@ -45,6 +45,8 @@ export class ReplaceUsersWithAdmins1786000000000 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    void queryRunner;
+    await Promise.resolve();
     throw new Error(
       'This migration intentionally cannot be reversed after legacy user data is removed.',
     );

@@ -2,9 +2,10 @@ import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
-// Load env variables from the root .env file
-
-dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
+// Load env variables from the root .env file in dev
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
+}
 
 export const AppDataSource = new DataSource({
   type: 'mysql',
@@ -21,5 +22,9 @@ export const AppDataSource = new DataSource({
   migrations: [
     path.resolve(process.cwd(), 'dist/database/migrations/*.js'),
   ],
+  ssl:
+    process.env.DB_SSL === 'true'
+      ? { rejectUnauthorized: false }
+      : undefined,
   subscribers: [],
 });

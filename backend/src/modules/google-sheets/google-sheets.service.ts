@@ -99,10 +99,16 @@ export class GoogleSheetsService {
       // const headers = rows[0];
       const dataRows = rows.slice(1);
 
+      const cellToString = (val: unknown): string => {
+        if (typeof val === 'string') return val.trim();
+        if (typeof val === 'number' || typeof val === 'boolean') {
+          return String(val).trim();
+        }
+        return '';
+      };
+
       const records: EvaluationRecord[] = dataRows
-        .filter(
-          (row) => row && row.length > 0 && Boolean(row[0]?.toString().trim()),
-        )
+        .filter((row) => row && row.length > 0 && Boolean(cellToString(row[0])))
         .map((row) => {
           const parseScore = (val: unknown): number | null => {
             if (val === undefined || val === null || val === '') return null;
@@ -140,21 +146,21 @@ export class GoogleSheetsService {
           const sessionNum = row[3] ? Number(row[3]) : null;
 
           return {
-            evaluationId: (row[0] || '').toString().trim(),
-            evaluationTitle: (row[1] || '').toString().trim(),
-            enrollment: (row[2] || '').toString().trim(),
+            evaluationId: cellToString(row[0]),
+            evaluationTitle: cellToString(row[1]),
+            enrollment: cellToString(row[2]),
             sessionNumber: isNaN(sessionNum as number) ? null : sessionNum,
-            sessionDate: (row[4] || '').toString().trim(),
-            comment: (row[5] || '').toString().trim(),
-            googleDriveLink: (row[6] || '').toString().trim(),
-            status: (row[7] || '').toString().trim() || 'Pending',
+            sessionDate: cellToString(row[4]),
+            comment: cellToString(row[5]),
+            googleDriveLink: cellToString(row[6]),
+            status: cellToString(row[7]) || 'Pending',
             scores,
             totalScore,
             averageScore,
-            teacherNote: (row[15] || '').toString().trim(),
-            aiMessage: (row[16] || '').toString().trim(),
-            genMessage: (row[17] || '').toString().trim(),
-            lineSentStatus: (row[18] || '').toString().trim(),
+            teacherNote: cellToString(row[15]),
+            aiMessage: cellToString(row[16]),
+            genMessage: cellToString(row[17]),
+            lineSentStatus: cellToString(row[18]),
           };
         });
 

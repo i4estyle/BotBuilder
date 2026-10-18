@@ -8,8 +8,15 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  const rawFrontendUrl = process.env.FRONTEND_URL;
+  const origin = rawFrontendUrl
+    ? rawFrontendUrl.includes(',')
+      ? rawFrontendUrl.split(',').map((url) => url.trim())
+      : rawFrontendUrl.trim()
+    : true;
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL ?? true,
+    origin,
     credentials: true,
   });
   app.setGlobalPrefix('api');
@@ -34,7 +41,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap().catch((err) => {
   console.error(err);
