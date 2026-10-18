@@ -9,14 +9,25 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const rawFrontendUrl = process.env.FRONTEND_URL;
-  const origin = rawFrontendUrl
-    ? rawFrontendUrl.includes(',')
-      ? rawFrontendUrl.split(',').map((url) => url.trim())
-      : rawFrontendUrl.trim()
-    : true;
-
   app.enableCors({
-    origin,
+    origin: (
+      requestOrigin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      if (!requestOrigin) return callback(null, true);
+      if (
+        requestOrigin.includes('localhost') ||
+        requestOrigin.includes('127.0.0.1') ||
+        requestOrigin.endsWith('.vercel.app')
+      ) {
+        return callback(null, true);
+      }
+      if (rawFrontendUrl) {
+        const allowed = rawFrontendUrl.split(',').map((url) => url.trim());
+        if (allowed.includes(requestOrigin)) return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   });
   app.setGlobalPrefix('api');
