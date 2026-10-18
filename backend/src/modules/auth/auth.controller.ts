@@ -96,7 +96,12 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<void> {
     await this.authService.logout(admin.adminId);
-    response.clearCookie('bb_refresh_token', { path: '/api/auth' });
+    const isProd = process.env.NODE_ENV === 'production';
+    response.clearCookie('bb_refresh_token', {
+      path: '/api/auth',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+    });
   }
 
   @Post('forgot-password')
@@ -130,10 +135,11 @@ export class AuthController {
   }
 
   private setRefreshCookie(response: Response, token: string): void {
+    const isProd = process.env.NODE_ENV === 'production';
     response.cookie('bb_refresh_token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
       path: '/api/auth',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });

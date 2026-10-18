@@ -27,9 +27,10 @@ export class AuthEmailService {
     route: string,
     token: string,
   ): Promise<void> {
-    const appUrl =
+    const rawAppUrl =
       this.config.get<string>('FRONTEND_URL') ?? 'http://localhost:9000';
-    const link = `${appUrl.replace(/\/$/, '')}/${route}?token=${encodeURIComponent(token)}`;
+    const baseUrl = rawAppUrl.split(',')[0].trim().replace(/\/$/, '');
+    const link = `${baseUrl}/#/${route}?token=${encodeURIComponent(token)}`;
     const host = this.config.get<string>('SMTP_HOST');
     const from = this.config.get<string>('SMTP_FROM');
     if (!host || !from) {

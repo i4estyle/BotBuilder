@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-export const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000';
+const rawBaseUrl = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000';
+export const API_BASE_URL = rawBaseUrl.replace(/\/$/, '');
 
 export const AUTH_TOKEN_STORAGE_KEY = 'bb_auth_token';
 

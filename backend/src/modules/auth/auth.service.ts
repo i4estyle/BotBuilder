@@ -2,8 +2,6 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  Logger,
-  OnApplicationBootstrap,
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -33,9 +31,7 @@ export interface AdminSummary extends AuthenticatedAdmin {
 }
 
 @Injectable()
-export class AuthService implements OnApplicationBootstrap {
-  private readonly logger = new Logger(AuthService.name);
-
+export class AuthService {
   constructor(
     @InjectRepository(Admin) private readonly admins: Repository<Admin>,
     @InjectRepository(AuthToken) private readonly tokens: Repository<AuthToken>,
@@ -43,42 +39,6 @@ export class AuthService implements OnApplicationBootstrap {
     private readonly email: AuthEmailService,
     private readonly config: ConfigService,
   ) {}
-
-  async onApplicationBootstrap(): Promise<void> {
-    try {
-      const count = await this.admins.count();
-      if (count === 0) {
-        const loginName =
-          this.config.get<string>('ADMIN_LOGIN_NAME') || 'admin';
-        const email = (
-          this.config.get<string>('ADMIN_EMAIL') || 'admin@botbuilder.local'
-        ).toLowerCase();
-        const rawPassword =
-          this.config.get<string>('ADMIN_PASSWORD') || 'Admin1234!';
-        const displayName =
-          this.config.get<string>('ADMIN_NAME') || 'Administrator';
-
-        const hash = await bcrypt.hash(rawPassword, 10);
-        const initialAdmin = this.admins.create({
-          adminId: 'ADMIN001',
-          loginName,
-          displayName,
-          email,
-          passwordHash: hash,
-          status: UserStatus.ACTIVE,
-        });
-
-        await this.admins.save(initialAdmin);
-        this.logger.log(
-          `Initial administrator account created: loginName="${loginName}", email="${email}"`,
-        );
-      }
-    } catch (err: unknown) {
-      this.logger.error(
-        `Failed to bootstrap initial admin account: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
-  }
 
   async login(dto: LoginDto): Promise<LoginResult> {
     const admin = await this.admins

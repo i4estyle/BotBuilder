@@ -73,7 +73,7 @@ import { useAuthStore } from '@/stores/auth-store';
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const loginName = ref('');
 const password = ref('');
 const showPassword = ref(false);
