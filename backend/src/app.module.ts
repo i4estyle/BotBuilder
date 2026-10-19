@@ -21,12 +21,29 @@ import { HealthModule } from './modules/health/health.module.js';
           : path.resolve(process.cwd(), '../.env'),
       ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 120, // 120 requests per minute per IP
+    ThrottlerModule.forRoot({
+      errorMessage: 'ThrottlerException: Too Many Requests (HTTP 429)',
+      getTracker: (req: Record<string, unknown>): string => {
+        const headers = req.headers as
+          | Record<string, string | string[] | undefined>
+          | undefined;
+        const xForwardedFor = headers?.['x-forwarded-for'];
+        if (typeof xForwardedFor === 'string' && xForwardedFor.length > 0) {
+          return xForwardedFor.split(',')[0].trim();
+        }
+        if (Array.isArray(xForwardedFor) && xForwardedFor.length > 0) {
+          return xForwardedFor[0].trim();
+        }
+        return typeof req.ip === 'string' ? req.ip : '127.0.0.1';
       },
-    ]),
+      throttlers: [
+        {
+          name: 'default',
+          ttl: 60000,
+          limit: 120, // 120 requests per minute per IP
+        },
+      ],
+    }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {

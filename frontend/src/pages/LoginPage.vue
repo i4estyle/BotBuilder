@@ -163,10 +163,20 @@ async function submit(): Promise<void> {
     await auth.login(loginName.value, password.value);
     await router.replace((route.query.redirect as string) || '/admin');
   } catch (error) {
-    errorMessage.value =
-      axios.isAxiosError(error) && error.response?.status === 401
-        ? 'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง'
-        : 'เกิดข้อผิดพลาด กรุณาลองใหม่';
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 429) {
+        errorMessage.value =
+          'ระบบตรวจพบการพยายามเข้าสู่ระบบบ่อยเกินไป (HTTP 429 Too Many Requests) บล็อกการใช้งานชั่วคราว กรุณารอสักครู่แล้วลองใหม่';
+      } else if (error.response?.status === 401) {
+        errorMessage.value = 'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง';
+      } else {
+        errorMessage.value =
+          (error.response?.data as { message?: string })?.message ||
+          'เกิดข้อผิดพลาด กรุณาลองใหม่';
+      }
+    } else {
+      errorMessage.value = 'เกิดข้อผิดพลาด กรุณาลองใหม่';
+    }
   } finally {
     loading.value = false;
   }

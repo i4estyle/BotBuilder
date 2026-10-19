@@ -11,6 +11,9 @@ import { GlobalExceptionFilter } from './common/filters/http-exception.filter.js
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  // Enable trust proxy so Express correctly reads X-Forwarded-For from Render / Cloud reverse proxies
+  app.set('trust proxy', 1);
+
   // Helmet HTTP Security Headers (X-Frame-Options, X-XSS-Protection, etc.)
   app.use(
     helmet({

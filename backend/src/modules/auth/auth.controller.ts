@@ -27,7 +27,7 @@ import { GoogleLoginDto } from './dto/google-login.dto.js';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Throttle({ default: { limit: 5, ttl: 900000 } })
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @ApiOperation({ summary: 'Log in as an administrator' })
   async login(
