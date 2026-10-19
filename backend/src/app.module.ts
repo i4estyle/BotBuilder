@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import * as path from 'path';
+import { CommonModule } from './common/common.module.js';
 import { PageSectionsModule } from './modules/page-sections/page-sections.module.js';
 import { UploadsModule } from './modules/uploads/uploads.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
@@ -13,6 +14,7 @@ import { HealthModule } from './modules/health/health.module.js';
 
 @Module({
   imports: [
+    CommonModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
@@ -25,8 +27,7 @@ import { HealthModule } from './modules/health/health.module.js';
       errorMessage: 'ThrottlerException: Too Many Requests (HTTP 429)',
       getTracker: (req: Record<string, unknown>): string => {
         const headers = req.headers as
-          | Record<string, string | string[] | undefined>
-          | undefined;
+          Record<string, string | string[] | undefined> | undefined;
         const xForwardedFor = headers?.['x-forwarded-for'];
         if (typeof xForwardedFor === 'string' && xForwardedFor.length > 0) {
           return xForwardedFor.split(',')[0].trim();

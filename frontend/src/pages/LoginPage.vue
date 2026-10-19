@@ -171,8 +171,7 @@ async function submit(): Promise<void> {
         errorMessage.value = 'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง';
       } else {
         errorMessage.value =
-          (error.response?.data as { message?: string })?.message ||
-          'เกิดข้อผิดพลาด กรุณาลองใหม่';
+          (error.response?.data as { message?: string })?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่';
       }
     } else {
       errorMessage.value = 'เกิดข้อผิดพลาด กรุณาลองใหม่';

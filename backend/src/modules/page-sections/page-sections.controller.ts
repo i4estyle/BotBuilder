@@ -7,8 +7,8 @@ import {
   Param,
   Delete,
   Query,
-  ParseIntPipe,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
@@ -21,8 +21,11 @@ import { BulkSavePageSectionsDto } from './dto/bulk-save-page-sections.dto.js';
 import { PageSectionQueryDto } from './dto/page-section-query.dto.js';
 import { PageSection } from './entities/page-section.entity.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { HashidParamPipe } from '../../common/pipes/hashid-param.pipe.js';
+import { HashidInterceptor } from '../../common/interceptors/hashid.interceptor.js';
 
 @ApiTags('PageSections')
+@UseInterceptors(HashidInterceptor)
 @Controller('page-sections')
 export class PageSectionsController {
   constructor(private readonly pageSectionsService: PageSectionsService) {}
@@ -45,7 +48,9 @@ export class PageSectionsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get single section record by ID' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<PageSection> {
+  async findOne(
+    @Param('id', HashidParamPipe) id: number,
+  ): Promise<PageSection> {
     return this.pageSectionsService.findOne(id);
   }
 
@@ -74,7 +79,7 @@ export class PageSectionsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update single section record by ID' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', HashidParamPipe) id: number,
     @Body() updatePageSectionDto: UpdatePageSectionDto,
   ): Promise<PageSection> {
     return this.pageSectionsService.update(id, updatePageSectionDto);
@@ -84,7 +89,7 @@ export class PageSectionsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Soft delete single section record by ID' })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<PageSection> {
+  async remove(@Param('id', HashidParamPipe) id: number): Promise<PageSection> {
     return this.pageSectionsService.remove(id);
   }
 }

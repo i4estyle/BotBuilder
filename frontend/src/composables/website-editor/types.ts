@@ -263,7 +263,7 @@ export interface ImageSizeSpec {
 }
 
 export interface PageSectionItem {
-  id: number;
+  id: number | string;
   pageName: string;
   locale: string;
   sectionKey: string;
