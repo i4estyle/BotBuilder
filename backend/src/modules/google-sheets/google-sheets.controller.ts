@@ -1,9 +1,18 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { GoogleSheetsService } from './google-sheets.service.js';
 import type { GoogleSheetsEvaluationsResponse } from './interfaces/evaluation.interface.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
 @ApiTags('Google Sheets')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('google-sheets')
 export class GoogleSheetsController {
   constructor(private readonly googleSheetsService: GoogleSheetsService) {}

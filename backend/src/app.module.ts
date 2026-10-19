@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import * as path from 'path';
 import { PageSectionsModule } from './modules/page-sections/page-sections.module.js';
 import { UploadsModule } from './modules/uploads/uploads.module.js';
@@ -19,6 +21,12 @@ import { HealthModule } from './modules/health/health.module.js';
           : path.resolve(process.cwd(), '../.env'),
       ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 120, // 120 requests per minute per IP
+      },
+    ]),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
@@ -44,6 +52,12 @@ import { HealthModule } from './modules/health/health.module.js';
     HealthModule,
     PageSectionsModule,
     UploadsModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

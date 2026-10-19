@@ -17,6 +17,16 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
 const uploadDirectory = join(process.cwd(), 'uploads', 'images');
 
+const ALLOWED_MIME_EXT_MAP: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/jpg': '.jpg',
+  'image/png': '.png',
+  'image/gif': '.gif',
+  'image/webp': '.webp',
+};
+
+const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
+
 @Controller('uploads')
 export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
@@ -42,9 +52,10 @@ export class UploadsController {
           file: Express.Multer.File,
           cb: (error: Error | null, filename: string) => void,
         ): void => {
+          const mime = file.mimetype.toLowerCase();
+          const safeExt = ALLOWED_MIME_EXT_MAP[mime] ?? '.png';
           const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-          const ext = extname(file.originalname).toLowerCase() || '.png';
-          cb(null, `img-${uniqueSuffix}${ext}`);
+          cb(null, `img-${uniqueSuffix}${safeExt}`);
         },
       }),
       limits: {
@@ -55,8 +66,17 @@ export class UploadsController {
         file: Express.Multer.File,
         cb: (error: Error | null, acceptFile: boolean) => void,
       ): void => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp|svg\+xml)$/)) {
-          cb(new BadRequestException('Only image files are allowed'), false);
+        const mime = file.mimetype.toLowerCase();
+        const rawExt = extname(file.originalname).toLowerCase();
+
+        // Strictly disallow SVG and non-standard image types to prevent Stored XSS / RCE
+        if (!ALLOWED_MIME_EXT_MAP[mime] || !ALLOWED_EXTENSIONS.has(rawExt)) {
+          cb(
+            new BadRequestException(
+              'Only standard image files (.jpg, .jpeg, .png, .gif, .webp) are allowed',
+            ),
+            false,
+          );
           return;
         }
         cb(null, true);

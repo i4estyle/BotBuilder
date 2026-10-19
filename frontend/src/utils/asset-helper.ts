@@ -12,6 +12,7 @@ import logoDefault from '@/assets/landing/logo.png';
 import heroJpegDefault from '@/assets/landing/hero.jpeg';
 import mapJpegDefault from '@/assets/landing/map.jpeg';
 import inside1JpgDefault from '@/assets/landing/inside1.jpg';
+import botBuilder390Default from '@/assets/landing/Bot Builder-390.jpg';
 
 const ASSET_MAP: Record<string, string> = {
   '/src/assets/landing/intro.png': heroImageDefault,
@@ -28,6 +29,8 @@ const ASSET_MAP: Record<string, string> = {
   '/src/assets/landing/hero.jpeg': heroJpegDefault,
   '/src/assets/landing/map.jpeg': mapJpegDefault,
   '/src/assets/landing/inside1.jpg': inside1JpgDefault,
+  '/src/assets/landing/Bot Builder-390.jpg': botBuilder390Default,
+  '/src/assets/landing/Bot%20Builder-390.jpg': botBuilder390Default,
   'intro.png': heroImageDefault,
   'playlearn.png': starterImageDefault,
   'roboticcamp.png': explorerImageDefault,
@@ -42,6 +45,8 @@ const ASSET_MAP: Record<string, string> = {
   'hero.jpeg': heroJpegDefault,
   'map.jpeg': mapJpegDefault,
   'inside1.jpg': inside1JpgDefault,
+  'Bot Builder-390.jpg': botBuilder390Default,
+  'Bot%20Builder-390.jpg': botBuilder390Default,
 };
 
 export function resolveAssetUrl(src: string | undefined | null): string {
@@ -49,7 +54,7 @@ export function resolveAssetUrl(src: string | undefined | null): string {
   if (src.startsWith('data:') || src.startsWith('http://') || src.startsWith('https://')) {
     return src;
   }
-  const cleanPath = src.replace(/^\/+/, '/');
+  const cleanPath = decodeURIComponent(src.replace(/^\/+/, '/'));
   if (ASSET_MAP[cleanPath]) {
     return ASSET_MAP[cleanPath];
   }

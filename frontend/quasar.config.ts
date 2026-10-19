@@ -43,6 +43,8 @@ export default defineConfig(() => {
         // extendTsConfig (tsConfig) {}
       },
 
+      sourcemap: false,
+
       // https://v2.quasar.dev/quasar-cli-vite/page-routing-with-vue-router#filename-based-routing
       // filenameBasedRouting: true,
 

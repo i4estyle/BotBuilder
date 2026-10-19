@@ -19,10 +19,18 @@ import { AuthEmailService } from './email.service.js';
       inject: [ConfigService],
       useFactory: (configService: ConfigService): JwtModuleOptions => {
         const expiresIn = configService.get<string>('JWT_EXPIRES_IN') ?? '8h';
+        const jwtSecret = configService.get<string>('JWT_SECRET');
+        const isProd = process.env.NODE_ENV === 'production';
+        if (
+          isProd &&
+          (!jwtSecret || jwtSecret === 'botbuilder-dev-secret-change-me')
+        ) {
+          throw new Error(
+            'FATAL SECURITY ERROR: JWT_SECRET must be set to a strong unique secret in production environment.',
+          );
+        }
         return {
-          secret:
-            configService.get<string>('JWT_SECRET') ??
-            'botbuilder-dev-secret-change-me',
+          secret: jwtSecret ?? 'botbuilder-dev-secret-change-me',
           signOptions: {
             expiresIn: expiresIn as NonNullable<
               JwtModuleOptions['signOptions']
