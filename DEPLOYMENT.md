@@ -7,6 +7,7 @@
 | Frontend | Vercel | Vue 3 / Quasar SPA |
 | Backend | Render | NestJS API |
 | Database | TiDB Cloud Starter | MySQL-compatible managed database |
+| Monitoring | UptimeRobot | Monitor API + database readiness |
 
 ## Production URLs
 
@@ -15,6 +16,8 @@
 - API + database readiness: https://botbuilder-api.onrender.com/api/health/ready
 
 `/api/health` ตรวจว่า API ยังทำงาน ส่วน `/api/health/ready` ตรวจ query ฐานข้อมูลจริง ใช้ URL หลังสำหรับ monitoring.
+
+ตั้ง UptimeRobot แบบ HTTP(s) ให้ตรวจ `https://botbuilder-api.onrender.com/api/health/ready` ทุก 5 นาที.
 
 ## TiDB Cloud Starter
 
