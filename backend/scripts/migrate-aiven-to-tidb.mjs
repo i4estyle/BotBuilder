@@ -99,7 +99,9 @@ async function main() {
     throw new Error('Root .env must contain the current Aiven DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, and DB_NAME.');
   }
 
-  const targetPassword = await readHidden('TiDB password (input hidden): ');
+  const targetPassword =
+    process.env.TIDB_PASSWORD ??
+    (await readHidden('TiDB password (input hidden): '));
   if (!targetPassword) throw new Error('TiDB password cannot be empty.');
   const targetCa = await fs.readFile(certificatePath, 'utf8');
 
