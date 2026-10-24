@@ -1,65 +1,49 @@
-# BotBuilder production deployment
+# BotBuilder — Production Deployment
 
-## Public endpoints
+## Services
 
-- Frontend: `https://botbuilder-web.vercel.app`
-- API liveness: `https://botbuilder-api.onrender.com/api/health`
-- API + database readiness: `https://botbuilder-api.onrender.com/api/health/ready`
+| ส่วน | ผู้ให้บริการ | หน้าที่ |
+| --- | --- | --- |
+| Frontend | Vercel | Vue 3 / Quasar SPA |
+| Backend | Render | NestJS API |
+| Database | TiDB Cloud Starter | MySQL-compatible managed database |
 
-`/api/health` only proves that NestJS is running. Use `/api/health/ready` for
-monitoring an actual database query.
+## Production URLs
 
-## Production topology
+- Web: https://botbuilder-web.vercel.app
+- API liveness: https://botbuilder-api.onrender.com/api/health
+- API + database readiness: https://botbuilder-api.onrender.com/api/health/ready
 
-- Vercel: Vue/Quasar SPA
-- Render: NestJS API
-- TiDB Cloud Starter: MySQL-compatible managed database
+`/api/health` ตรวจว่า API ยังทำงาน ส่วน `/api/health/ready` ตรวจ query ฐานข้อมูลจริง ใช้ URL หลังสำหรับ monitoring.
 
-Do not rely on an Aiven Free MySQL service for an always-available production
-database: Aiven can power off inactive free services. TiDB Cloud Starter has a
-different serverless, request-driven model; it does not require manually
-powering a service back on after an idle period. Free tiers are still not an
-SLA or a substitute for backups and monitoring.
+## TiDB Cloud Starter
 
-## Render environment variables
+- ใช้ MySQL-compatible protocol ผ่าน TLS
+- Serverless และ auto-scaling: ไม่มีการ power off แบบ idle service
+- Free quota: 5 GiB row storage และ 50 ล้าน Request Units (RU) ต่อเดือน
+- ตั้ง Spending Limit เป็น `$0` เพื่อไม่ให้มีค่าใช้จ่ายเกิน quota
+- เมื่อ quota หมด ระบบอาจ throttle หรือปฏิเสธ connection ใหม่จนกว่าจะเริ่มเดือนใหม่
 
-Set these in Render for `botbuilder-api`. Never commit their real values.
+## Render environment (database)
 
 ```dotenv
-NODE_ENV=production
 DB_TYPE=mysql
-DB_HOST=<TiDB host from Connect>
-DB_PORT=<TiDB port from Connect>
-DB_USER=<TiDB user from Connect>
-DB_PASSWORD=<TiDB password from Connect>
-DB_NAME=<TiDB database name from Connect>
+DB_HOST=<TiDB host>
+DB_PORT=4000
+DB_USER=<TiDB user>
+DB_PASSWORD=<TiDB password>
+DB_NAME=botbuilder
 DB_SSL=true
 DB_SSL_REJECT_UNAUTHORIZED=true
-DB_SSL_CA_BASE64=<Base64 of the TiDB CA PEM file>
+DB_SSL_CA_BASE64=<Base64-encoded TiDB CA certificate>
 DB_CONNECT_RETRY_ATTEMPTS=10
 DB_CONNECT_RETRY_DELAY_MS=3000
 DB_POOL_MAX=5
 ```
 
-Create the CA value locally without putting the source PEM in Git:
+## Resilience
 
-```powershell
-[Convert]::ToBase64String([IO.File]::ReadAllBytes('C:\path\to\tidb-ca.pem'))
-```
-
-Paste the command output into `DB_SSL_CA_BASE64`. Do not set
-`DB_SSL_REJECT_UNAUTHORIZED=false` for TiDB production.
-
-## Runtime resilience
-
-- Initial database connection retries 10 times with a 3-second delay.
-- Only failed GET/HEAD/OPTIONS requests with transient database/network errors
-  are retried (250 ms, then 750 ms). Writes are never automatically repeated,
-  preventing duplicate saves, tokens, or password-reset actions.
-- A remaining transient DB error returns HTTP 503 instead of a misleading 500.
-
-## Migration runbook
-
-Follow [docs/TIDB_MIGRATION.md](docs/TIDB_MIGRATION.md). Take and verify a
-backup before editing Render variables. The old Aiven variables remain the
-rollback path until TiDB has passed all checks.
+- API retries initial database connections during startup.
+- Read-only requests retry short-lived database/network failures.
+- Database failures return HTTP `503` instead of a generic `500`.
+- Never commit passwords, certificates, or production environment values to Git.
