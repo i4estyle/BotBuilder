@@ -14,40 +14,24 @@ TiDB has been verified. It does not require committing any secret.
 Do not use PostgreSQL Compatible mode for this project: BotBuilder uses
 `mysql2`, TypeORM's MySQL driver, and MySQL migrations.
 
-## 2. Back up Aiven before any switch
+## 2. Copy Aiven data before any switch
 
-Run this from a machine with MySQL client tools. Replace placeholders locally;
-do not paste credentials into chat or Git.
+The repository includes `backend/scripts/migrate-aiven-to-tidb.mjs`. It reads
+the existing Aiven connection only from the local root `.env`, prompts for the
+TiDB password without echoing it, refuses to run when TiDB is not empty, copies
+every table (including TypeORM's `migrations` table), and validates row counts.
 
-```powershell
-$env:MYSQL_PWD = '<AIVEN_PASSWORD>'
-mysqldump --host=<AIVEN_HOST> --port=<AIVEN_PORT> --user=<AIVEN_USER> --ssl-mode=REQUIRED --single-transaction --no-tablespaces --routines=false --triggers=false <AIVEN_DATABASE> > botbuilder-aiven-backup.sql
-Remove-Item Env:MYSQL_PWD
-```
-
-Keep `botbuilder-aiven-backup.sql` outside the repository. Check that the file
-is non-empty, and retain the Aiven service and its original Render variables
-until all checks below pass.
-
-The dump must include TypeORM's `migrations` table. This prevents the API from
-re-running historical schema migrations against an imported, already-current
-database.
-
-## 3. Import into TiDB
-
-Use the exact TLS command provided in TiDB Cloud's **Connect** panel. Typical
-MySQL client form:
+From PowerShell:
 
 ```powershell
-$env:MYSQL_PWD = '<TIDB_PASSWORD>'
-mysql --host=<TIDB_HOST> --port=<TIDB_PORT> --user=<TIDB_USER> --ssl-mode=VERIFY_IDENTITY --ssl-ca=C:\path\to\tidb-ca.pem <TIDB_DATABASE> < botbuilder-aiven-backup.sql
-Remove-Item Env:MYSQL_PWD
+cd backend
+pnpm run migrate:aiven:tidb -- --target-host <TIDB_HOST> --target-port 4000 --target-user <TIDB_USER> --target-database botbuilder --ca C:\path\to\tidb-ca.pem
 ```
 
-If the TiDB Connect panel specifies a different TLS mode, use that command.
-Do not disable certificate verification.
+Retain the Aiven service and its original Render variables until all checks
+below pass.
 
-## 4. Validate TiDB before changing Render
+## 3. Validate TiDB before changing Render
 
 Connect with the TiDB command and run:
 
@@ -63,7 +47,7 @@ Confirm the tables and row counts match Aiven. Do not proceed if any command
 fails. TiDB is MySQL-compatible but not every MySQL feature is identical; this
 validation is the rollback gate for the project's raw SQL migrations.
 
-## 5. Switch Render
+## 4. Switch Render
 
 1. Render dashboard -> `botbuilder-api` -> **Environment**.
 2. Copy the existing `DB_*` values to a private rollback note.
@@ -73,7 +57,7 @@ validation is the rollback gate for the project's raw SQL migrations.
    restart after this repository commit is deployed).
 5. Watch Render logs. The app must start without migration or TLS errors.
 
-## 6. Verify production
+## 5. Verify production
 
 Run these read-only requests:
 
