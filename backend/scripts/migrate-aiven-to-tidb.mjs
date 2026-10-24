@@ -149,7 +149,9 @@ async function main() {
       const [createRows] = await sourceConnection.query(
         `SHOW CREATE TABLE ${quotedTable}`,
       );
-      const createSql = createRows[0]['Create Table'];
+      // Aiven can emit ANSI double-quoted identifiers in SHOW CREATE TABLE.
+      // TiDB Cloud's MySQL-compatible parser expects MySQL backticks instead.
+      const createSql = createRows[0]['Create Table'].replaceAll('"', '`');
       await targetConnection.query(createSql);
 
       const [rows] = await sourceConnection.query(`SELECT * FROM ${quotedTable}`);
