@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { isTransientDatabaseError } from '../utils/database-error.util.js';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -18,9 +19,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const isHttpException = exception instanceof HttpException;
+    const isTransientDatabaseFailure = isTransientDatabaseError(exception);
     const status = isHttpException
       ? exception.getStatus()
-      : HttpStatus.INTERNAL_SERVER_ERROR;
+      : isTransientDatabaseFailure
+        ? HttpStatus.SERVICE_UNAVAILABLE
+        : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const isProd = process.env.NODE_ENV === 'production';
 
@@ -36,17 +40,24 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       );
 
       // In production, mask internal error details and connection strings
-      errorResponse = isProd
+      errorResponse = isTransientDatabaseFailure
         ? {
-            statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: 'Internal server error',
+            statusCode: HttpStatus.SERVICE_UNAVAILABLE,
+            message: 'Database temporarily unavailable. Please retry shortly.',
           }
-        : {
-            statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-            message:
-              exception instanceof Error ? exception.message : 'Unknown error',
-            error: String(exception),
-          };
+        : isProd
+          ? {
+              statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+              message: 'Internal server error',
+            }
+          : {
+              statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+              message:
+                exception instanceof Error
+                  ? exception.message
+                  : 'Unknown error',
+              error: String(exception),
+            };
     }
 
     response.status(status).json(

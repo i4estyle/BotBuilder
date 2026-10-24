@@ -12,6 +12,30 @@ import { ChildAccessCodesModule } from './modules/child-access-codes/child-acces
 import { GoogleSheetsModule } from './modules/google-sheets/google-sheets.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 
+function positiveInteger(value: string | undefined, fallback: number): number {
+  const parsed = Number.parseInt(value ?? '', 10);
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function databaseSslOptions(
+  configService: ConfigService,
+): { ca?: string; rejectUnauthorized: boolean } | undefined {
+  if (configService.get<string>('DB_SSL') !== 'true') return undefined;
+
+  const certificateBase64 = configService
+    .get<string>('DB_SSL_CA_BASE64')
+    ?.trim();
+  return {
+    // Keep the current Aiven deployment compatible until its CA is configured.
+    // TiDB production setup must set this to true and provide its CA.
+    rejectUnauthorized:
+      configService.get<string>('DB_SSL_REJECT_UNAUTHORIZED') === 'true',
+    ...(certificateBase64
+      ? { ca: Buffer.from(certificateBase64, 'base64').toString('utf8') }
+      : {}),
+  };
+}
+
 @Module({
   imports: [
     CommonModule,
@@ -48,7 +72,6 @@ import { HealthModule } from './modules/health/health.module.js';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const useSsl = configService.get<string>('DB_SSL') === 'true';
         return {
           type: 'mysql',
           host: configService.get<string>('DB_HOST'),
@@ -60,7 +83,27 @@ import { HealthModule } from './modules/health/health.module.js';
           synchronize: false,
           migrationsRun: true,
           migrations: ['dist/database/migrations/*.js'],
-          ssl: useSsl ? { rejectUnauthorized: false } : undefined,
+          ssl: databaseSslOptions(configService),
+          // Covers cold starts and temporary network failures before Nest starts.
+          retryAttempts: positiveInteger(
+            configService.get<string>('DB_CONNECT_RETRY_ATTEMPTS'),
+            10,
+          ),
+          retryDelay: positiveInteger(
+            configService.get<string>('DB_CONNECT_RETRY_DELAY_MS'),
+            3000,
+          ),
+          verboseRetryLog: true,
+          // Keep the pool deliberately small for serverless databases and keep
+          // TCP sockets healthy while the API is active.
+          extra: {
+            connectionLimit: positiveInteger(
+              configService.get<string>('DB_POOL_MAX'),
+              5,
+            ),
+            enableKeepAlive: true,
+            keepAliveInitialDelay: 0,
+          },
         };
       },
     }),

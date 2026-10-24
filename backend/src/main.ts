@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import type { Request, Response, NextFunction } from 'express';
 import { AppModule } from './app.module.js';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter.js';
+import { DatabaseReadRetryInterceptor } from './common/interceptors/database-read-retry.interceptor.js';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -98,6 +99,7 @@ async function bootstrap(): Promise<void> {
 
   // Global exception filter to sanitize errors and hide internal DB details in production
   app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalInterceptors(new DatabaseReadRetryInterceptor());
 
   // Expose Swagger UI in development environment only
   if (process.env.NODE_ENV !== 'production') {
