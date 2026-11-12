@@ -84,6 +84,12 @@
         pointer-events: none;
       }
 
+      #bb-initial-loader.bb-initial-loader--ready .bb-initial-loader__fill {
+        width: 100%;
+        animation: none;
+        transition: width 160ms ease-out;
+      }
+
       .bb-initial-loader__stage {
         display: flex;
         width: min(440px, 100%);
