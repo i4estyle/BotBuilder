@@ -109,6 +109,7 @@ import {
 import { applyHomeNavigationPolicy } from './website-editor/home-navigation-policy';
 import { pageSectionsApiService } from '@/services/page-sections-api.service';
 import type { EditorLocale } from './website-editor/types';
+import { APP_CONTENT_READY_EVENT } from '@/constants/loading-constants';
 
 const liveSyncChannel =
   typeof window !== 'undefined' && 'BroadcastChannel' in window
@@ -265,6 +266,11 @@ export function useWebsiteEditor() {
       syncActiveContentToTarget(contentStateMap[targetLocale]);
     } finally {
       isLoading.value = false;
+      window.dispatchEvent(
+        new CustomEvent(APP_CONTENT_READY_EVENT, {
+          detail: { pageName: targetPage, locale: targetLocale },
+        }),
+      );
     }
   };
 

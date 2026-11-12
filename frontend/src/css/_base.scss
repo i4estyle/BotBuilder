@@ -76,7 +76,7 @@ body {
   border-bottom: 2px solid var(--green);
   padding-bottom: 6px;
 }
-.site-header__nav a.router-link-active {
+.site-header__nav a.router-link-exact-active {
   color: var(--green);
   border-bottom: 2px solid var(--green);
   padding-bottom: 6px;
@@ -144,7 +144,7 @@ body {
     background-color 160ms ease,
     color 160ms ease;
 }
-.site-header__mobile-nav a.router-link-active {
+.site-header__mobile-nav a.router-link-exact-active {
   color: var(--green);
   background: rgba(0, 108, 12, 0.08);
 }

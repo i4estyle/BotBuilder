@@ -89,10 +89,13 @@ const statusStyle = computed<Record<string, string>>(() => ({
   justify-content: center;
   overflow: hidden;
   transition:
-    opacity 450ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 450ms cubic-bezier(0.16, 1, 0.3, 1),
-    filter 450ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 320ms cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform, filter;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+  box-sizing: border-box;
 
   &--exit {
     opacity: 0;
@@ -107,14 +110,14 @@ const statusStyle = computed<Record<string, string>>(() => ({
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: clamp(16px, 4vw, 32px);
   max-width: 440px;
   width: 100%;
   animation: bb-stage-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .bb-loader__logo-wrap {
-  margin: 0 0 28px 0;
+  margin: 0 0 clamp(18px, 4vh, 24px) 0;
   padding: 0;
   display: flex;
   align-items: center;
@@ -123,9 +126,9 @@ const statusStyle = computed<Record<string, string>>(() => ({
 }
 
 .bb-loader__logo {
-  height: 58px;
-  width: auto;
-  max-width: 240px;
+  width: clamp(60px, 14vw, 72px);
+  height: clamp(60px, 14vw, 72px);
+  max-width: 72px;
   object-fit: contain;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.06));
   animation: bb-float 3s ease-in-out infinite;
@@ -187,11 +190,14 @@ const statusStyle = computed<Record<string, string>>(() => ({
   align-items: center;
   gap: 10px;
   margin-bottom: 8px;
+  max-width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .bb-loader__title {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: clamp(1rem, 3.8vw, 1.15rem);
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.2;
@@ -210,7 +216,7 @@ const statusStyle = computed<Record<string, string>>(() => ({
 
 .bb-loader__status {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: clamp(0.8rem, 3.2vw, 0.88rem);
   font-weight: 500;
   line-height: 1.4;
   text-align: center;
@@ -244,6 +250,48 @@ const statusStyle = computed<Record<string, string>>(() => ({
   }
   100% {
     transform: translateX(200%);
+  }
+}
+
+@media (max-width: 420px) {
+  .bb-loader__info {
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .bb-loader__badge {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .bb-loader-stage {
+    padding-block: 12px;
+  }
+
+  .bb-loader__logo-wrap {
+    margin-bottom: 12px;
+  }
+
+  .bb-loader__logo {
+    width: 52px;
+    height: 52px;
+  }
+
+  .bb-loader__progress-box {
+    margin-bottom: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-loading-screen,
+  .bb-loader-stage,
+  .bb-loader__logo,
+  .bb-loader__fill,
+  .bb-loader__shimmer {
+    animation: none;
+    transition-duration: 1ms;
   }
 }
 </style>

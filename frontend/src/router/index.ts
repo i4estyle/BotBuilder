@@ -36,6 +36,9 @@ export default defineRouter((/* { store, ssrContext } */) => {
   });
 
   Router.beforeEach(async (to) => {
+    const needsAuthState = Boolean(to.meta.requiresAuth || to.meta.guestOnly);
+    if (!needsAuthState) return true;
+
     const authStore = useAuthStore();
     await authStore.initialize();
 

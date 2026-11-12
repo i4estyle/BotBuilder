@@ -1,13 +1,15 @@
 import type { LoadingConfig } from '@/types/loading.types';
 
+export const APP_CONTENT_READY_EVENT = 'botbuilder:content-ready';
+
 export const LOADING_CONFIG: LoadingConfig = {
   title: 'BotBuilder Website',
   badgeTextTh: 'สถาบันหุ่นยนต์และการเขียนโปรแกรม',
   badgeTextEn: 'Robotics & Programming',
-  minDurationMs: 1100,
-  maxTimeoutMs: 2800,
+  minDurationMs: 650,
+  maxTimeoutMs: 4500,
   frameIntervalMs: 16,
-  logoAssetKey: 'logo.png',
+  logoAssetKey: '/icons/icon-192x192.png',
   theme: {
     backdropColor: '#ffffff',
     cardBackground: 'rgba(255, 255, 255, 0.98)',
