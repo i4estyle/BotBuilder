@@ -46,6 +46,39 @@
   ],
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "botbuilderthailand.com"
+        }
+      ],
+      "destination": "https://www.botbuilderthailand.com/",
+      "statusCode": 301
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "botbuilder-web.vercel.app"
+        }
+      ],
+      "destination": "https://www.botbuilderthailand.com/",
+      "statusCode": 301
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "botbuilder-pi.vercel.app"
+        }
+      ],
+      "destination": "https://www.botbuilderthailand.com/",
+      "statusCode": 301
+    },
+    {
       "source": "/:path*",
       "has": [
         {
@@ -54,7 +87,7 @@
         }
       ],
       "destination": "https://www.botbuilderthailand.com/:path*",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/:path*",
@@ -65,7 +98,7 @@
         }
       ],
       "destination": "https://www.botbuilderthailand.com/:path*",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/:path*",
@@ -76,7 +109,7 @@
         }
       ],
       "destination": "https://www.botbuilderthailand.com/:path*",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/home",
@@ -112,3 +145,4 @@
     }
   ]
 }
+
