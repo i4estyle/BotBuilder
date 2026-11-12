@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="th" class="bb-loading-active">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -61,6 +61,16 @@
     <!-- Available before Vue starts, so the first paint never flashes an empty page. -->
     <link rel="preload" as="image" href="/icons/icon-192x192.png" />
     <style>
+      html {
+        scrollbar-gutter: stable;
+      }
+
+      html.bb-loading-active,
+      html.bb-loading-active body {
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+
       #bb-initial-loader {
         position: fixed;
         inset: 0;
@@ -73,7 +83,7 @@
         color: #1a202c;
         font-family: 'Segoe UI', Roboto, Arial, sans-serif;
         opacity: 1;
-        transition: opacity 180ms ease-out;
+        transition: opacity 360ms cubic-bezier(0.16, 1, 0.3, 1);
         padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
           env(safe-area-inset-left);
         box-sizing: border-box;
@@ -82,12 +92,6 @@
       #bb-initial-loader.bb-initial-loader--exit {
         opacity: 0;
         pointer-events: none;
-      }
-
-      #bb-initial-loader.bb-initial-loader--ready .bb-initial-loader__fill {
-        width: 100%;
-        animation: none;
-        transition: width 160ms ease-out;
       }
 
       .bb-initial-loader__stage {
@@ -119,13 +123,32 @@
       }
 
       .bb-initial-loader__fill {
+        position: relative;
         display: block;
-        width: 8%;
+        width: 100%;
         height: 100%;
+        overflow: hidden;
         border-radius: inherit;
         background: linear-gradient(90deg, #bc0100 0%, #ef233c 55%, #1c871e 100%);
         box-shadow: 0 0 10px rgba(239, 35, 60, 0.3);
-        animation: bb-initial-loader-progress 2.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        transform: scaleX(0.08);
+        transform-origin: left center;
+        will-change: transform;
+        animation: bb-initial-loader-progress 3.2s cubic-bezier(0.16, 0.7, 0.3, 1) forwards;
+      }
+
+      .bb-initial-loader__fill::after {
+        position: absolute;
+        inset: 0;
+        content: '';
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.68) 50%,
+          transparent 100%
+        );
+        transform: translateX(-100%);
+        animation: bb-initial-loader-shimmer 1.5s ease-in-out infinite;
       }
 
       .bb-initial-loader__info {
@@ -168,10 +191,19 @@
 
       @keyframes bb-initial-loader-progress {
         from {
-          width: 8%;
+          transform: scaleX(0.08);
         }
         to {
-          width: 88%;
+          transform: scaleX(0.92);
+        }
+      }
+
+      @keyframes bb-initial-loader-shimmer {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(180%);
         }
       }
 
@@ -216,13 +248,14 @@
       @media (prefers-reduced-motion: reduce) {
         #bb-initial-loader,
         .bb-initial-loader__logo,
-        .bb-initial-loader__fill {
+        .bb-initial-loader__fill,
+        .bb-initial-loader__fill::after {
           animation: none;
           transition-duration: 1ms;
         }
 
         .bb-initial-loader__fill {
-          width: 72%;
+          transform: scaleX(0.72);
         }
       }
     </style>
