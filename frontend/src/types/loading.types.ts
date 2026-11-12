@@ -10,6 +10,8 @@ export interface LoadingThemeConfig {
   barTrackColor: string;
   barFillGradient: string;
   barGlow: string;
+  waveRed: string;
+  waveGreen: string;
   textPrimary: string;
   textSecondary: string;
   badgeBg: string;
@@ -23,7 +25,10 @@ export interface LoadingConfig {
   badgeTextEn: string;
   minDurationMs: number;
   maxTimeoutMs: number;
-  frameIntervalMs: number;
+  completionDurationMs: number;
+  fadeDurationMs: number;
+  waitingProgress: number;
+  contentRoutes: readonly string[];
   logoAssetKey: string;
   theme: LoadingThemeConfig;
   steps: readonly LoadingStepConfig[];

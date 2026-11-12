@@ -146,7 +146,6 @@
               :key="index"
               class="branch-block"
               data-reveal
-              :style="revealDelay(index)"
             >
               <div class="branches__map">
                 <iframe
@@ -252,6 +251,7 @@ import SiteFooter from '@/components/landing/SiteFooter.vue';
 import SiteHeader from '@/components/landing/SiteHeader.vue';
 import AdminSectionBlockLayer from '@/components/admin/sections/common/admin-section-block-layer.vue';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
+import { useSectionReveal } from '@/composables/use-section-reveal';
 import { resolveAssetUrl } from '@/utils/asset-helper';
 
 const {
@@ -280,36 +280,12 @@ function scrollToDiscoveryClass(): void {
 const pageRoot = ref<HTMLElement | null>(null);
 const quizOpen = ref(false);
 
-let revealObserver: IntersectionObserver | undefined;
-
-function revealDelay(index: number): Record<string, string> {
-  return { '--reveal-delay': `${index * 90}ms` };
-}
-
-function setupRevealObserver(): void {
-  const revealElements = pageRoot.value?.querySelectorAll<HTMLElement>('[data-reveal]');
-  if (!revealElements?.length) return;
-
-  revealObserver?.disconnect();
-  revealObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-revealed');
-        revealObserver?.unobserve(entry.target);
-      });
-    },
-    { threshold: 0.15 },
-  );
-
-  revealElements.forEach((element) => revealObserver?.observe(element));
-}
+useSectionReveal(pageRoot, () => navSections.map((section) => section.id));
 
 let liveSyncChannel: BroadcastChannel | null = null;
 
 onMounted(async () => {
   await fetchPageData('home', editorLocale.value);
-  setupRevealObserver();
 
   if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
     liveSyncChannel = new BroadcastChannel('botbuilder-live-sync');
@@ -326,7 +302,6 @@ watch(editorLocale, async (newLoc) => {
 });
 
 onBeforeUnmount(() => {
-  revealObserver?.disconnect();
   liveSyncChannel?.close();
 });
 </script>

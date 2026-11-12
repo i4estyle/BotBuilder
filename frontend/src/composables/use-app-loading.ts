@@ -1,97 +1,83 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { APP_CONTENT_READY_EVENT, LOADING_CONFIG } from '@/constants/loading-constants';
-import type { LoadingPhase, LoadingStepConfig } from '@/types/loading.types';
-
-const currentProgress = ref<number>(0);
-const phase = ref<LoadingPhase>('loading');
-const isVisible = ref<boolean>(true);
-
-const fallbackStep: LoadingStepConfig = {
-  threshold: 100,
-  labelTh: '',
-  labelEn: '',
-};
+import { useRoute } from 'vue-router';
+import {
+  APP_CONTENT_READY_EVENT,
+  APP_LOADING_COMPLETE_EVENT,
+  LOADING_CONFIG,
+} from '@/constants/loading-constants';
+import type { LoadingPhase } from '@/types/loading.types';
 
 export function useAppLoading() {
+  const route = useRoute();
+  const currentProgress = ref(0);
+  const phase = ref<LoadingPhase>('loading');
+  const isVisible = ref(true);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fadeDurationMs = reducedMotion ? 0 : LOADING_CONFIG.fadeDurationMs;
+  let contentReady = !LOADING_CONFIG.contentRoutes.includes(route.path);
   let animationFrameId: number | undefined;
-  let safetyTimer: number | undefined;
   let finishTimer: number | undefined;
-  let contentReady = false;
+  let completionStartedAt: number | undefined;
+  let completionStartedProgress = 0;
 
-  const currentStepLabelTh = computed<string>((): string => {
-    const matched = LOADING_CONFIG.steps.find((step) => currentProgress.value <= step.threshold);
-    const finalStep = LOADING_CONFIG.steps[LOADING_CONFIG.steps.length - 1] ?? fallbackStep;
-    return matched ? matched.labelTh : finalStep.labelTh;
-  });
-
-  const currentStepLabelEn = computed<string>((): string => {
-    const matched = LOADING_CONFIG.steps.find((step) => currentProgress.value <= step.threshold);
-    const finalStep = LOADING_CONFIG.steps[LOADING_CONFIG.steps.length - 1] ?? fallbackStep;
-    return matched ? matched.labelEn : finalStep.labelEn;
-  });
-
-  const finishLoading = (): void => {
-    if (phase.value !== 'loading') return;
-
-    if (animationFrameId !== undefined) cancelAnimationFrame(animationFrameId);
-    if (safetyTimer !== undefined) window.clearTimeout(safetyTimer);
-    window.removeEventListener(APP_CONTENT_READY_EVENT, handleContentReady);
-
-    currentProgress.value = 100;
-    phase.value = 'completing';
-
-    finishTimer = window.setTimeout((): void => {
-      phase.value = 'done';
-      isVisible.value = false;
-    }, 380);
-  };
+  const currentStep = computed(() =>
+    LOADING_CONFIG.steps.find((step) => currentProgress.value <= step.threshold),
+  );
+  const currentStepLabelTh = computed(() => currentStep.value?.labelTh ?? '');
+  const currentStepLabelEn = computed(() => currentStep.value?.labelEn ?? '');
 
   const handleContentReady = (): void => {
     contentReady = true;
   };
 
-  const startProgressEngine = (): void => {
-    phase.value = 'loading';
-    currentProgress.value = 0;
-    isVisible.value = true;
-    contentReady = false;
-
-    window.addEventListener(APP_CONTENT_READY_EVENT, handleContentReady, { once: true });
-
-    const startTime = performance.now();
-
-    safetyTimer = window.setTimeout((): void => {
-      finishLoading();
-    }, LOADING_CONFIG.maxTimeoutMs);
-
-    const tick = (now: number): void => {
-      const elapsed = now - startTime;
-      const linearRatio = Math.min(elapsed / LOADING_CONFIG.minDurationMs, 1);
-      const easeProgress = Math.round(Math.sin((linearRatio * Math.PI) / 2) * 92);
-
-      currentProgress.value = Math.max(currentProgress.value, easeProgress);
-
-      if (contentReady && linearRatio >= 1) {
-        finishLoading();
-      } else if (phase.value === 'loading') {
-        animationFrameId = requestAnimationFrame(tick);
-      } else {
-        animationFrameId = undefined;
-      }
-    };
-
-    animationFrameId = requestAnimationFrame(tick);
-  };
+  window.addEventListener(APP_CONTENT_READY_EVENT, handleContentReady, { once: true });
+  document.documentElement.classList.add('bb-loading-active');
 
   onMounted((): void => {
-    startProgressEngine();
+    const startedAt = performance.now();
+    const tick = (now: number): void => {
+      const elapsed = now - startedAt;
+      if (
+        completionStartedAt === undefined &&
+        ((contentReady && elapsed >= LOADING_CONFIG.minDurationMs) ||
+          elapsed >= LOADING_CONFIG.maxTimeoutMs)
+      ) {
+        completionStartedAt = now;
+        completionStartedProgress = currentProgress.value;
+      }
+
+      if (completionStartedAt !== undefined) {
+        const ratio = reducedMotion
+          ? 1
+          : Math.min((now - completionStartedAt) / LOADING_CONFIG.completionDurationMs, 1);
+        const eased = ratio * ratio * (3 - 2 * ratio);
+        currentProgress.value =
+          completionStartedProgress + (100 - completionStartedProgress) * eased;
+        if (ratio >= 1) {
+          phase.value = 'completing';
+          window.removeEventListener(APP_CONTENT_READY_EVENT, handleContentReady);
+          finishTimer = window.setTimeout((): void => {
+            phase.value = 'done';
+            isVisible.value = false;
+            document.documentElement.classList.remove('bb-loading-active');
+            window.dispatchEvent(new Event(APP_LOADING_COMPLETE_EVENT));
+          }, fadeDurationMs);
+          return;
+        }
+      } else {
+        currentProgress.value =
+          LOADING_CONFIG.waitingProgress * (1 - Math.exp(-elapsed / LOADING_CONFIG.minDurationMs));
+      }
+      animationFrameId = requestAnimationFrame(tick);
+    };
+    animationFrameId = requestAnimationFrame(tick);
   });
 
   onBeforeUnmount((): void => {
     if (animationFrameId !== undefined) cancelAnimationFrame(animationFrameId);
-    if (safetyTimer !== undefined) window.clearTimeout(safetyTimer);
     if (finishTimer !== undefined) window.clearTimeout(finishTimer);
     window.removeEventListener(APP_CONTENT_READY_EVENT, handleContentReady);
+    document.documentElement.classList.remove('bb-loading-active');
   });
 
   return {
@@ -100,6 +86,6 @@ export function useAppLoading() {
     isVisible,
     currentStepLabelTh,
     currentStepLabelEn,
-    startProgressEngine,
+    fadeDurationMs,
   };
 }
