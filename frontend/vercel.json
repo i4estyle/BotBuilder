@@ -54,7 +54,7 @@
         }
       ],
       "destination": "https://www.botbuilderthailand.com/:path*",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/:path*",
@@ -65,7 +65,7 @@
         }
       ],
       "destination": "https://www.botbuilderthailand.com/:path*",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/:path*",
@@ -76,7 +76,7 @@
         }
       ],
       "destination": "https://www.botbuilderthailand.com/:path*",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/home",
@@ -112,3 +112,4 @@
     }
   ]
 }
+
