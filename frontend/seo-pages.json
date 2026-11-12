@@ -1,0 +1,31 @@
+{
+  "siteOrigin": "https://www.botbuilderthailand.com",
+  "defaultImage": "/images/og-botbuilder.jpg",
+  "pages": [
+    {
+      "path": "/",
+      "title": "BotBuilder Thailand | สถาบันสอนหุ่นยนต์และ Coding เด็ก",
+      "description": "BotBuilder Thailand สถาบันเสริมทักษะเด็กด้านหุ่นยนต์และการเขียนโปรแกรมด้วย LEGO Education, STEM, Robotics, Coding และ Problem Solving ที่บางแสนและศรีราชา"
+    },
+    {
+      "path": "/promotions",
+      "title": "โปรโมชั่นคอร์สเรียนหุ่นยนต์และ Coding | BotBuilder",
+      "description": "ดูโปรโมชั่นและกิจกรรมพิเศษสำหรับคอร์สหุ่นยนต์ Coding และ STEM สำหรับเด็กจาก BotBuilder Thailand"
+    },
+    {
+      "path": "/courses",
+      "title": "หลักสูตรหุ่นยนต์และ Coding เด็ก | BotBuilder Thailand",
+      "description": "หลักสูตร LEGO Education, Robotics, Coding และ STEM สำหรับเด็ก เรียนผ่านการลงมือทำและพัฒนาทักษะ Problem Solving"
+    },
+    {
+      "path": "/resources",
+      "title": "บทความและสื่อการเรียนรู้ STEM | BotBuilder",
+      "description": "บทความและสื่อการเรียนรู้ด้านหุ่นยนต์ Coding, LEGO Education และ STEM สำหรับเด็กและผู้ปกครอง"
+    },
+    {
+      "path": "/about-us",
+      "title": "เกี่ยวกับ BotBuilder Thailand | สถาบันหุ่นยนต์เด็ก",
+      "description": "รู้จัก BotBuilder Thailand สถาบันพัฒนาทักษะเด็กด้านหุ่นยนต์ Coding และ STEM พร้อมสาขาบางแสนและศรีราชา"
+    }
+  ]
+}

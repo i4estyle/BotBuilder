@@ -1,7 +1,9 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "buildCommand": "npm run build",
   "outputDirectory": "dist/spa",
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/(.*)",
@@ -31,16 +33,79 @@
           "value": "max-age=63072000; includeSubDomains; preload"
         }
       ]
+    },
+    {
+      "source": "/admin/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive"
+        }
+      ]
     }
   ],
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "botbuilderthailand.com"
+        }
+      ],
+      "destination": "https://www.botbuilderthailand.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "botbuilder-web.vercel.app"
+        }
+      ],
+      "destination": "https://www.botbuilderthailand.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "botbuilder-pi.vercel.app"
+        }
+      ],
+      "destination": "https://www.botbuilderthailand.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
       "source": "/(\\.env.*|\\.git.*|\\.aws.*)",
-      "destination": "/home",
+      "destination": "/",
       "permanent": false
     }
   ],
   "rewrites": [
+    {
+      "source": "/courses",
+      "destination": "/courses/index.html"
+    },
+    {
+      "source": "/promotions",
+      "destination": "/promotions/index.html"
+    },
+    {
+      "source": "/resources",
+      "destination": "/resources/index.html"
+    },
+    {
+      "source": "/about-us",
+      "destination": "/about-us/index.html"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

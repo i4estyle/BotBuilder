@@ -1,16 +1,20 @@
 <template>
   <header class="site-header" :class="{ 'site-header--scrolled': isScrolled }">
     <RouterLink
-      to="/home"
+      to="/"
       class="site-header__brand"
-      aria-label="Bot Builder home"
+      aria-label="BotBuilder home"
       :style="getStyleOverride('header.logo')"
       @click="isMobileMenuOpen = false"
     >
-      <img :src="resolveAssetUrl(headerData.logo)" alt="Bot Builder" class="site-header__logo" />
+      <img
+        :src="resolveAssetUrl(headerData.logo)"
+        alt="BotBuilder Thailand"
+        class="site-header__logo"
+      />
     </RouterLink>
     <nav class="site-header__nav" aria-label="Main navigation">
-      <RouterLink to="/home" :style="getStyleOverride('header.nav.home')">{{
+      <RouterLink to="/" :style="getStyleOverride('header.nav.home')">{{
         headerData.nav?.home || 'หน้าหลัก'
       }}</RouterLink>
       <RouterLink to="/promotions" :style="getStyleOverride('header.nav.promotions')">{{
@@ -63,7 +67,7 @@
         aria-label="Mobile navigation"
       >
         <nav class="site-header__mobile-nav">
-          <RouterLink to="/home" @click="isMobileMenuOpen = false">
+          <RouterLink to="/" @click="isMobileMenuOpen = false">
             {{ headerData.nav?.home || 'หน้าหลัก' }}
           </RouterLink>
           <RouterLink to="/promotions" @click="isMobileMenuOpen = false">

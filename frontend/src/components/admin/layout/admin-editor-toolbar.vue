@@ -112,7 +112,7 @@
           flat
           dense
           icon="open_in_new"
-          href="/home"
+          href="/"
           target="_blank"
           class="admin-toolbar__btn admin-toolbar__preview-btn"
           aria-label="Preview live site"
