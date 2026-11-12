@@ -36,7 +36,7 @@ async function bootstrap(): Promise<void> {
     }
     next();
   });
-
+  //allow orgin
   const rawFrontendUrl = process.env.FRONTEND_URL;
   const defaultAllowedOrigins = [
     'https://botbuilder-web.vercel.app',
