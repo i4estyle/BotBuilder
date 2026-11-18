@@ -96,7 +96,7 @@
             </template>
           </q-input>
         </div>
-        <div class="col-8 col-sm-auto">
+        <div class="col-6 col-sm-auto">
           <q-select
             v-model="selectedStatus"
             dense
@@ -108,7 +108,19 @@
             map-options
           />
         </div>
-        <div class="col-4 col-sm-auto text-right text-caption text-grey-7">
+        <div class="col-6 col-sm-auto">
+          <q-select
+            v-model="selectedSort"
+            dense
+            outlined
+            :options="sortOptions"
+            label="เรียงตาม"
+            class="status-select"
+            emit-value
+            map-options
+          />
+        </div>
+        <div class="col-12 col-sm-auto text-right text-caption text-grey-7">
           {{ filteredRecords.length.toLocaleString() }} รายการ
         </div>
       </q-card-section>
@@ -416,7 +428,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useQuasar } from 'quasar';
 import type { QTableColumn } from 'quasar';
 import { useEvaluationStore } from '@/stores/evaluation-store';
@@ -439,9 +451,47 @@ const statusFilterOptions = [
   { label: 'รอดำเนินการ', value: 'Pending' },
 ];
 
-const pagination = ref({
+type SortKey = 'date-desc' | 'date-asc' | 'score-desc' | 'score-asc';
+
+const selectedSort = ref<SortKey>('date-desc');
+
+const sortOptions: { label: string; value: SortKey }[] = [
+  { label: 'วันที่ล่าสุด', value: 'date-desc' },
+  { label: 'วันที่เก่าสุด', value: 'date-asc' },
+  { label: 'คะแนนสูง → ต่ำ', value: 'score-desc' },
+  { label: 'คะแนนต่ำ → สูง', value: 'score-asc' },
+];
+
+const pagination = ref<{ rowsPerPage: number; sortBy: string | null; descending: boolean }>({
   rowsPerPage: 15,
+  sortBy: null,
+  descending: false,
 });
+
+// Picking a sort option clears any column-header sort so the dropdown takes effect
+watch(selectedSort, () => {
+  pagination.value = { ...pagination.value, sortBy: null, descending: false };
+});
+
+function compareByDate(a: EvaluationRecord, b: EvaluationRecord): number {
+  // sessionDate is ISO (YYYY-MM-DD) so string comparison is chronological; tie-break on session number
+  const byDate = (a.sessionDate || '').localeCompare(b.sessionDate || '');
+  return byDate !== 0 ? byDate : (a.sessionNumber ?? 0) - (b.sessionNumber ?? 0);
+}
+
+function sortRecords(list: EvaluationRecord[]): EvaluationRecord[] {
+  const sorted = [...list];
+  switch (selectedSort.value) {
+    case 'date-desc':
+      return sorted.sort((a, b) => compareByDate(b, a));
+    case 'date-asc':
+      return sorted.sort(compareByDate);
+    case 'score-desc':
+      return sorted.sort((a, b) => b.averageScore - a.averageScore || compareByDate(b, a));
+    case 'score-asc':
+      return sorted.sort((a, b) => a.averageScore - b.averageScore || compareByDate(b, a));
+  }
+}
 
 const skillLabels: { key: keyof EvaluationScores; label: string }[] = [
   { key: 'score1', label: 'ความสามารถทางเทคนิค' },
@@ -607,7 +657,7 @@ const filteredRecords = computed(() => {
     );
   }
 
-  return list;
+  return sortRecords(list);
 });
 
 function formatTime(isoString: string | null): string {
