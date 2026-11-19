@@ -1,41 +1,48 @@
 <template>
   <q-page class="q-pa-md q-pa-md-lg evaluation-dashboard-page">
     <!-- Header Section -->
-    <div class="row items-start justify-between q-col-gutter-sm q-mb-lg">
+    <div
+      class="row items-start justify-between q-col-gutter-sm q-mb-lg page-header"
+      :class="{ 'page-header--with-toggle': !isDrawerOpen }"
+    >
       <div class="col-12 col-sm">
-        <h1 class="text-h5 text-weight-bolder text-grey-10 q-my-none">การประเมินผลผู้เรียน</h1>
-        <div class="row items-center q-gutter-x-sm text-caption text-grey-7 q-mt-xs">
-          <span class="live-badge row items-center q-px-sm rounded-borders">
-            <span class="live-dot q-mr-xs"></span>
-            <span class="text-weight-bold text-bb-green">Google Sheets</span>
+        <h1 class="page-title text-grey-10 q-my-none">การประเมินผลผู้เรียน</h1>
+        <div class="header-meta text-caption text-grey-7">
+          <span class="live-badge">
+            <span class="live-dot"></span>
+            Google Sheets
           </span>
-          <span>
+          <span class="meta-item">
             แผ่นงาน
             <span class="text-weight-bold text-grey-9">{{ store.sheetTitle || 'Sheet1' }}</span>
           </span>
-          <span>· อัปเดตล่าสุด {{ formatTime(store.lastUpdated) }}</span>
+          <span class="meta-item">อัปเดตล่าสุด {{ formatTime(store.lastUpdated) }}</span>
         </div>
       </div>
 
-      <div class="col-12 col-sm-auto row items-center q-gutter-sm q-mt-xs q-mt-sm-none">
-        <q-btn
-          outline
-          color="grey-8"
-          icon="refresh"
-          label="รีเฟรช"
-          class="action-btn"
-          :loading="store.isLoading"
-          @click="() => store.fetchEvaluations()"
-        />
-        <q-btn
-          outline
-          color="primary"
-          icon="open_in_new"
-          label="เปิด Google Sheet"
-          class="action-btn"
-          :href="sheetUrl"
-          target="_blank"
-        />
+      <div class="col-12 col-sm-auto">
+        <div class="header-actions">
+          <q-btn
+            outline
+            no-caps
+            color="grey-8"
+            icon="refresh"
+            label="รีเฟรช"
+            class="action-btn"
+            :loading="store.isLoading"
+            @click="() => store.fetchEvaluations()"
+          />
+          <q-btn
+            outline
+            no-caps
+            color="primary"
+            icon="open_in_new"
+            :label="$q.screen.lt.sm ? 'Google Sheet' : 'เปิด Google Sheet'"
+            class="action-btn"
+            :href="sheetUrl"
+            target="_blank"
+          />
+        </div>
       </div>
     </div>
 
@@ -141,6 +148,7 @@
         class="evaluation-table"
         rows-per-page-label="แสดงต่อหน้า"
         :pagination-label="paginationLabel"
+        @row-click="(_evt, row) => openDetails(row)"
       >
         <!-- Custom ID Cell -->
         <template #body-cell-evaluationId="props">
@@ -155,8 +163,12 @@
             <div class="text-weight-medium text-grey-10 title-cell">
               {{ props.row.evaluationTitle }}
             </div>
-            <div v-if="props.row.enrollment" class="text-caption text-grey-6 title-cell">
-              {{ props.row.enrollment }}
+            <div
+              v-if="subtitleOf(props.row) || $q.screen.lt.md"
+              class="text-caption text-grey-6 title-cell row items-center q-gutter-x-sm"
+            >
+              <span v-if="$q.screen.lt.md" class="id-badge">{{ props.row.evaluationId }}</span>
+              <span v-if="subtitleOf(props.row)">{{ subtitleOf(props.row) }}</span>
             </div>
           </q-td>
         </template>
@@ -173,7 +185,7 @@
         <!-- Custom Average Score Cell -->
         <template #body-cell-averageScore="props">
           <q-td :props="props">
-            <div class="score-cell">
+            <div v-if="props.row.averageScore > 0" class="score-cell">
               <div>
                 <span
                   class="text-weight-bold"
@@ -191,6 +203,7 @@
                 size="4px"
               />
             </div>
+            <span v-else class="text-caption text-grey-5 no-wrap">ยังไม่มีคะแนน</span>
           </q-td>
         </template>
 
@@ -198,14 +211,15 @@
         <template #body-cell-googleDriveLink="props">
           <q-td :props="props">
             <q-btn
-              v-if="props.row.googleDriveLink"
+              v-if="safeLink(props.row.googleDriveLink)"
               flat
               round
               dense
               color="primary"
               icon="photo_library"
-              :href="props.row.googleDriveLink"
+              :href="safeLink(props.row.googleDriveLink)"
               target="_blank"
+              @click.stop
             >
               <q-tooltip>เปิดโฟลเดอร์ภาพใน Google Drive</q-tooltip>
             </q-btn>
@@ -221,10 +235,16 @@
               dense
               no-caps
               color="primary"
-              label="ดูรายละเอียด"
-              icon-right="chevron_right"
-              @click="openDetails(props.row)"
-            />
+              class="no-wrap"
+              :round="!showActionLabel"
+              :label="showActionLabel ? 'ดูรายละเอียด' : undefined"
+              :icon-right="showActionLabel ? 'chevron_right' : undefined"
+              :icon="showActionLabel ? undefined : 'chevron_right'"
+              :aria-label="'ดูรายละเอียด'"
+              @click.stop="openDetails(props.row)"
+            >
+              <q-tooltip v-if="!showActionLabel">ดูรายละเอียด</q-tooltip>
+            </q-btn>
           </q-td>
         </template>
 
@@ -243,12 +263,14 @@
                     <div class="text-weight-bold text-grey-10">
                       {{ props.row.evaluationTitle }}
                     </div>
-                    <div class="text-caption text-grey-6">
-                      <span class="id-badge q-mr-xs">{{ props.row.evaluationId }}</span>
-                      <span v-if="props.row.sessionNumber"
+                    <div class="meta-line text-caption text-grey-6">
+                      <span class="id-badge">{{ props.row.evaluationId }}</span>
+                      <span v-if="props.row.sessionNumber" class="no-wrap"
                         >ครั้งที่ {{ props.row.sessionNumber }}</span
                       >
-                      <span v-if="props.row.sessionDate"> · {{ props.row.sessionDate }}</span>
+                      <span v-if="props.row.sessionDate" class="no-wrap">{{
+                        props.row.sessionDate
+                      }}</span>
                     </div>
                   </div>
                   <span class="status-pill q-ml-sm" :class="statusClass(props.row.status)">
@@ -257,27 +279,30 @@
                 </div>
 
                 <div class="row items-center no-wrap q-gutter-x-sm">
-                  <q-linear-progress
-                    class="col"
-                    :value="props.row.averageScore / 5"
-                    :color="scoreColor(props.row.averageScore)"
-                    track-color="grey-3"
-                    rounded
-                    size="6px"
-                  />
-                  <div class="text-body2 text-weight-bold">
-                    {{ formatScore(props.row.averageScore) }}
-                    <span class="text-caption text-grey-6">/ 5</span>
-                  </div>
+                  <template v-if="props.row.averageScore > 0">
+                    <q-linear-progress
+                      class="col"
+                      :value="props.row.averageScore / 5"
+                      :color="scoreColor(props.row.averageScore)"
+                      track-color="grey-3"
+                      rounded
+                      size="6px"
+                    />
+                    <div class="text-body2 text-weight-bold no-wrap">
+                      {{ formatScore(props.row.averageScore) }}
+                      <span class="text-caption text-grey-6">/ 5</span>
+                    </div>
+                  </template>
+                  <div v-else class="col text-caption text-grey-5">ยังไม่มีคะแนน</div>
                   <q-btn
-                    v-if="props.row.googleDriveLink"
+                    v-if="safeLink(props.row.googleDriveLink)"
                     flat
                     round
                     dense
                     size="sm"
                     color="primary"
                     icon="photo_library"
-                    :href="props.row.googleDriveLink"
+                    :href="safeLink(props.row.googleDriveLink)"
                     target="_blank"
                     @click.stop
                   />
@@ -331,11 +356,11 @@
             <span v-if="selectedRecord.enrollment" class="text-caption text-grey-7">
               คอร์ส: {{ selectedRecord.enrollment }}
             </span>
-            <span v-if="selectedRecord.sessionNumber" class="text-caption text-grey-7">
-              · ครั้งที่ {{ selectedRecord.sessionNumber }}
+            <span v-if="selectedRecord.sessionNumber" class="text-caption text-grey-7 no-wrap">
+              ครั้งที่ {{ selectedRecord.sessionNumber }}
             </span>
-            <span v-if="selectedRecord.sessionDate" class="text-caption text-grey-7">
-              · {{ selectedRecord.sessionDate }}
+            <span v-if="selectedRecord.sessionDate" class="text-caption text-grey-7 no-wrap">
+              {{ selectedRecord.sessionDate }}
             </span>
           </div>
 
@@ -407,7 +432,7 @@
           </div>
         </q-card-section>
 
-        <template v-if="selectedRecord?.googleDriveLink">
+        <template v-if="selectedRecord && safeLink(selectedRecord.googleDriveLink)">
           <q-separator />
           <q-card-actions align="right" class="q-pa-md">
             <q-btn
@@ -417,7 +442,7 @@
               icon="photo_library"
               label="เปิดโฟลเดอร์ภาพใน Google Drive"
               class="action-btn"
-              :href="selectedRecord.googleDriveLink"
+              :href="safeLink(selectedRecord.googleDriveLink)"
               target="_blank"
             />
           </q-card-actions>
@@ -432,10 +457,13 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useQuasar } from 'quasar';
 import type { QTableColumn } from 'quasar';
 import { useEvaluationStore } from '@/stores/evaluation-store';
+import { useAdminDrawer } from '@/composables/use-admin-drawer';
 import type { EvaluationRecord, EvaluationScores } from '@/types/evaluation';
 
 const $q = useQuasar();
 const store = useEvaluationStore();
+// The admin layout shows a floating menu button whenever the drawer is closed (any screen width)
+const { isDrawerOpen } = useAdminDrawer();
 
 const sheetUrl =
   'https://docs.google.com/spreadsheets/d/1OQ8X-6bmzj6DEsOMToPMNwE0AikWgqalzhTJXeZs57k/edit?pli=1&gid=0#gid=0';
@@ -462,7 +490,13 @@ const sortOptions: { label: string; value: SortKey }[] = [
   { label: 'คะแนนต่ำ → สูง', value: 'score-asc' },
 ];
 
-const pagination = ref<{ rowsPerPage: number; sortBy: string | null; descending: boolean }>({
+const pagination = ref<{
+  page: number;
+  rowsPerPage: number;
+  sortBy: string | null;
+  descending: boolean;
+}>({
+  page: 1,
   rowsPerPage: 15,
   sortBy: null,
   descending: false,
@@ -470,13 +504,45 @@ const pagination = ref<{ rowsPerPage: number; sortBy: string | null; descending:
 
 // Picking a sort option clears any column-header sort so the dropdown takes effect
 watch(selectedSort, () => {
-  pagination.value = { ...pagination.value, sortBy: null, descending: false };
+  pagination.value = { ...pagination.value, page: 1, sortBy: null, descending: false };
 });
 
+// New search/filter results should start from the first page
+watch([searchQuery, selectedStatus], () => {
+  pagination.value = { ...pagination.value, page: 1 };
+});
+
+/**
+ * Sheet dates are free text: usually ISO (2026-08-02) but staff may type D/M/YYYY,
+ * possibly in Buddhist Era (2/8/2569). Returns a sortable timestamp; empty/unknown sorts last.
+ */
+function dateValue(raw: string): number {
+  const s = (raw || '').trim();
+  if (!s) return Number.NEGATIVE_INFINITY;
+  let y: number, m: number, d: number;
+  const iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  const dmy = s.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})/);
+  if (iso) {
+    [y, m, d] = [Number(iso[1]), Number(iso[2]), Number(iso[3])];
+  } else if (dmy) {
+    [d, m, y] = [Number(dmy[1]), Number(dmy[2]), Number(dmy[3])];
+  } else {
+    const t = Date.parse(s);
+    return Number.isNaN(t) ? Number.NEGATIVE_INFINITY : t;
+  }
+  if (y > 2400) y -= 543;
+  return Date.UTC(y, m - 1, d);
+}
+
 function compareByDate(a: EvaluationRecord, b: EvaluationRecord): number {
-  // sessionDate is ISO (YYYY-MM-DD) so string comparison is chronological; tie-break on session number
-  const byDate = (a.sessionDate || '').localeCompare(b.sessionDate || '');
-  return byDate !== 0 ? byDate : (a.sessionNumber ?? 0) - (b.sessionNumber ?? 0);
+  const byDate = dateValue(a.sessionDate) - dateValue(b.sessionDate);
+  if (byDate !== 0 && !Number.isNaN(byDate)) return byDate;
+  return (a.sessionNumber ?? 0) - (b.sessionNumber ?? 0);
+}
+
+// Only allow http(s) links from the sheet so a crafted cell can't inject javascript: URLs
+function safeLink(url: string): string {
+  return /^https?:\/\//i.test((url || '').trim()) ? url.trim() : '';
 }
 
 function sortRecords(list: EvaluationRecord[]): EvaluationRecord[] {
@@ -571,7 +637,6 @@ function formatScore(score: number): string {
 const columns: QTableColumn<EvaluationRecord>[] = [
   {
     name: 'evaluationId',
-    required: true,
     label: 'รหัสประเมิน',
     align: 'left',
     field: (row) => row.evaluationId,
@@ -588,7 +653,8 @@ const columns: QTableColumn<EvaluationRecord>[] = [
     name: 'sessionNumber',
     label: 'ครั้งที่',
     align: 'center',
-    field: (row) => row.sessionNumber ?? '-',
+    field: (row) => row.sessionNumber ?? 0,
+    format: (val: number) => (val ? String(val) : '-'),
     sortable: true,
   },
   {
@@ -627,13 +693,24 @@ const columns: QTableColumn<EvaluationRecord>[] = [
 ];
 
 // Hide secondary columns on tablet widths so the table fits without horizontal scroll
+// (the evaluation ID moves under the title instead)
 const visibleColumns = computed(() => {
   const all = columns.map((c) => c.name);
   if ($q.screen.lt.md) {
-    return all.filter((n) => n !== 'sessionDate' && n !== 'googleDriveLink');
+    return all.filter((n) => !['evaluationId', 'sessionDate', 'googleDriveLink'].includes(n));
   }
   return all;
 });
+
+// The text label only fits on wide screens; elsewhere the action is an icon with a tooltip
+const showActionLabel = computed(() => $q.screen.width >= 1600);
+
+// Enrollment usually repeats the start of the title ("#111 รอย - Level 5"), so only show it when it adds info
+function subtitleOf(row: EvaluationRecord): string {
+  const enrollment = (row.enrollment || '').trim();
+  if (!enrollment || row.evaluationTitle.includes(enrollment)) return '';
+  return enrollment;
+}
 
 function paginationLabel(start: number, end: number, total: number): string {
   return `${start}-${end} จาก ${total}`;
@@ -733,9 +810,56 @@ onUnmounted(() => {
   min-width: 150px;
 }
 
+/* Header */
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+/* Leave room for the admin layout's floating menu button (shown while the drawer is closed) */
+.page-header--with-toggle > div:first-child {
+  padding-left: 60px;
+  min-height: 42px;
+}
+.header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: 8px;
+}
+.meta-item {
+  white-space: nowrap;
+}
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+.action-btn :deep(.q-btn__content) {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-top: 2px;
+}
+.evaluation-table :deep(tbody tr) {
+  cursor: pointer;
+}
+
 /* Live badge */
 .live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
   background: #e8f5e9;
+  color: #006c0c;
+  font-weight: 700;
   line-height: 20px;
 }
 .live-dot {
@@ -854,6 +978,9 @@ onUnmounted(() => {
 }
 
 @media (max-width: 599px) {
+  .header-actions > * {
+    flex: 1 1 0;
+  }
   .kpi-value {
     font-size: 1.4rem;
   }
