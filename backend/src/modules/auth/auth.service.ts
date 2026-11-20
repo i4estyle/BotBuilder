@@ -32,6 +32,7 @@ export interface AdminSummary extends AuthenticatedAdmin {
   loginName: string;
   status: UserStatus;
   createdAt: Date;
+  lastLoginAt: Date | null;
 }
 
 @Injectable()
@@ -60,6 +61,7 @@ export class AuthService {
       !(await bcrypt.compare(dto.password, admin.passwordHash))
     )
       throw new UnauthorizedException('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
+    await this.recordLogin(admin.adminId);
     return this.createLoginResult(admin);
   }
 
@@ -92,6 +94,7 @@ export class AuthService {
     if (!admin || admin.status !== UserStatus.ACTIVE) {
       throw new UnauthorizedException('This Google account is not authorized');
     }
+    await this.recordLogin(admin.adminId);
     return this.createLoginResult(admin);
   }
 
@@ -292,7 +295,20 @@ export class AuthService {
       loginName: admin.loginName,
       status: admin.status,
       createdAt: admin.createdAt,
+      lastLoginAt: admin.lastLoginAt ?? null,
     };
+  }
+  /** Stamps an interactive sign-in (password or Google); token refreshes don't count. */
+  private async recordLogin(adminId: string): Promise<void> {
+    await this.admins
+      .createQueryBuilder()
+      .update(Admin)
+      .set({
+        lastLoginAt: () => 'CURRENT_TIMESTAMP',
+        updatedAt: () => 'UPDATED_AT',
+      })
+      .where('adminId = :adminId', { adminId })
+      .execute();
   }
   private async createLoginResult(admin: Admin): Promise<LoginResult> {
     return {

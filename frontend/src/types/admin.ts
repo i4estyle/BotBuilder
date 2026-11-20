@@ -7,6 +7,7 @@ export interface AdminAccount {
   email: string;
   status: AdminAccountStatus;
   createdAt: string;
+  lastLoginAt: string | null;
 }
 
 export interface CreateAdminAccountPayload {

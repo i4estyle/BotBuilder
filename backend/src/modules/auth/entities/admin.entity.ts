@@ -41,6 +41,9 @@ export class Admin {
   @Column({ name: 'AUTH_VERSION', type: 'int', default: 0 })
   authVersion!: number;
 
+  @Column({ name: 'LAST_LOGIN_AT', type: 'timestamp', nullable: true })
+  lastLoginAt?: Date | null;
+
   @CreateDateColumn({ name: 'CREATED_AT', type: 'timestamp' })
   createdAt!: Date;
 

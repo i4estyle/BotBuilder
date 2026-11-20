@@ -88,6 +88,14 @@
         <template #body-cell-createdAt="props">
           <q-td :props="props">{{ formatDate(props.value) }}</q-td>
         </template>
+        <template #body-cell-lastLoginAt="props">
+          <q-td :props="props">
+            <span :class="props.value ? '' : 'text-grey-6'">
+              {{ formatLastLogin(props.value) }}
+            </span>
+            <q-tooltip v-if="props.value">{{ formatDate(props.value) }}</q-tooltip>
+          </q-td>
+        </template>
         <template #body-cell-actions="props">
           <q-td :props="props" auto-width>
             <q-btn
@@ -143,6 +151,10 @@
                     สร้างเมื่อ {{ formatDate(props.row.createdAt) }}
                   </span>
                 </div>
+                <div class="row items-center q-gutter-sm no-wrap q-mt-xs text-caption text-grey-7">
+                  <q-icon name="login" color="grey-6" />
+                  <span>เข้าสู่ระบบล่าสุด {{ formatLastLogin(props.row.lastLoginAt) }}</span>
+                </div>
               </q-card-section>
             </q-card>
           </div>
@@ -196,17 +208,62 @@
                 outlined
                 :type="showPassword ? 'text' : 'password'"
                 label="รหัสผ่าน"
-                hint="อย่างน้อย 8 ตัวอักษร"
                 :rules="[passwordRule]"
+                hide-bottom-space
+                autocomplete="new-password"
               >
                 <template #append>
-                  <q-icon
-                    :name="showPassword ? 'visibility_off' : 'visibility'"
-                    class="cursor-pointer"
+                  <q-btn
+                    flat
+                    round
+                    dense
+                    size="sm"
+                    icon="autorenew"
+                    aria-label="สุ่มรหัสผ่าน"
+                    @click="fillGeneratedPassword"
+                  >
+                    <q-tooltip>สุ่มรหัสผ่านที่ปลอดภัย</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    flat
+                    round
+                    dense
+                    size="sm"
+                    icon="content_copy"
+                    aria-label="คัดลอกรหัสผ่าน"
+                    :disable="!form.password"
+                    @click="copyPassword"
+                  >
+                    <q-tooltip>คัดลอกรหัสผ่าน</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    flat
+                    round
+                    dense
+                    size="sm"
+                    :icon="showPassword ? 'visibility_off' : 'visibility'"
+                    :aria-label="showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'"
                     @click="showPassword = !showPassword"
                   />
                 </template>
               </q-input>
+              <div class="admin-users-page__strength" aria-live="polite">
+                <q-linear-progress
+                  rounded
+                  size="6px"
+                  :value="passwordStrength.value"
+                  :color="passwordStrength.color"
+                  track-color="grey-3"
+                />
+                <div class="row justify-between text-caption q-mt-xs">
+                  <span :class="`text-${passwordStrength.color}`">{{
+                    passwordStrength.label
+                  }}</span>
+                  <span class="text-grey-7"
+                    >อย่างน้อย 8 ตัว ผสมตัวพิมพ์ใหญ่ ตัวเลข และสัญลักษณ์</span
+                  >
+                </div>
+              </div>
               <q-input
                 v-model="form.confirmPassword"
                 outlined
@@ -272,6 +329,7 @@ import {
   QMenu,
   QSeparator,
   QTooltip,
+  copyToClipboard,
   useQuasar,
 } from 'quasar';
 import type { QTableColumn } from 'quasar';
@@ -312,6 +370,15 @@ const columns: QTableColumn<AdminAccount>[] = [
   { name: 'email', label: 'อีเมล', field: 'email', align: 'left', sortable: true },
   { name: 'status', label: 'สถานะ', field: 'status', align: 'left', sortable: true },
   { name: 'createdAt', label: 'สร้างเมื่อ', field: 'createdAt', align: 'left', sortable: true },
+  {
+    name: 'lastLoginAt',
+    label: 'เข้าสู่ระบบล่าสุด',
+    field: 'lastLoginAt',
+    align: 'left',
+    sortable: true,
+    // Never-signed-in accounts sort as oldest
+    sort: (a: string | null, b: string | null) => (a ? Date.parse(a) : 0) - (b ? Date.parse(b) : 0),
+  },
   { name: 'actions', label: '', field: 'adminId', align: 'right' },
 ];
 
@@ -352,6 +419,79 @@ const loginNameRule = (value: string) =>
 const emailRule = (value: string) => EMAIL_PATTERN.test(value) || 'กรุณากรอกอีเมลให้ถูกต้อง';
 const passwordRule = (value: string) => value.length >= 8 || 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร';
 const confirmPasswordRule = (value: string) => value === form.password || 'รหัสผ่านไม่ตรงกัน';
+
+const relativeTime = new Intl.RelativeTimeFormat('th-TH', { numeric: 'auto' });
+const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
+  ['year', 365 * 24 * 3600],
+  ['month', 30 * 24 * 3600],
+  ['week', 7 * 24 * 3600],
+  ['day', 24 * 3600],
+  ['hour', 3600],
+  ['minute', 60],
+];
+function formatLastLogin(value: string | null): string {
+  if (!value) return 'ยังไม่เคยเข้าสู่ระบบ';
+  const seconds = (Date.parse(value) - Date.now()) / 1000;
+  for (const [unit, size] of RELATIVE_UNITS) {
+    if (Math.abs(seconds) >= size) return relativeTime.format(Math.round(seconds / size), unit);
+  }
+  return 'เมื่อสักครู่';
+}
+
+/* ---------- password helpers ---------- */
+const PASSWORD_SETS = [
+  'ABCDEFGHJKLMNPQRSTUVWXYZ',
+  'abcdefghijkmnopqrstuvwxyz',
+  '23456789',
+  '!@#$%^&*-_=+?',
+];
+function randomIndex(max: number): number {
+  // Rejection sampling avoids modulo bias
+  const limit = Math.floor(0x100000000 / max) * max;
+  const buffer = new Uint32Array(1);
+  do crypto.getRandomValues(buffer);
+  while (buffer[0]! >= limit);
+  return buffer[0]! % max;
+}
+function generatePassword(length = 16): string {
+  const all = PASSWORD_SETS.join('');
+  // One character from each set guarantees the mix, the rest are random
+  const chars = PASSWORD_SETS.map((set) => set[randomIndex(set.length)]!);
+  while (chars.length < length) chars.push(all[randomIndex(all.length)]!);
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = randomIndex(i + 1);
+    [chars[i], chars[j]] = [chars[j]!, chars[i]!];
+  }
+  return chars.join('');
+}
+function fillGeneratedPassword(): void {
+  const password = generatePassword();
+  form.password = password;
+  form.confirmPassword = password;
+  showPassword.value = true;
+}
+async function copyPassword(): Promise<void> {
+  try {
+    await copyToClipboard(form.password);
+    Notify.create({ type: 'positive', message: 'คัดลอกรหัสผ่านแล้ว', timeout: 1500 });
+  } catch {
+    Notify.create({ type: 'negative', message: 'คัดลอกไม่สำเร็จ' });
+  }
+}
+const passwordStrength = computed(() => {
+  const value = form.password;
+  if (!value) return { value: 0, color: 'grey-5', label: 'ยังไม่ได้กรอกรหัสผ่าน' };
+  const score =
+    Number(value.length >= 8) +
+    Number(value.length >= 12) +
+    Number(/[a-z]/.test(value) && /[A-Z]/.test(value)) +
+    Number(/\d/.test(value)) +
+    Number(/[^A-Za-z0-9]/.test(value));
+  if (value.length < 8 || score <= 2) return { value: 0.25, color: 'negative', label: 'อ่อน' };
+  if (score === 3) return { value: 0.5, color: 'warning', label: 'พอใช้' };
+  if (score === 4) return { value: 0.75, color: 'light-green-8', label: 'ดี' };
+  return { value: 1, color: 'positive', label: 'แข็งแรงมาก' };
+});
 
 function formatDate(value: string): string {
   return new Intl.DateTimeFormat('th-TH', { dateStyle: 'medium', timeStyle: 'short' }).format(
@@ -657,6 +797,9 @@ onMounted(() => void loadAdmins());
 .admin-users-page__header--with-toggle > div:first-child {
   padding-left: 60px;
   min-height: 42px;
+}
+.admin-users-page__strength {
+  margin-top: 8px;
 }
 .admin-users-page__toolbar {
   display: flex;
