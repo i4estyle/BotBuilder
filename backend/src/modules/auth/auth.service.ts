@@ -1,7 +1,10 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
+  Logger,
+  NotFoundException,
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -11,10 +14,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { createHash, randomBytes } from 'crypto';
 import { google } from 'googleapis';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { UserStatus } from '../../common/enums/user-status.enum.js';
 import { LoginDto } from './dto/login.dto.js';
 import { CreateAdminDto } from './dto/create-admin.dto.js';
+import { UpdateAdminDto } from './dto/update-admin.dto.js';
 import { Admin } from './entities/admin.entity.js';
 import { AuthToken, AuthTokenPurpose } from './entities/auth-token.entity.js';
 import { AuthEmailService } from './email.service.js';
@@ -32,6 +36,8 @@ export interface AdminSummary extends AuthenticatedAdmin {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectRepository(Admin) private readonly admins: Repository<Admin>,
     @InjectRepository(AuthToken) private readonly tokens: Repository<AuthToken>,
@@ -98,19 +104,10 @@ export class AuthService {
     const loginName = dto.loginName.trim();
     const email = dto.email.trim().toLowerCase();
     const displayName = dto.displayName.trim();
-    const existing = await this.admins
-      .createQueryBuilder('admin')
-      .where('admin.loginName = :loginName OR admin.email = :email', {
-        loginName,
-        email,
-      })
-      .getOne();
-
-    if (existing)
-      throw new ConflictException('ชื่อผู้ใช้งานหรืออีเมลนี้ถูกใช้งานแล้ว');
+    await this.assertUnique({ loginName, email });
 
     const admin = this.admins.create({
-      adminId: this.createAdminId(),
+      adminId: await this.createUniqueAdminId(),
       loginName,
       displayName,
       email,
@@ -118,6 +115,84 @@ export class AuthService {
       status: UserStatus.ACTIVE,
     });
     return this.toAdminSummary(await this.admins.save(admin));
+  }
+
+  async updateAdmin(
+    adminId: string,
+    dto: UpdateAdminDto,
+  ): Promise<AdminSummary> {
+    const admin = await this.findAdminOrFail(adminId);
+    const displayName = dto.displayName?.trim();
+    const email = dto.email?.trim().toLowerCase();
+    if (email && email !== admin.email) {
+      await this.assertUnique({ email }, adminId);
+      admin.email = email;
+    }
+    if (displayName) admin.displayName = displayName;
+    return this.toAdminSummary(await this.admins.save(admin));
+  }
+
+  async updateAdminStatus(
+    actorId: string,
+    adminId: string,
+    status: UserStatus.ACTIVE | UserStatus.SUSPENDED,
+  ): Promise<AdminSummary> {
+    const admin = await this.findAdminOrFail(adminId);
+    if (admin.status === status) return this.toAdminSummary(admin);
+    if (status !== UserStatus.ACTIVE) {
+      if (actorId === adminId)
+        throw new ForbiddenException('ไม่สามารถระงับบัญชีของตัวเองได้');
+      await this.assertNotLastActive(admin);
+    }
+    admin.status = status;
+    if (status !== UserStatus.ACTIVE) admin.authVersion += 1;
+    const saved = await this.admins.save(admin);
+    if (status !== UserStatus.ACTIVE) await this.revokeTokens(adminId);
+    return this.toAdminSummary(saved);
+  }
+
+  async sendAdminPasswordReset(adminId: string): Promise<void> {
+    const admin = await this.findAdminOrFail(adminId);
+    if (admin.status !== UserStatus.ACTIVE)
+      throw new BadRequestException(
+        'บัญชีนี้ถูกระงับอยู่ กรุณาเปิดใช้งานก่อนส่งลิงก์',
+      );
+    const token = await this.createToken(
+      admin.adminId,
+      AuthTokenPurpose.PASSWORD_RESET,
+      60 * 60 * 1000,
+    );
+    try {
+      await this.email.sendPasswordReset(admin.email, token);
+    } catch (error) {
+      this.logger.error(
+        `Password reset email to admin ${adminId} failed`,
+        error instanceof Error ? error.stack : String(error),
+      );
+      throw new ServiceUnavailableException(
+        'ส่งอีเมลไม่สำเร็จ กรุณาตรวจสอบการตั้งค่า SMTP ของระบบ',
+      );
+    }
+  }
+
+  async deleteAdmin(actorId: string, adminId: string): Promise<void> {
+    if (actorId === adminId)
+      throw new ForbiddenException('ไม่สามารถลบบัญชีของตัวเองได้');
+    const admin = await this.findAdminOrFail(adminId);
+    await this.assertNotLastActive(admin);
+    // Free the unique login name / email so they can be reused by a new account.
+    const suffix = `~del-${admin.adminId}`;
+    await this.admins.update(
+      { adminId },
+      {
+        loginName: `${admin.loginName.slice(0, 100 - suffix.length)}${suffix}`,
+        email: `${admin.email.slice(0, 100 - suffix.length)}${suffix}`,
+        status: UserStatus.INACTIVE,
+        authVersion: () => 'AUTH_VERSION + 1',
+      },
+    );
+    await this.revokeTokens(adminId);
+    await this.admins.softDelete({ adminId });
   }
 
   async validateAdminById(
@@ -278,7 +353,61 @@ export class AuthService {
   private hashToken(token: string): string {
     return createHash('sha256').update(token).digest('hex');
   }
-  private createAdminId(): string {
-    return randomBytes(6).toString('base64url').slice(0, 8).toUpperCase();
+  private async findAdminOrFail(adminId: string): Promise<Admin> {
+    const admin = await this.admins.findOneBy({ adminId });
+    if (!admin) throw new NotFoundException('ไม่พบบัญชีผู้ดูแล');
+    return admin;
+  }
+  /** Rejects when another account (including soft-deleted ones) already uses the value. */
+  private async assertUnique(
+    values: { loginName?: string; email?: string },
+    excludeAdminId?: string,
+  ): Promise<void> {
+    const query = this.admins.createQueryBuilder('admin').withDeleted();
+    query.where(
+      new Brackets((where) => {
+        if (values.loginName)
+          where.orWhere('admin.loginName = :loginName', {
+            loginName: values.loginName,
+          });
+        if (values.email)
+          where.orWhere('admin.email = :email', { email: values.email });
+      }),
+    );
+    if (excludeAdminId)
+      query.andWhere('admin.adminId <> :excludeAdminId', { excludeAdminId });
+    if (await query.getExists())
+      throw new ConflictException(
+        values.loginName
+          ? 'ชื่อผู้ใช้งานหรืออีเมลนี้ถูกใช้งานแล้ว'
+          : 'อีเมลนี้ถูกใช้งานแล้ว',
+      );
+  }
+  private async assertNotLastActive(admin: Admin): Promise<void> {
+    if (admin.status !== UserStatus.ACTIVE) return;
+    const activeCount = await this.admins.countBy({
+      status: UserStatus.ACTIVE,
+    });
+    if (activeCount <= 1)
+      throw new ForbiddenException(
+        'ต้องมีผู้ดูแลที่ใช้งานอยู่อย่างน้อย 1 บัญชี',
+      );
+  }
+  private async createUniqueAdminId(): Promise<string> {
+    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const id = Array.from(
+        randomBytes(8),
+        (byte) => alphabet[byte % alphabet.length],
+      ).join('');
+      if (
+        !(await this.admins.exists({
+          where: { adminId: id },
+          withDeleted: true,
+        }))
+      )
+        return id;
+    }
+    throw new ServiceUnavailableException('Could not allocate an admin ID');
   }
 }

@@ -1,7 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -20,6 +24,10 @@ import { EmailDto } from './dto/email.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { CreateAdminDto } from './dto/create-admin.dto.js';
+import {
+  UpdateAdminDto,
+  UpdateAdminStatusDto,
+} from './dto/update-admin.dto.js';
 import { GoogleLoginDto } from './dto/google-login.dto.js';
 
 @ApiTags('Auth')
@@ -75,6 +83,53 @@ export class AuthController {
   @ApiOperation({ summary: 'Create an administrator account' })
   createAdmin(@Body() dto: CreateAdminDto): Promise<AdminSummary> {
     return this.authService.createAdmin(dto);
+  }
+
+  @Patch('admins/:adminId')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update an administrator profile' })
+  updateAdmin(
+    @Param('adminId') adminId: string,
+    @Body() dto: UpdateAdminDto,
+  ): Promise<AdminSummary> {
+    return this.authService.updateAdmin(adminId, dto);
+  }
+
+  @Patch('admins/:adminId/status')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Suspend or reactivate an administrator' })
+  updateAdminStatus(
+    @CurrentUser() actor: AuthenticatedAdmin,
+    @Param('adminId') adminId: string,
+    @Body() dto: UpdateAdminStatusDto,
+  ): Promise<AdminSummary> {
+    return this.authService.updateAdminStatus(
+      actor.adminId,
+      adminId,
+      dto.status,
+    );
+  }
+
+  @Throttle({ default: { limit: 5, ttl: 900000 } })
+  @Post('admins/:adminId/password-reset')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Email a password reset link to an administrator' })
+  async sendAdminPasswordReset(
+    @Param('adminId') adminId: string,
+  ): Promise<{ message: string }> {
+    await this.authService.sendAdminPasswordReset(adminId);
+    return { message: 'ส่งลิงก์รีเซ็ตรหัสผ่านแล้ว' };
+  }
+
+  @Delete('admins/:adminId')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Delete an administrator account' })
+  deleteAdmin(
+    @CurrentUser() actor: AuthenticatedAdmin,
+    @Param('adminId') adminId: string,
+  ): Promise<void> {
+    return this.authService.deleteAdmin(actor.adminId, adminId);
   }
 
   @Post('refresh')
