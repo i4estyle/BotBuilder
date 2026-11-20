@@ -37,12 +37,12 @@
   position: absolute;
   bottom: 18px;
   left: 18px;
-  max-width: 270px;
+  max-width: 320px;
   margin: 0;
   padding: 12px 14px;
   background: rgb(255 255 255 / 92%);
   color: #121a22;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 800;
   line-height: 1.5;
 }
@@ -53,10 +53,10 @@
   padding: 56px 0;
   order: 1;
 }
-.hero__kicker {
+.hero__copy .hero__kicker {
   margin: 0;
   color: #167a52;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 900;
   letter-spacing: 0.14em;
   line-height: 1.4;
@@ -65,8 +65,8 @@
 .hero__copy h1 {
   margin: 18px 0 22px;
   color: var(--green);
-  max-width: 620px;
-  font-size: clamp(40px, 4vw, 58px);
+  max-width: 680px;
+  font-size: clamp(48px, 5.2vw, 78px);
   font-weight: 900;
   letter-spacing: -0.035em;
   line-height: 1.18;
@@ -85,7 +85,7 @@
   max-width: 620px;
   margin: 0;
   color: #53606d;
-  font-size: 19px;
+  font-size: 20px;
   line-height: 1.55;
   word-break: keep-all;
   overflow-wrap: normal;
@@ -134,7 +134,7 @@
 }
 .hero__brandline-grid {
   display: grid;
-  grid-template-columns: 1.4fr repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
 }
@@ -151,13 +151,14 @@
 }
 .hero__brandline strong {
   color: #121a22;
-  font-size: 20px;
+  font-size: 22px;
   letter-spacing: -0.03em;
 }
 .hero__brandline span {
-  margin-top: 3px;
-  color: #64707d;
-  font-size: 12px;
+  margin-top: 6px;
+  color: #53606d;
+  font-size: 16px;
+  line-height: 1.5;
 }
 .app-button {
   display: inline-flex;
@@ -196,7 +197,7 @@
   line-height: 1.3;
 }
 .app-button--stacked span {
-  font-size: 13px;
+  font-size: 17px;
   letter-spacing: 0.8px;
   opacity: 0.85;
 }
