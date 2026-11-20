@@ -79,6 +79,9 @@ function databaseSslOptions(
           username: configService.get<string>('DB_USER'),
           password: configService.get<string>('DB_PASSWORD'),
           database: configService.get<string>('DB_NAME'),
+          // MySQL stores TIMESTAMPs in UTC; without this the driver reads them
+          // as the Node process's local time (e.g. +07 on a Thai dev machine).
+          timezone: 'Z',
           autoLoadEntities: true,
           synchronize: false,
           migrationsRun: true,
