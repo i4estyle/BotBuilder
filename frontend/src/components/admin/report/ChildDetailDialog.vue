@@ -34,7 +34,31 @@
             หลักสูตร: {{ child.courseTitle }}
           </div>
         </div>
-        <q-btn flat round dense icon="close" v-close-popup class="text-white q-ml-sm" />
+        <div class="row items-center no-wrap q-ml-sm">
+          <q-btn
+            outline
+            no-caps
+            dense
+            icon="print"
+            :label="$q.screen.lt.sm ? undefined : 'พิมพ์ใบรายงาน'"
+            :round="$q.screen.lt.sm"
+            class="text-white print-btn"
+            :class="{ 'q-px-sm': !$q.screen.lt.sm }"
+            aria-label="พิมพ์ใบรายงาน"
+            @click="printReport"
+          >
+            <q-tooltip>พิมพ์หรือบันทึกเป็น PDF</q-tooltip>
+          </q-btn>
+          <q-btn
+            flat
+            round
+            dense
+            icon="close"
+            v-close-popup
+            aria-label="ปิด"
+            class="text-white q-ml-xs"
+          />
+        </div>
       </q-card-section>
 
       <!-- Subheader Stats Bar -->
@@ -298,6 +322,7 @@
         </q-tab-panel>
       </q-tab-panels>
     </q-card>
+    <ChildReportSheet v-if="printing && child" :child="child" :overall-stats="overallStats" />
   </q-dialog>
 </template>
 
@@ -307,8 +332,9 @@ import { useQuasar } from 'quasar';
 import { SKILL_DEFINITIONS, type ChildSummary, type OverallStats } from '@/types/report';
 import ChildRadarChart from './ChildRadarChart.vue';
 import ProgressLineChart from './ProgressLineChart.vue';
+import ChildReportSheet from './ChildReportSheet.vue';
 
-defineProps<{
+const props = defineProps<{
   modelValue: boolean;
   child: ChildSummary | null;
   overallStats?: OverallStats | undefined;
@@ -331,6 +357,33 @@ function safeLink(url: string): string {
   return /^https?:\/\//i.test((url || '').trim()) ? url.trim() : '';
 }
 const isDialogReady = ref(false);
+
+/* ---------- print ---------- */
+const printing = ref(false);
+
+/**
+ * Mounts the A4 report sheet, hides the rest of the app via `body.bb-printing`,
+ * and opens the browser print dialog (which also offers "Save as PDF").
+ */
+async function printReport(): Promise<void> {
+  if (!props.child || printing.value) return;
+  printing.value = true;
+  await nextTick();
+
+  const originalTitle = document.title;
+  // The browser uses the page title as the default PDF file name
+  document.title = `รายงานพัฒนาการ - ${props.child.studentName.replace(/^#\d+\s*/, '')}`;
+  document.body.classList.add('bb-printing');
+
+  const cleanup = () => {
+    window.removeEventListener('afterprint', cleanup);
+    document.body.classList.remove('bb-printing');
+    document.title = originalTitle;
+    printing.value = false;
+  };
+  window.addEventListener('afterprint', cleanup);
+  window.print();
+}
 
 function onDialogShow(): void {
   // Give Quasar dialog transition 100ms to finish scaling and calculate accurate DOM dimensions
@@ -388,6 +441,10 @@ function getScoreBadgeClass(val: number): string {
   background: #006c0c;
   border-bottom: 3px solid #bc0100;
   padding: 16px 20px;
+}
+.print-btn {
+  border-color: rgb(255 255 255 / 60%);
+  white-space: nowrap;
 }
 .border {
   border: 1px solid #e2e8f0;
