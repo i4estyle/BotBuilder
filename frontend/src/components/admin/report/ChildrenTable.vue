@@ -44,6 +44,47 @@
                 <q-icon name="search" />
               </template>
             </q-input>
+
+            <div class="sort-control">
+              <q-select
+                v-model="sortField"
+                dense
+                outlined
+                emit-value
+                map-options
+                options-dense
+                label="เรียงตาม"
+                :options="sortFieldOptions"
+                class="sort-select"
+              >
+                <template #option="scope">
+                  <q-item-label v-if="scope.opt.header" header class="q-py-xs text-caption">
+                    {{ scope.opt.header }}
+                  </q-item-label>
+                  <q-item v-bind="scope.itemProps">
+                    <q-item-section avatar class="sort-option-icon">
+                      <q-icon
+                        :name="scope.opt.icon"
+                        :style="{ color: scope.opt.color }"
+                        size="18px"
+                      />
+                    </q-item-section>
+                    <q-item-section>{{ scope.opt.label }}</q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+              <q-btn
+                outline
+                dense
+                no-caps
+                color="grey-8"
+                class="sort-direction"
+                :icon="sortDescending ? 'arrow_downward' : 'arrow_upward'"
+                :label="directionLabel"
+                :aria-label="`ลำดับ: ${directionLabel}`"
+                @click="sortDescending = !sortDescending"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -118,6 +159,9 @@
               {{ Math.min(props.row.completedSessions, 7) }}/7
             </span>
           </div>
+          <div class="text-caption text-grey-6">
+            ประเมินล่าสุด {{ formatLatest(latestDateOf(props.row)) }}
+          </div>
         </q-td>
       </template>
 
@@ -133,8 +177,8 @@
       <!-- Overall Average -->
       <template #body-cell-overallAverage="props">
         <q-td :props="props">
-          <div v-if="props.row.overallAverage > 0" class="text-weight-bold text-bb-green no-wrap">
-            {{ props.row.overallAverage }}
+          <div v-if="displayScore(props.row) > 0" class="text-weight-bold text-bb-green no-wrap">
+            {{ displayScore(props.row) }}
             <span class="text-caption text-grey-6 text-weight-regular">/ 5.0</span>
           </div>
           <span v-else class="text-caption text-grey-5 no-wrap">ยังไม่มีคะแนน</span>
@@ -194,8 +238,13 @@
                 {{ Math.min(props.row.completedSessions, 7) }}/7
               </span>
               <div class="col text-right text-body2 text-weight-bold text-bb-green no-wrap">
-                <template v-if="props.row.overallAverage > 0">
-                  {{ props.row.overallAverage }}
+                <span
+                  v-if="selectedSkill"
+                  class="text-caption text-grey-7 text-weight-regular q-mr-xs"
+                  >{{ selectedSkill.shortLabel }}</span
+                >
+                <template v-if="displayScore(props.row) > 0">
+                  {{ displayScore(props.row) }}
                   <span class="text-caption text-grey-6 text-weight-regular">/ 5.0</span>
                 </template>
                 <span v-else class="text-caption text-grey-5 text-weight-regular"
@@ -203,6 +252,9 @@
                 >
               </div>
               <q-icon name="chevron_right" color="grey-5" size="20px" />
+            </div>
+            <div class="text-caption text-grey-6 q-mt-xs">
+              ประเมินล่าสุด {{ formatLatest(latestDateOf(props.row)) }}
             </div>
           </div>
         </div>
@@ -223,7 +275,8 @@
 import { ref, computed, watch } from 'vue';
 import { useQuasar } from 'quasar';
 import type { QTableColumn } from 'quasar';
-import type { ChildSummary } from '@/types/report';
+import { SKILL_DEFINITIONS, type ChildSummary, type SkillMeta } from '@/types/report';
+import { sheetDateValue } from '@/utils/sheet-date';
 
 const props = defineProps<{
   children: ChildSummary[];
@@ -238,15 +291,139 @@ const $q = useQuasar();
 const searchQuery = ref('');
 const completionFilter = ref<'ALL' | 'COMPLETED' | 'IN_PROGRESS'>('ALL');
 
-const pagination = ref({
+const pagination = ref<{
+  page: number;
+  rowsPerPage: number;
+  sortBy: string | null;
+  descending: boolean;
+}>({
   page: 1,
   rowsPerPage: 15,
+  sortBy: null,
+  descending: false,
+});
+
+/* ---------- sort-by menu (works on mobile cards too, where there are no column headers) ---------- */
+type SkillKey = SkillMeta['key'];
+type SortField = 'latest' | 'average' | 'progress' | 'name' | `skill:${SkillKey}`;
+
+const sortField = ref<SortField>('latest');
+const sortDescending = ref(true);
+
+interface SortFieldOption {
+  label: string;
+  value: SortField;
+  icon: string;
+  color?: string;
+  header?: string;
+}
+const sortFieldOptions: SortFieldOption[] = [
+  { label: 'ประเมินล่าสุด', value: 'latest', icon: 'event' },
+  { label: 'คะแนนเฉลี่ยรวม', value: 'average', icon: 'grade' },
+  { label: 'ความก้าวหน้า', value: 'progress', icon: 'donut_large' },
+  { label: 'ชื่อผู้เรียน', value: 'name', icon: 'sort_by_alpha' },
+  ...SKILL_DEFINITIONS.map((skill, index) => ({
+    label: skill.label,
+    value: `skill:${skill.key}` as SortField,
+    icon: skill.icon,
+    color: skill.color,
+    ...(index === 0 ? { header: 'คะแนนรายทักษะ' } : {}),
+  })),
+];
+
+const selectedSkill = computed(() =>
+  sortField.value.startsWith('skill:')
+    ? (SKILL_DEFINITIONS.find((s) => `skill:${s.key}` === sortField.value) ?? null)
+    : null,
+);
+
+const directionLabel = computed(() => {
+  if (sortField.value === 'name') return sortDescending.value ? 'ฮ → ก' : 'ก → ฮ';
+  if (sortField.value === 'latest') return sortDescending.value ? 'ใหม่ → เก่า' : 'เก่า → ใหม่';
+  return sortDescending.value ? 'มาก → น้อย' : 'น้อย → มาก';
+});
+
+// Each field starts in its most useful direction: A→Z for names, highest/newest first otherwise
+watch(sortField, (field) => {
+  sortDescending.value = field !== 'name';
+});
+
+// Picking from the menu clears any column-header sort so the menu takes effect
+watch([sortField, sortDescending], () => {
+  pagination.value = { ...pagination.value, page: 1, sortBy: null, descending: false };
 });
 
 // New search/filter results should start from the first page
 watch([searchQuery, completionFilter], () => {
   pagination.value = { ...pagination.value, page: 1 };
 });
+
+const latestDateCache = new WeakMap<ChildSummary, number>();
+function latestDateOf(child: ChildSummary): number {
+  let value = latestDateCache.get(child);
+  if (value === undefined) {
+    value = child.records.reduce(
+      (max, r) => Math.max(max, sheetDateValue(r.sessionDate)),
+      Number.NEGATIVE_INFINITY,
+    );
+    latestDateCache.set(child, value);
+  }
+  return value;
+}
+
+function formatLatest(value: number): string {
+  if (!Number.isFinite(value)) return '-';
+  return new Date(value).toLocaleDateString('th-TH', {
+    day: 'numeric',
+    month: 'short',
+    year: '2-digit',
+    timeZone: 'UTC',
+  });
+}
+
+/** The score shown in the score column: the selected skill when sorting by one, else the overall average. */
+function displayScore(child: ChildSummary): number {
+  return selectedSkill.value
+    ? child.skillAverages[selectedSkill.value.key] || 0
+    : child.overallAverage;
+}
+
+/** Value to sort on; null means "no data", which always sorts last regardless of direction. */
+function sortValue(child: ChildSummary): number | string | null {
+  switch (sortField.value) {
+    case 'latest': {
+      const value = latestDateOf(child);
+      return Number.isFinite(value) ? value : null;
+    }
+    case 'average':
+      return child.overallAverage > 0 ? child.overallAverage : null;
+    case 'progress':
+      return child.completedSessions;
+    case 'name':
+      return child.studentName;
+    default:
+      return displayScore(child) > 0 ? displayScore(child) : null;
+  }
+}
+
+const thaiCollator = new Intl.Collator('th');
+function sortChildren(list: ChildSummary[]): ChildSummary[] {
+  const direction = sortDescending.value ? -1 : 1;
+  return [...list].sort((a, b) => {
+    const va = sortValue(a);
+    const vb = sortValue(b);
+    if (va === null || vb === null) {
+      if (va !== vb) return va === null ? 1 : -1;
+    } else {
+      const diff =
+        typeof va === 'string' || typeof vb === 'string'
+          ? thaiCollator.compare(String(va), String(vb))
+          : va - vb;
+      if (diff !== 0) return diff * direction;
+    }
+    return thaiCollator.compare(a.studentName, b.studentName);
+  });
+}
 
 const completedCount = computed(() => {
   return props.children.filter((c) => c.isCompleted7).length;
@@ -273,7 +450,7 @@ function statusClass(child: ChildSummary): string {
 // The text label only fits on wide screens; elsewhere the action is an icon with a tooltip
 const showActionLabel = computed(() => $q.screen.width >= 1600);
 
-const columns: QTableColumn<ChildSummary>[] = [
+const columns = computed<QTableColumn<ChildSummary>[]>(() => [
   {
     name: 'studentName',
     required: true,
@@ -301,13 +478,12 @@ const columns: QTableColumn<ChildSummary>[] = [
     label: 'สถานะ',
     align: 'center',
     field: (row) => (row.isCompleted7 ? 'ครบ' : 'กำลังเรียน'),
-    sortable: true,
   },
   {
     name: 'overallAverage',
-    label: 'คะแนนเฉลี่ย',
+    label: selectedSkill.value ? `คะแนน${selectedSkill.value.label}` : 'คะแนนเฉลี่ย',
     align: 'center',
-    field: (row) => row.overallAverage,
+    field: (row) => displayScore(row),
     sortable: true,
   },
   {
@@ -316,12 +492,12 @@ const columns: QTableColumn<ChildSummary>[] = [
     align: 'right',
     field: () => '',
   },
-];
+]);
 
 // Course is already shown under the name, so the separate column is only kept on wide screens;
 // on tablets the status column also goes (the 7/7 progress already says it)
 const visibleColumns = computed(() => {
-  const all = columns.map((c) => c.name);
+  const all = columns.value.map((c) => c.name);
   if ($q.screen.lt.md) return all.filter((n) => !['courseTitle', 'status'].includes(n));
   if ($q.screen.lt.lg) return all.filter((n) => n !== 'courseTitle');
   return all;
@@ -346,7 +522,7 @@ const filteredChildren = computed(() => {
     );
   }
 
-  return list;
+  return sortChildren(list);
 });
 </script>
 
@@ -379,6 +555,21 @@ const filteredChildren = computed(() => {
 }
 .search-input {
   width: 260px;
+}
+.sort-control {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+.sort-select {
+  width: 200px;
+}
+.sort-direction {
+  white-space: nowrap;
+  border-radius: 4px;
+}
+.sort-option-icon {
+  min-width: 32px;
 }
 
 .children-table :deep(thead th) {
@@ -472,6 +663,10 @@ const filteredChildren = computed(() => {
   }
   .search-input {
     width: 100%;
+  }
+  .sort-select {
+    flex: 1 1 auto;
+    width: auto;
   }
 }
 </style>
