@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue';
+import { useQuasar } from 'quasar';
 import type { ApexOptions } from 'apexcharts';
 import { SKILL_DEFINITIONS, type ChildSummary, type OverallStats } from '@/types/report';
 
@@ -27,6 +28,8 @@ const props = defineProps<{
   overallStats?: OverallStats | undefined;
   height?: number;
 }>();
+
+const $q = useQuasar();
 
 const chartReady = ref(false);
 const renderId = ref(0);
@@ -55,7 +58,9 @@ const series = computed(() => {
 });
 
 const chartOptions = computed<ApexOptions>(() => {
-  const categories = SKILL_DEFINITIONS.map((s) => s.label);
+  // Short labels + smaller polygon on phones so the axis labels are not clipped
+  const isPhone = $q.screen.lt.sm;
+  const categories = SKILL_DEFINITIONS.map((s) => (isPhone ? s.shortLabel : s.label));
 
   return {
     chart: {
@@ -71,7 +76,7 @@ const chartOptions = computed<ApexOptions>(() => {
     colors: ['#006c0c', '#bc0100'],
     plotOptions: {
       radar: {
-        size: 115,
+        size: isPhone ? 85 : 115,
         offsetX: 0,
         offsetY: 0,
         polygons: {

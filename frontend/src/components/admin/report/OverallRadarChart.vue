@@ -20,8 +20,8 @@
         <apexchart type="radar" height="400" :options="chartOptions" :series="series" />
       </div>
       <div v-else class="text-grey-6 q-pa-xl text-center">
-        <q-spinner-dots size="40px" color="primary" />
-        <div class="q-mt-sm text-caption">กำลังประมวลผลข้อมูลกราฟใยแมงมุม...</div>
+        <q-icon name="radar" size="40px" color="grey-4" />
+        <div class="q-mt-sm text-caption">ยังไม่มีข้อมูลการประเมิน</div>
       </div>
     </q-card-section>
   </q-card>
@@ -29,12 +29,15 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useQuasar } from 'quasar';
 import type { ApexOptions } from 'apexcharts';
 import { SKILL_DEFINITIONS, type OverallStats } from '@/types/report';
 
 const props = defineProps<{
   stats: OverallStats;
 }>();
+
+const $q = useQuasar();
 
 const hasData = computed(() => {
   return props.stats.totalEvaluations > 0;
@@ -60,13 +63,15 @@ const series = computed(() => {
 });
 
 const chartOptions = computed<ApexOptions>(() => {
-  const categories = SKILL_DEFINITIONS.map((s) => s.label);
+  // Short labels + smaller polygon on phones so the axis labels are not clipped
+  const isPhone = $q.screen.lt.sm;
+  const categories = SKILL_DEFINITIONS.map((s) => (isPhone ? s.shortLabel : s.label));
 
   return {
     chart: {
       type: 'radar',
       toolbar: {
-        show: true,
+        show: !isPhone,
         tools: {
           download: true,
         },
@@ -79,7 +84,7 @@ const chartOptions = computed<ApexOptions>(() => {
     },
     plotOptions: {
       radar: {
-        size: 120,
+        size: isPhone ? 90 : 120,
         offsetX: 0,
         offsetY: 0,
         polygons: {

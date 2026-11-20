@@ -459,6 +459,7 @@ import type { QTableColumn } from 'quasar';
 import { useEvaluationStore } from '@/stores/evaluation-store';
 import { useAdminDrawer } from '@/composables/use-admin-drawer';
 import type { EvaluationRecord, EvaluationScores } from '@/types/evaluation';
+import { SKILL_DEFINITIONS } from '@/types/report';
 
 const $q = useQuasar();
 const store = useEvaluationStore();
@@ -559,15 +560,8 @@ function sortRecords(list: EvaluationRecord[]): EvaluationRecord[] {
   }
 }
 
-const skillLabels: { key: keyof EvaluationScores; label: string }[] = [
-  { key: 'score1', label: 'ความสามารถทางเทคนิค' },
-  { key: 'score2', label: 'การออกแบบและความคิดสร้างสรรค์' },
-  { key: 'score3', label: 'การคิดเชิงระบบ' },
-  { key: 'score4', label: 'การแก้ปัญหา' },
-  { key: 'score5', label: 'ความร่วมมือและความเป็นผู้นำ' },
-  { key: 'score6', label: 'ความยืดหยุ่นและทัศนคติเชิงเติบโต' },
-  { key: 'score7', label: 'การนำเสนอและการสื่อสาร' },
-];
+// Single source of truth for the 7 skill names (shared with the report page)
+const skillLabels = SKILL_DEFINITIONS;
 
 const kpiCards = computed(() => [
   {

@@ -1,48 +1,46 @@
 <template>
-  <q-page class="q-pa-lg admin-report-page">
-    <!-- Institutional Header -->
-    <div class="row items-start justify-between q-col-gutter-sm q-mb-lg header-wrap">
+  <q-page class="q-pa-md q-pa-md-lg admin-report-page">
+    <!-- Header -->
+    <div
+      class="row items-start justify-between q-col-gutter-sm q-mb-lg header-wrap"
+      :class="{ 'header-wrap--with-toggle': !isDrawerOpen }"
+    >
       <div class="col-12 col-md">
-        <div class="row items-center q-gutter-sm">
-          <q-icon name="analytics" color="primary" size="28px" />
-          <h1 class="text-h5 text-weight-bolder text-grey-10 q-my-none">
-            รายงานและวิเคราะห์สมรรถนะผู้เรียน 7 ทักษะหลัก
-          </h1>
-          <div class="live-badge row items-center q-px-sm q-py-xs rounded-borders q-ml-sm">
-            <span class="live-pulse-dot q-mr-xs"></span>
-            <span class="text-caption text-weight-bold text-bb-green"
-              >เชื่อมต่อสด Google Sheets</span
-            >
-          </div>
-        </div>
-        <div class="text-caption text-grey-7 q-mt-xs">
-          วิเคราะห์สมรรถนะ 7 ด้าน: สมาธิ, กล้ามเนื้อ, การสร้างหุ่นยนต์, การเขียนโปรแกรม,
-          การแก้ปัญหา, ความคิดสร้างสรรค์, การนำเสนอ
-          <span v-if="store.lastUpdated" class="q-ml-sm text-grey-8">
-            · ปรับปรุงล่าสุด: {{ formatTime(store.lastUpdated) }}
+        <h1 class="page-title text-grey-10 q-my-none">
+          รายงานและวิเคราะห์สมรรถนะผู้เรียน 7 ทักษะหลัก
+        </h1>
+        <div class="header-meta text-caption text-grey-7">
+          <span class="live-badge">
+            <span class="live-dot"></span>
+            Google Sheets
           </span>
+          <span class="meta-item">อัปเดตล่าสุด {{ formatTime(store.lastUpdated) }}</span>
         </div>
+        <div class="text-caption text-grey-6 q-mt-xs">สมรรถนะ 7 ด้าน: {{ skillNames }}</div>
       </div>
 
-      <div class="col-12 col-md-auto row items-center q-gutter-sm q-mt-xs q-mt-md-none">
-        <q-btn
-          outline
-          color="grey-8"
-          icon="table_rows"
-          label="ตารางบันทึกดิบ"
-          to="/admin/evaluations"
-          class="action-pill"
-        />
-
-        <q-btn
-          outline
-          color="primary"
-          icon="open_in_new"
-          label="เปิด Google Sheet"
-          :href="sheetUrl"
-          target="_blank"
-          class="action-pill"
-        />
+      <div class="col-12 col-md-auto">
+        <div class="header-actions">
+          <q-btn
+            outline
+            no-caps
+            color="grey-8"
+            icon="table_rows"
+            label="ตารางบันทึกดิบ"
+            to="/admin/evaluations"
+            class="action-pill"
+          />
+          <q-btn
+            outline
+            no-caps
+            color="primary"
+            icon="open_in_new"
+            :label="$q.screen.lt.sm ? 'Google Sheet' : 'เปิด Google Sheet'"
+            :href="sheetUrl"
+            target="_blank"
+            class="action-pill"
+          />
+        </div>
       </div>
     </div>
 
@@ -84,14 +82,15 @@
 
         <!-- Academic Analytics Insights Box -->
         <div class="col-12 col-lg-7">
-          <q-card flat bordered class="insights-card">
+          <q-card flat bordered class="insights-card full-height">
             <q-card-section>
               <div class="text-subtitle1 text-weight-bold text-grey-9 row items-center q-mb-xs">
                 <q-icon name="insights" color="primary" size="20px" class="q-mr-xs" />
                 บทวิเคราะห์และข้อเสนอแนะเชิงวิชาการ (Academic Insights)
               </div>
               <div class="text-caption text-grey-7 q-mb-md">
-                สรุปจากฐานข้อมูลบันทึกการประเมินผลจริงทั้งหมด 875 รายการ
+                สรุปจากบันทึกการประเมินผลทั้งหมด
+                {{ store.overallStats.totalEvaluations.toLocaleString() }} รายการ
               </div>
 
               <div class="row q-col-gutter-sm">
@@ -103,7 +102,10 @@
                       สมรรถนะที่ผู้เรียนโดดเด่นสูงสุด
                     </div>
                     <div class="text-h6 text-weight-bolder text-bb-green q-mt-xs">
-                      {{ topSkill.label }} ({{ topSkill.avg }} / 5.0)
+                      <template v-if="topSkill">
+                        {{ topSkill.label }} ({{ topSkill.avg }} / 5.0)
+                      </template>
+                      <template v-else>-</template>
                     </div>
                     <div class="text-caption text-grey-8 q-mt-xs">
                       ผู้เรียนส่วนใหญ่มีความพร้อมและแสดงศักยภาพด้านนี้ได้สม่ำเสมอ
@@ -119,7 +121,10 @@
                       สมรรถนะที่แนะนำให้ส่งเสริมพัฒนา
                     </div>
                     <div class="text-h6 text-weight-bolder text-bb-red q-mt-xs">
-                      {{ lowestSkill.label }} ({{ lowestSkill.avg }} / 5.0)
+                      <template v-if="lowestSkill">
+                        {{ lowestSkill.label }} ({{ lowestSkill.avg }} / 5.0)
+                      </template>
+                      <template v-else>-</template>
                     </div>
                     <div class="text-caption text-grey-8 q-mt-xs">
                       แนะนำให้จัดกิจกรรมเสริมเฉพาะกลุ่มเพื่อพัฒนาทักษะนี้ในบทเรียนถัดไป
@@ -130,7 +135,7 @@
                 <!-- 7 Topics Completed Milestone -->
                 <div class="col-12 q-mt-sm">
                   <q-card flat bordered class="q-pa-md bg-white border">
-                    <div class="row items-center justify-between">
+                    <div class="row items-center justify-between q-col-gutter-sm">
                       <div>
                         <div class="text-caption text-bb-green text-weight-bold row items-center">
                           <q-icon name="verified" size="16px" class="q-mr-xs" />
@@ -148,10 +153,11 @@
                       <q-btn
                         flat
                         dense
+                        no-caps
                         color="primary"
                         label="ดูรายชื่อ"
-                        icon="arrow_forward"
-                        to="#children-table"
+                        icon-right="arrow_downward"
+                        @click="scrollToChildren"
                       />
                     </div>
                   </q-card>
@@ -187,7 +193,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useQuasar } from 'quasar';
 import { useEvaluationStore } from '@/stores/evaluation-store';
+import { useAdminDrawer } from '@/composables/use-admin-drawer';
 import { SKILL_DEFINITIONS, type ChildSummary } from '@/types/report';
 import ReportOverviewCards from '@/components/admin/report/ReportOverviewCards.vue';
 import OverallRadarChart from '@/components/admin/report/OverallRadarChart.vue';
@@ -196,7 +204,12 @@ import CompletionDonutChart from '@/components/admin/report/CompletionDonutChart
 import ChildrenTable from '@/components/admin/report/ChildrenTable.vue';
 import ChildDetailDialog from '@/components/admin/report/ChildDetailDialog.vue';
 
+const $q = useQuasar();
 const store = useEvaluationStore();
+// The admin layout shows a floating menu button whenever the drawer is closed (any screen width)
+const { isDrawerOpen } = useAdminDrawer();
+
+const skillNames = SKILL_DEFINITIONS.map((s) => s.label).join(', ');
 
 const sheetUrl =
   'https://docs.google.com/spreadsheets/d/1OQ8X-6bmzj6DEsOMToPMNwE0AikWgqalzhTJXeZs57k/edit?pli=1&gid=0#gid=0';
@@ -211,41 +224,40 @@ const completionPercent = computed(() => {
   );
 });
 
-const topSkill = computed(() => {
-  let highest = { label: 'สมาธิ', avg: 0 };
-  SKILL_DEFINITIONS.forEach((skill) => {
-    const avg = store.overallStats.skillAverages[skill.key] || 0;
-    if (avg > highest.avg) {
-      highest = { label: skill.label, avg };
-    }
-  });
-  return highest;
-});
+// Skills that actually have scores; empty when there is no data yet (shown as "-" instead of a fake skill)
+const scoredSkills = computed(() =>
+  SKILL_DEFINITIONS.map((skill) => ({
+    label: skill.label,
+    avg: store.overallStats.skillAverages[skill.key] || 0,
+  })).filter((s) => s.avg > 0),
+);
 
-const lowestSkill = computed(() => {
-  let lowest = { label: 'กล้ามเนื้อ', avg: 999 };
-  SKILL_DEFINITIONS.forEach((skill) => {
-    const avg = store.overallStats.skillAverages[skill.key] || 0;
-    if (avg > 0 && avg < lowest.avg) {
-      lowest = { label: skill.label, avg };
-    }
-  });
-  if (lowest.avg === 999) lowest.avg = 0;
-  return lowest;
-});
+const topSkill = computed(() =>
+  scoredSkills.value.length
+    ? scoredSkills.value.reduce((best, s) => (s.avg > best.avg ? s : best))
+    : null,
+);
+
+const lowestSkill = computed(() =>
+  scoredSkills.value.length
+    ? scoredSkills.value.reduce((low, s) => (s.avg < low.avg ? s : low))
+    : null,
+);
+
+function scrollToChildren(): void {
+  document.getElementById('children-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
 function openChildDetail(child: ChildSummary): void {
   selectedChild.value = child;
   showChildModal.value = true;
 }
 
-function formatTime(isoString: string): string {
-  try {
-    const d = new Date(isoString);
-    return d.toLocaleTimeString('th-TH');
-  } catch {
-    return isoString;
-  }
+function formatTime(isoString: string | null): string {
+  if (!isoString) return '-';
+  const d = new Date(isoString);
+  if (Number.isNaN(d.getTime())) return '-';
+  return d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
 }
 
 onMounted(async () => {
@@ -267,11 +279,73 @@ onUnmounted(() => {
   border-bottom: 1px solid #e2e8f0;
   padding-bottom: 16px;
 }
+/* Leave room for the admin layout's floating menu button (shown while the drawer is closed) */
+.header-wrap--with-toggle > div:first-child {
+  padding-left: 60px;
+  min-height: 42px;
+}
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+.header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: 8px;
+}
+.meta-item {
+  white-space: nowrap;
+}
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #e8f5e9;
+  color: #006c0c;
+  font-weight: 700;
+  line-height: 20px;
+}
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #1c871e;
+  animation: live-pulse 2s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+.action-pill :deep(.q-btn__content) {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
 .insights-card {
   border-radius: 10px;
   border: 1px solid #e2e8f0;
   background: #ffffff;
-  min-height: 380px;
+}
+@media (max-width: 599px) {
+  .page-title {
+    font-size: 1.25rem;
+  }
+  .header-actions > * {
+    flex: 1 1 0;
+  }
 }
 .border {
   border: 1px solid #e2e8f0;
@@ -281,11 +355,6 @@ onUnmounted(() => {
 }
 .border-red {
   border: 1px solid #fecaca;
-}
-
-.live-badge {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
 }
 
 .action-pill {

@@ -1,16 +1,17 @@
 <template>
   <q-dialog
     :model-value="modelValue"
-    transition-show="jump-down"
-    transition-hide="jump-up"
+    :maximized="$q.screen.lt.sm"
+    :transition-show="$q.screen.lt.sm ? 'slide-up' : 'jump-down'"
+    :transition-hide="$q.screen.lt.sm ? 'slide-down' : 'jump-up'"
     @update:model-value="(val) => emit('update:modelValue', val)"
     @show="onDialogShow"
     @hide="onDialogHide"
   >
-    <q-card v-if="child" class="dialog-card">
+    <q-card v-if="child" class="dialog-card column no-wrap">
       <!-- Modal Header -->
-      <q-card-section class="dialog-header text-white row items-center justify-between">
-        <div>
+      <q-card-section class="dialog-header text-white row items-center justify-between no-wrap">
+        <div style="min-width: 0">
           <div class="row items-center q-gutter-sm">
             <span class="text-h6 text-weight-bold tracking-tight">{{ child.studentName }}</span>
             <q-badge
@@ -25,29 +26,30 @@
               {{
                 child.isCompleted7
                   ? 'ผ่านครบหลักสูตร 7 ครั้ง'
-                  : `กำลังเรียน (${child.completedSessions}/7 ครั้ง)`
+                  : `กำลังเรียน (${Math.min(child.completedSessions, 7)}/7 ครั้ง)`
               }}
             </q-badge>
           </div>
-          <div class="text-caption text-grey-3 q-mt-xs">
-            <span v-if="child.courseTitle">หลักสูตร: {{ child.courseTitle }} · </span>
-            รหัสลงทะเบียน: {{ child.enrollment }}
+          <div v-if="child.courseTitle" class="text-caption text-grey-3 q-mt-xs">
+            หลักสูตร: {{ child.courseTitle }}
           </div>
         </div>
-        <q-btn flat round dense icon="close" v-close-popup class="text-white" />
+        <q-btn flat round dense icon="close" v-close-popup class="text-white q-ml-sm" />
       </q-card-section>
 
       <!-- Subheader Stats Bar -->
-      <div class="row items-center justify-around bg-grey-1 q-pa-sm text-center border-bottom">
+      <div
+        class="row items-center justify-around no-wrap bg-grey-1 q-pa-sm text-center border-bottom"
+      >
         <div>
-          <div class="text-caption text-grey-7">จำนวนการประเมิน</div>
+          <div class="text-caption text-grey-7">ประเมินแล้ว</div>
           <div class="text-subtitle1 text-weight-bolder text-bb-green">
             {{ child.completedSessions }} / {{ child.totalSessions }} ครั้ง
           </div>
         </div>
         <q-separator vertical />
         <div>
-          <div class="text-caption text-grey-7">ความคืบหน้าหลักสูตร</div>
+          <div class="text-caption text-grey-7">ความคืบหน้า</div>
           <div
             class="text-subtitle1 text-weight-bolder"
             :class="child.isCompleted7 ? 'text-positive' : 'text-warning'"
@@ -57,7 +59,7 @@
         </div>
         <q-separator vertical />
         <div>
-          <div class="text-caption text-grey-7">คะแนนเฉลี่ยรวม</div>
+          <div class="text-caption text-grey-7">คะแนนเฉลี่ย</div>
           <div class="text-subtitle1 text-weight-bolder text-bb-green">
             {{ child.overallAverage }}
             <span class="text-caption text-weight-regular text-grey-6">/ 5.0</span>
@@ -72,17 +74,32 @@
         class="text-grey-8 q-mt-xs"
         active-color="primary"
         indicator-color="primary"
+        no-caps
         align="left"
+        outside-arrows
+        mobile-arrows
         @update:model-value="onTabChange"
       >
-        <q-tab name="radar" icon="radar" label="กราฟใยแมงมุมและสมรรถนะ 7 ด้าน" />
-        <q-tab name="timeline" icon="timeline" label="พัฒนาการแต่ละครั้ง (Sessions)" />
-        <q-tab name="comments" icon="chat_bubble_outline" label="บันทึกผลการประเมินและสรุป" />
+        <q-tab
+          name="radar"
+          icon="radar"
+          :label="$q.screen.lt.sm ? 'สมรรถนะ' : 'กราฟใยแมงมุมและสมรรถนะ 7 ด้าน'"
+        />
+        <q-tab
+          name="timeline"
+          icon="timeline"
+          :label="$q.screen.lt.sm ? 'รายครั้ง' : 'พัฒนาการแต่ละครั้ง'"
+        />
+        <q-tab
+          name="comments"
+          icon="chat_bubble_outline"
+          :label="$q.screen.lt.sm ? 'บันทึก' : 'บันทึกผลการประเมินและสรุป'"
+        />
       </q-tabs>
       <q-separator />
 
       <!-- Tab Panels -->
-      <q-tab-panels v-model="activeTab" animated class="q-pa-none">
+      <q-tab-panels v-model="activeTab" animated class="q-pa-none col scroll">
         <!-- Tab 1: Radar & Skills -->
         <q-tab-panel name="radar" class="q-pa-md">
           <div class="row q-col-gutter-md items-start">
@@ -185,10 +202,8 @@
                 <td class="text-weight-bold text-bb-green">#{{ rec.sessionNumber ?? '-' }}</td>
                 <td>{{ rec.sessionDate }}</td>
                 <td class="text-center">
-                  <q-badge
-                    :color="rec.status.toLowerCase() === 'complete' ? 'positive' : 'warning'"
-                  >
-                    {{ rec.status }}
+                  <q-badge :color="isComplete(rec.status) ? 'positive' : 'warning'">
+                    {{ isComplete(rec.status) ? 'เสร็จสิ้น' : 'รอดำเนินการ' }}
                   </q-badge>
                 </td>
                 <td class="text-center">{{ rec.scores.score1 ?? '-' }}</td>
@@ -199,17 +214,17 @@
                 <td class="text-center">{{ rec.scores.score6 ?? '-' }}</td>
                 <td class="text-center">{{ rec.scores.score7 ?? '-' }}</td>
                 <td class="text-center text-weight-bold text-bb-green">
-                  {{ rec.averageScore }}
+                  {{ rec.averageScore || '-' }}
                 </td>
                 <td class="text-right">
                   <q-btn
-                    v-if="rec.googleDriveLink"
+                    v-if="safeLink(rec.googleDriveLink)"
                     flat
                     round
                     dense
                     icon="folder"
                     color="primary"
-                    :href="rec.googleDriveLink"
+                    :href="safeLink(rec.googleDriveLink)"
                     target="_blank"
                   >
                     <q-tooltip>เปิด Google Drive</q-tooltip>
@@ -229,21 +244,30 @@
               :key="rec.evaluationId"
               class="q-pa-md rounded-borders bg-white border"
             >
-              <div class="row items-center justify-between q-mb-sm">
+              <div class="row items-center justify-between q-col-gutter-sm q-mb-sm">
                 <div class="text-subtitle2 text-weight-bold text-bb-green row items-center">
                   <q-icon name="event_note" size="18px" class="q-mr-xs" />
-                  บทเรียนที่ {{ rec.sessionNumber }} (วันที่ {{ rec.sessionDate }})
+                  บทเรียนที่ {{ rec.sessionNumber ?? '-' }}
+                  <span v-if="rec.sessionDate" class="text-weight-regular text-grey-7 q-ml-xs">
+                    ({{ rec.sessionDate }})
+                  </span>
                 </div>
-                <q-btn
-                  v-if="rec.googleDriveLink"
-                  outline
-                  size="sm"
-                  color="primary"
-                  icon="open_in_new"
-                  label="ดูรูปภาพกิจกรรม"
-                  :href="rec.googleDriveLink"
-                  target="_blank"
-                />
+                <div>
+                  <q-btn
+                    v-if="safeLink(rec.googleDriveLink)"
+                    outline
+                    no-caps
+                    size="sm"
+                    color="primary"
+                    icon="open_in_new"
+                    label="ดูรูปภาพกิจกรรม"
+                    :href="safeLink(rec.googleDriveLink)"
+                    target="_blank"
+                  />
+                </div>
+              </div>
+              <div v-if="!rec.comment && !rec.aiMessage" class="text-caption text-grey-5">
+                ยังไม่มีบันทึก
               </div>
 
               <!-- Comment -->
@@ -279,6 +303,7 @@
 
 <script setup lang="ts">
 import { ref, nextTick } from 'vue';
+import { useQuasar } from 'quasar';
 import { SKILL_DEFINITIONS, type ChildSummary, type OverallStats } from '@/types/report';
 import ChildRadarChart from './ChildRadarChart.vue';
 import ProgressLineChart from './ProgressLineChart.vue';
@@ -293,7 +318,18 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
 }>();
 
+const $q = useQuasar();
+
 const activeTab = ref('radar');
+
+function isComplete(status: string): boolean {
+  return status.toLowerCase() === 'complete';
+}
+
+// Only allow http(s) links from the sheet so a crafted cell can't inject javascript: URLs
+function safeLink(url: string): string {
+  return /^https?:\/\//i.test((url || '').trim()) ? url.trim() : '';
+}
 const isDialogReady = ref(false);
 
 function onDialogShow(): void {
@@ -332,11 +368,21 @@ function getScoreBadgeClass(val: number): string {
 
 <style scoped>
 .dialog-card {
-  min-width: 860px;
+  width: 920px;
   max-width: 95vw;
+  max-height: 92vh;
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #e2e8f0;
+}
+@media (max-width: 599px) {
+  .dialog-card {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    border: 0;
+  }
 }
 .dialog-header {
   background: #006c0c;

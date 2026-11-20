@@ -4,6 +4,24 @@ import type { EvaluationRecord, EvaluationScores } from '@/types/evaluation';
 import { SKILL_DEFINITIONS, type ChildSummary, type OverallStats } from '@/types/report';
 import axios from 'axios';
 
+/** Group key for one child: enrollment ("#111 รอย - Intermediate Level 5"), falling back to the title */
+function childKey(rec: EvaluationRecord): string {
+  return rec.enrollment || rec.evaluationTitle || 'Unknown';
+}
+
+/**
+ * Number of distinct sessions a child has completed. A session evaluated twice
+ * (duplicate rows) must only count once, otherwise children show "8/7".
+ */
+function countCompletedSessions(records: EvaluationRecord[]): number {
+  const done = new Set<string>();
+  records.forEach((r) => {
+    if (r.status.toLowerCase() !== 'complete') return;
+    done.add(r.sessionNumber !== null ? `s${r.sessionNumber}` : `id:${r.evaluationId}`);
+  });
+  return done.size;
+}
+
 interface EvaluationState {
   records: EvaluationRecord[];
   sheetTitle: string;
@@ -54,7 +72,7 @@ export const useEvaluationStore = defineStore('evaluation', {
       const groups = new Map<string, EvaluationRecord[]>();
 
       state.records.forEach((rec) => {
-        const key = rec.enrollment || rec.evaluationTitle || 'Unknown';
+        const key = childKey(rec);
         if (!groups.has(key)) {
           groups.set(key, []);
         }
@@ -64,23 +82,22 @@ export const useEvaluationStore = defineStore('evaluation', {
       const summaries: ChildSummary[] = [];
 
       groups.forEach((childRecords, enrollment) => {
-        // Parse name and course from enrollment e.g. "#111 รอย - Intermediate Level 5"
+        // Parse name and course from enrollment e.g. "#111 รอย - Intermediate Level 5".
+        // Split on " - " (with spaces) so hyphenated names like "ปาล์ม-ปุณณ์" stay intact.
         let studentName = enrollment;
         let courseTitle = '';
-        if (enrollment.includes('-')) {
-          const parts = enrollment.split('-');
-          studentName = parts[0]?.trim() ?? enrollment;
-          courseTitle = parts.slice(1).join('-').trim();
+        const sepIndex = enrollment.indexOf(' - ');
+        if (sepIndex > 0) {
+          studentName = enrollment.slice(0, sepIndex).trim();
+          courseTitle = enrollment.slice(sepIndex + 3).trim();
         }
 
         const sortedRecords = [...childRecords].sort((a, b) => {
           return (a.sessionNumber ?? 0) - (b.sessionNumber ?? 0);
         });
 
-        const completedRecords = sortedRecords.filter((r) => r.status.toLowerCase() === 'complete');
-
         const totalSessions = sortedRecords.length;
-        const completedSessions = completedRecords.length;
+        const completedSessions = countCompletedSessions(sortedRecords);
         const isCompleted7 = completedSessions >= 7;
         const completionRate = Math.min(100, Math.round((completedSessions / 7) * 100));
 
@@ -152,7 +169,8 @@ export const useEvaluationStore = defineStore('evaluation', {
       // Children summary
       const groups = new Map<string, EvaluationRecord[]>();
       state.records.forEach((rec) => {
-        const key = rec.enrollment || 'Unknown';
+        // Same grouping as childrenSummaries so the KPI counts match the table
+        const key = childKey(rec);
         if (!groups.has(key)) groups.set(key, []);
         groups.get(key)!.push(rec);
       });
@@ -161,8 +179,7 @@ export const useEvaluationStore = defineStore('evaluation', {
       const completedChildrenRecords: EvaluationRecord[] = [];
 
       groups.forEach((recs) => {
-        const completed = recs.filter((r) => r.status.toLowerCase() === 'complete').length;
-        if (completed >= 7) {
+        if (countCompletedSessions(recs) >= 7) {
           fullyCompletedCount++;
           completedChildrenRecords.push(...recs);
         }
