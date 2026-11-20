@@ -322,7 +322,7 @@
         </q-tab-panel>
       </q-tab-panels>
     </q-card>
-    <ChildReportSheet v-if="printing && child" :child="child" :overall-stats="overallStats" />
+    <ChildReportSheet v-if="printing && child" :child="child" />
   </q-dialog>
 </template>
 
@@ -362,6 +362,26 @@ const isDialogReady = ref(false);
 const printing = ref(false);
 
 /**
+ * The sheet mounts just before printing, so its logo and the Sarabun font may still be
+ * loading; printing then would leave a blank logo. Wait for both, but never hang the button.
+ */
+async function waitForSheetAssets(timeoutMs = 2000): Promise<void> {
+  const images = [...document.querySelectorAll<HTMLImageElement>('.bb-print-sheet img')];
+  const imagesReady = images.map((img) =>
+    img.complete && img.naturalWidth > 0
+      ? Promise.resolve()
+      : new Promise<void>((resolve) => {
+          img.addEventListener('load', () => resolve(), { once: true });
+          img.addEventListener('error', () => resolve(), { once: true });
+        }),
+  );
+  await Promise.race([
+    Promise.all([...imagesReady, document.fonts?.ready]),
+    new Promise((resolve) => setTimeout(resolve, timeoutMs)),
+  ]);
+}
+
+/**
  * Mounts the A4 report sheet, hides the rest of the app via `body.bb-printing`,
  * and opens the browser print dialog (which also offers "Save as PDF").
  */
@@ -369,6 +389,7 @@ async function printReport(): Promise<void> {
   if (!props.child || printing.value) return;
   printing.value = true;
   await nextTick();
+  await waitForSheetAssets();
 
   const originalTitle = document.title;
   // The browser uses the page title as the default PDF file name

@@ -2,50 +2,68 @@
   <!-- Rendered only while printing; teleported to <body> so print CSS can hide the rest of the app -->
   <Teleport to="body">
     <article class="bb-print-sheet" aria-hidden="true">
-      <header class="sheet-header">
-        <img :src="logo" alt="BotBuilder" class="sheet-logo" />
-        <div class="sheet-title">
-          <h1>รายงานพัฒนาการผู้เรียน</h1>
-          <p>สมรรถนะ 7 ทักษะหลัก</p>
+      <!-- Header -->
+      <header class="rp-header">
+        <img :src="logo" alt="BotBuilder" class="rp-logo" />
+        <div class="rp-header-text">
+          <div class="rp-doc-title">รายงานผลการเรียน</div>
+          <div class="rp-doc-sub">โครงการสมรรถนะ 7 ทักษะ · BotBuilder Robotics</div>
         </div>
-        <div class="sheet-issued">ออกรายงาน<br />{{ issuedDate }}</div>
+        <div class="rp-date">
+          <div class="rp-muted">วันที่ออกรายงาน</div>
+          <div>{{ issuedDate }}</div>
+        </div>
       </header>
 
-      <section class="sheet-student">
-        <div>
-          <div class="label">ชื่อผู้เรียน</div>
-          <div class="value value--name">{{ displayName }}</div>
+      <!-- Student -->
+      <section class="rp-student">
+        <div class="rp-student-main">
+          <div class="rp-muted">ชื่อผู้เรียน</div>
+          <div class="rp-name">{{ displayName }}</div>
+          <div v-if="child.courseTitle" class="rp-course">{{ child.courseTitle }}</div>
         </div>
-        <div v-if="child.courseTitle">
-          <div class="label">หลักสูตร</div>
-          <div class="value">{{ child.courseTitle }}</div>
-        </div>
-        <div>
-          <div class="label">ความก้าวหน้า</div>
-          <div class="value">
-            {{ Math.min(child.completedSessions, 7) }} / 7 บทเรียน
-            <span class="pill" :class="child.isCompleted7 ? 'pill--done' : 'pill--progress'">
-              {{ child.isCompleted7 ? 'ครบหลักสูตร' : 'กำลังเรียน' }}
-            </span>
+        <div class="rp-stat">
+          <div class="rp-muted">ความก้าวหน้า</div>
+          <div class="rp-dots" :aria-label="`${sessionsDone} จาก 7 บทเรียน`">
+            <span
+              v-for="n in 7"
+              :key="n"
+              class="rp-dot"
+              :class="{ 'rp-dot--on': sessionAverage(n) !== null }"
+            ></span>
           </div>
+          <div class="rp-stat-value">{{ sessionsDone }} / 7 บทเรียน</div>
         </div>
-        <div>
-          <div class="label">คะแนนเฉลี่ยรวม</div>
-          <div class="value value--score">
-            {{ child.overallAverage > 0 ? child.overallAverage.toFixed(2) : '-' }}
-            <small>/ 5.00</small>
+        <div class="rp-stat">
+          <div class="rp-muted">ผลการเรียนโดยรวม</div>
+          <div class="rp-overall">
+            {{ child.overallAverage > 0 ? child.overallAverage.toFixed(2) : '–' }}
+            <small>/ 5</small>
           </div>
+          <div class="rp-stat-value">{{ levelOf(child.overallAverage) }}</div>
         </div>
       </section>
 
-      <section class="sheet-skills">
-        <div class="radar">
+      <!-- Summary sentence -->
+      <p class="rp-summary">{{ summarySentence }}</p>
+
+      <!-- Skills -->
+      <section class="rp-section">
+        <h2 class="rp-h2">ผลการประเมิน 7 ทักษะ</h2>
+        <div class="rp-skills">
           <svg
-            :viewBox="`${-LABEL_PAD} 0 ${SIZE + LABEL_PAD * 2} ${SIZE}`"
+            class="rp-radar"
+            :viewBox="`${-LABEL_PAD} ${-6} ${SIZE + LABEL_PAD * 2} ${SIZE + 12}`"
             role="img"
             aria-label="กราฟใยแมงมุม 7 ทักษะ"
           >
-            <polygon v-for="ring in 5" :key="ring" :points="ringPoints(ring)" class="radar-ring" />
+            <polygon
+              v-for="ring in 5"
+              :key="ring"
+              :points="ringPoints(ring)"
+              class="rp-radar-ring"
+              :class="{ 'rp-radar-ring--outer': ring === 5 }"
+            />
             <line
               v-for="(axis, i) in axes"
               :key="`axis-${i}`"
@@ -53,17 +71,16 @@
               :y1="CENTER"
               :x2="axis.x"
               :y2="axis.y"
-              class="radar-axis"
+              class="rp-radar-axis"
             />
-            <polygon v-if="overallPoints" :points="overallPoints" class="radar-overall" />
-            <polygon :points="childPoints" class="radar-child" />
+            <polygon :points="childPoints" class="rp-radar-shape" />
             <circle
               v-for="(p, i) in childVertices"
               :key="`dot-${i}`"
               :cx="p.x"
               :cy="p.y"
-              r="3"
-              class="radar-dot"
+              r="2.6"
+              class="rp-radar-point"
             />
             <text
               v-for="(axis, i) in axes"
@@ -72,109 +89,97 @@
               :y="axis.labelY"
               :text-anchor="axis.anchor"
               dominant-baseline="middle"
-              class="radar-label"
+              class="rp-radar-label"
             >
               {{ SKILL_DEFINITIONS[i]!.shortLabel }}
             </text>
           </svg>
-          <div class="radar-legend">
-            <span><i class="swatch swatch--child"></i>คะแนนผู้เรียน</span>
-            <span v-if="overallPoints"
-              ><i class="swatch swatch--overall"></i>ค่าเฉลี่ยทั้งรุ่น</span
-            >
-          </div>
-        </div>
 
-        <table class="skill-table">
-          <thead>
-            <tr>
-              <th>ทักษะ</th>
-              <th class="num">คะแนน</th>
-              <th class="bar-col">ระดับ</th>
-            </tr>
-          </thead>
+          <table class="rp-skill-table">
+            <tbody>
+              <tr v-for="skill in skillRows" :key="skill.key">
+                <td class="rp-skill-name">{{ skill.label }}</td>
+                <td class="rp-skill-bar">
+                  <div class="rp-bar">
+                    <div class="rp-bar-fill" :style="{ width: `${(skill.avg / 5) * 100}%` }"></div>
+                  </div>
+                </td>
+                <td class="rp-skill-score">{{ skill.avg > 0 ? skill.avg.toFixed(1) : '–' }}</td>
+                <td class="rp-skill-level">
+                  {{ skill.avg > 0 ? levelOf(skill.avg) : 'ยังไม่ประเมิน' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="rp-scale">
+          เกณฑ์: 4.5–5 ดีเยี่ยม · 4.0–4.4 ดีมาก · 3.0–3.9 ดี · 2.0–2.9 พอใช้ · ต่ำกว่า 2 กำลังพัฒนา
+        </div>
+      </section>
+
+      <!-- Strengths & growth -->
+      <section v-if="strengths.length || growth.length" class="rp-section rp-two-col">
+        <div v-if="strengths.length">
+          <h2 class="rp-h2">จุดเด่นของน้อง</h2>
+          <ul class="rp-list">
+            <li v-for="s in strengths" :key="s.key">
+              <strong>{{ s.label }}</strong> — {{ SKILL_COPY[s.key].strength }}
+            </li>
+          </ul>
+        </div>
+        <div v-if="growth.length">
+          <h2 class="rp-h2">สิ่งที่ผู้ปกครองช่วยส่งเสริมได้</h2>
+          <ul class="rp-list">
+            <li v-for="s in growth" :key="s.key">
+              <strong>{{ s.label }}</strong> — {{ SKILL_COPY[s.key].atHome }}
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Progress across sessions -->
+      <section class="rp-section">
+        <h2 class="rp-h2">พัฒนาการรายบทเรียน (คะแนนเฉลี่ย)</h2>
+        <table class="rp-session-table">
           <tbody>
-            <tr v-for="skill in SKILL_DEFINITIONS" :key="skill.key">
-              <td>
-                {{ skill.label }}
-                <span v-if="topSkill?.key === skill.key" class="tag tag--top">เด่น</span>
-                <span v-else-if="growthSkill?.key === skill.key" class="tag tag--grow"
-                  >ส่งเสริม</span
-                >
-              </td>
-              <td class="num">{{ scoreText(child.skillAverages[skill.key]) }}</td>
-              <td class="bar-col">
-                <div class="bar">
-                  <div
-                    class="bar-fill"
-                    :style="{
-                      width: `${((child.skillAverages[skill.key] || 0) / 5) * 100}%`,
-                      background: skill.color,
-                    }"
-                  ></div>
-                </div>
+            <tr>
+              <th v-for="n in 7" :key="n">บทที่ {{ n }}</th>
+            </tr>
+            <tr>
+              <td v-for="n in 7" :key="n" :class="{ 'rp-empty': sessionAverage(n) === null }">
+                {{ sessionAverage(n)?.toFixed(2) ?? '–' }}
               </td>
             </tr>
           </tbody>
         </table>
+        <div v-if="trendText" class="rp-trend">{{ trendText }}</div>
       </section>
 
-      <section v-if="topSkill || growthSkill" class="sheet-summary">
-        <div v-if="topSkill" class="summary-box summary-box--top">
-          <div class="summary-head">ทักษะที่โดดเด่น</div>
-          <div class="summary-skill">{{ topSkill.label }} ({{ scoreText(topSkill.avg) }})</div>
-        </div>
-        <div v-if="growthSkill" class="summary-box summary-box--grow">
-          <div class="summary-head">ทักษะที่ควรส่งเสริมต่อ</div>
-          <div class="summary-skill">
-            {{ growthSkill.label }} ({{ scoreText(growthSkill.avg) }})
+      <!-- Teacher comments -->
+      <section v-if="notes.length" class="rp-section">
+        <h2 class="rp-h2">ความเห็นจากครูผู้สอน</h2>
+        <div v-for="note in notes" :key="note.id" class="rp-note">
+          <div class="rp-note-head">
+            บทเรียนที่ {{ note.session ?? '–' }}<span v-if="note.date"> · {{ note.date }}</span>
           </div>
+          <p class="rp-note-text">{{ note.text }}</p>
         </div>
       </section>
 
-      <section class="sheet-sessions">
-        <h2>ผลการประเมินรายบทเรียน</h2>
-        <table class="session-table">
-          <thead>
-            <tr>
-              <th>บทที่</th>
-              <th>วันที่</th>
-              <th v-for="skill in SKILL_DEFINITIONS" :key="skill.key" class="num">
-                {{ skill.shortLabel }}
-              </th>
-              <th class="num">เฉลี่ย</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="rec in completedRecords" :key="rec.evaluationId">
-              <td>{{ rec.sessionNumber ?? '-' }}</td>
-              <td class="nowrap">{{ rec.sessionDate || '-' }}</td>
-              <td v-for="skill in SKILL_DEFINITIONS" :key="skill.key" class="num">
-                {{ rec.scores[skill.key] ?? '-' }}
-              </td>
-              <td class="num strong">{{ rec.averageScore ? rec.averageScore.toFixed(2) : '-' }}</td>
-            </tr>
-            <tr v-if="completedRecords.length === 0">
-              <td :colspan="SKILL_DEFINITIONS.length + 3" class="empty">ยังไม่มีผลการประเมิน</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section v-if="notes.length" class="sheet-notes">
-        <h2>ความเห็นจากผู้สอน</h2>
-        <div v-for="note in notes" :key="note.id" class="note">
-          <div class="note-head">
-            บทเรียนที่ {{ note.session ?? '-' }}
-            <span v-if="note.date">· {{ note.date }}</span>
-          </div>
-          <p>{{ note.text }}</p>
+      <!-- Signatures -->
+      <footer class="rp-footer">
+        <div class="rp-sign">
+          <div class="rp-sign-line"></div>
+          <div>ครูผู้สอน</div>
         </div>
-      </section>
-
-      <footer class="sheet-footer">
-        BotBuilder · Code, Play &amp; Learn Robotics Through STEAM Education
+        <div class="rp-sign">
+          <div class="rp-sign-line"></div>
+          <div>ผู้ปกครอง</div>
+        </div>
       </footer>
+      <div class="rp-brand">
+        BotBuilder · Code, Play &amp; Learn Robotics Through STEAM Education
+      </div>
     </article>
   </Teleport>
 </template>
@@ -182,19 +187,51 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import logo from '@/assets/landing/logo.png';
-import { SKILL_DEFINITIONS, type ChildSummary, type OverallStats } from '@/types/report';
+import { SKILL_DEFINITIONS, type ChildSummary, type SkillMeta } from '@/types/report';
+import { sheetDateValue } from '@/utils/sheet-date';
 
 const props = defineProps<{
   child: ChildSummary;
-  overallStats?: OverallStats | undefined;
 }>();
 
-const SIZE = 300;
+type SkillKey = SkillMeta['key'];
+
+/** Plain-language copy for parents: what a strong score means, and what helps at home. */
+const SKILL_COPY: Record<SkillKey, { strength: string; atHome: string }> = {
+  score1: {
+    strength: 'จดจ่อกับกิจกรรมได้ต่อเนื่อง และทำงานจนสำเร็จ',
+    atHome: 'ชวนทำกิจกรรมที่ใช้เวลาต่อเนื่อง เช่น ต่อจิ๊กซอว์ หรืออ่านนิทานด้วยกันจนจบเรื่อง',
+  },
+  score2: {
+    strength: 'ใช้มือหยิบจับและประกอบชิ้นส่วนเล็ก ๆ ได้คล่องแคล่ว',
+    atHome: 'ฝึกกิจกรรมที่ใช้มือ เช่น ต่อตัวต่อ ปั้นดินน้ำมัน หรือวาดและระบายสี',
+  },
+  score3: {
+    strength: 'เข้าใจโครงสร้างและประกอบหุ่นยนต์ได้ตามแบบอย่างมั่นใจ',
+    atHome: 'ชวนต่อบล็อกหรือของเล่นประกอบ แล้วให้น้องเล่าว่าแต่ละชิ้นทำหน้าที่อะไร',
+  },
+  score4: {
+    strength: 'เข้าใจลำดับคำสั่งและคิดอย่างเป็นเหตุเป็นผล',
+    atHome: 'เล่นเกมเรียงลำดับขั้นตอน เช่น ให้น้องบอกทางทีละคำสั่ง หรือเรียงขั้นตอนกิจวัตรประจำวัน',
+  },
+  score5: {
+    strength: 'ลองหาวิธีใหม่เมื่อเจออุปสรรค และไม่ยอมแพ้ง่าย',
+    atHome: 'เมื่อน้องเจอปัญหา ลองถามว่า "มีวิธีอื่นอีกไหม" ก่อนเข้าไปช่วย',
+  },
+  score6: {
+    strength: 'มีไอเดียเป็นของตัวเอง และต่อยอดผลงานได้อย่างสร้างสรรค์',
+    atHome: 'เปิดโอกาสให้น้องออกแบบหรือดัดแปลงของเล่นตามจินตนาการของตัวเอง',
+  },
+  score7: {
+    strength: 'เล่าและอธิบายผลงานของตัวเองได้อย่างมั่นใจ',
+    atHome: 'ชวนน้องเล่าสิ่งที่ทำในห้องเรียนให้ฟัง และชื่นชมเมื่อน้องอธิบายได้',
+  },
+};
+
+const SIZE = 240;
 const CENTER = SIZE / 2;
-const RADIUS = 105;
-const MAX_SCORE = 5;
-// Extra horizontal room so side labels ("สร้างสรรค์", "สร้างหุ่น") stay inside the chart box
-const LABEL_PAD = 30;
+const RADIUS = 88;
+const LABEL_PAD = 34;
 
 const issuedDate = new Date().toLocaleDateString('th-TH', {
   day: 'numeric',
@@ -207,10 +244,16 @@ const displayName = computed(
   () => props.child.studentName.replace(/^#\d+\s*/, '') || props.child.studentName,
 );
 
-function scoreText(value: number | undefined): string {
-  return value && value > 0 ? value.toFixed(2) : '-';
+function levelOf(score: number): string {
+  if (!score || score <= 0) return '–';
+  if (score >= 4.5) return 'ดีเยี่ยม';
+  if (score >= 4) return 'ดีมาก';
+  if (score >= 3) return 'ดี';
+  if (score >= 2) return 'พอใช้';
+  return 'กำลังพัฒนา';
 }
 
+/* ---------- radar ---------- */
 function point(index: number, ratio: number): { x: number; y: number } {
   const angle = -Math.PI / 2 + (index * 2 * Math.PI) / SKILL_DEFINITIONS.length;
   return {
@@ -220,15 +263,12 @@ function point(index: number, ratio: number): { x: number; y: number } {
 }
 const toPoints = (pts: { x: number; y: number }[]) =>
   pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-
-function ringPoints(ring: number): string {
-  return toPoints(SKILL_DEFINITIONS.map((_, i) => point(i, ring / 5)));
-}
+const ringPoints = (ring: number) => toPoints(SKILL_DEFINITIONS.map((_, i) => point(i, ring / 5)));
 
 const axes = computed(() =>
   SKILL_DEFINITIONS.map((_, i) => {
     const end = point(i, 1);
-    const label = point(i, 1.22);
+    const label = point(i, 1.2);
     const dx = label.x - CENTER;
     return {
       ...end,
@@ -238,56 +278,84 @@ const axes = computed(() =>
     };
   }),
 );
-
 const childVertices = computed(() =>
   SKILL_DEFINITIONS.map((skill, i) =>
-    point(i, Math.min((props.child.skillAverages[skill.key] || 0) / MAX_SCORE, 1)),
+    point(i, Math.min((props.child.skillAverages[skill.key] || 0) / 5, 1)),
   ),
 );
 const childPoints = computed(() => toPoints(childVertices.value));
 
-const overallPoints = computed(() => {
-  const averages = props.overallStats?.skillAverages;
-  if (!averages || !SKILL_DEFINITIONS.some((s) => (averages[s.key] || 0) > 0)) return null;
-  return toPoints(
-    SKILL_DEFINITIONS.map((skill, i) =>
-      point(i, Math.min((averages[skill.key] || 0) / MAX_SCORE, 1)),
-    ),
-  );
+/* ---------- skills ---------- */
+const skillRows = computed(() =>
+  SKILL_DEFINITIONS.map((s) => ({ ...s, avg: props.child.skillAverages[s.key] || 0 })),
+);
+const scored = computed(() =>
+  [...skillRows.value].filter((s) => s.avg > 0).sort((a, b) => b.avg - a.avg),
+);
+// Up to two clear strengths (scored "ดี" or better)
+const strengths = computed(() => scored.value.filter((s) => s.avg >= 3).slice(0, 2));
+// Up to two lowest skills that sit below the top score; never repeat a strength
+const growth = computed(() => {
+  const top = scored.value[0]?.avg ?? 0;
+  const picked = new Set(strengths.value.map((s) => s.key));
+  return [...scored.value]
+    .reverse()
+    .filter((s) => s.avg < top && !picked.has(s.key))
+    .slice(0, 2);
 });
 
-const scoredSkills = computed(() =>
-  SKILL_DEFINITIONS.map((s) => ({ ...s, avg: props.child.skillAverages[s.key] || 0 })).filter(
-    (s) => s.avg > 0,
-  ),
-);
-const topSkill = computed(() =>
-  scoredSkills.value.length
-    ? scoredSkills.value.reduce((best, s) => (s.avg > best.avg ? s : best))
-    : null,
-);
-// Only point out a growth area when the scores actually differ
-const growthSkill = computed(() => {
-  if (scoredSkills.value.length < 2) return null;
-  const low = scoredSkills.value.reduce((min, s) => (s.avg < min.avg ? s : min));
-  return low.avg < (topSkill.value?.avg ?? 0) ? low : null;
-});
-
+/* ---------- sessions ---------- */
 const completedRecords = computed(() =>
-  props.child.records.filter((r) => r.status.toLowerCase() === 'complete'),
+  props.child.records.filter((r) => r.status.toLowerCase() === 'complete' && r.averageScore > 0),
 );
+const sessionsDone = computed(
+  () => new Set(completedRecords.value.map((r) => r.sessionNumber).filter((n) => n !== null)).size,
+);
+function sessionAverage(n: number): number | null {
+  const recs = completedRecords.value.filter((r) => r.sessionNumber === n);
+  if (!recs.length) return null;
+  return recs.reduce((sum, r) => sum + r.averageScore, 0) / recs.length;
+}
 
-// Parent-facing summary first; fall back to the teacher's evaluation comment
-const notes = computed(() =>
-  props.child.records
+const trendText = computed(() => {
+  const values = Array.from({ length: 7 }, (_, i) => sessionAverage(i + 1)).filter(
+    (v): v is number => v !== null,
+  );
+  if (values.length < 2) return '';
+  const diff = values[values.length - 1]! - values[0]!;
+  if (diff >= 0.1)
+    return `คะแนนเฉลี่ยบทเรียนล่าสุดสูงขึ้น ${diff.toFixed(2)} คะแนน เมื่อเทียบกับบทเรียนแรก`;
+  if (diff <= -0.1)
+    return `คะแนนบทเรียนล่าสุดลดลง ${Math.abs(diff).toFixed(2)} คะแนน เมื่อเทียบกับบทเรียนแรก ครูจะช่วยติดตามอย่างใกล้ชิด`;
+  return 'คะแนนมีความสม่ำเสมอตลอดบทเรียนที่ผ่านมา';
+});
+
+const summarySentence = computed(() => {
+  const name = `น้อง${displayName.value}`;
+  const done = sessionsDone.value;
+  if (!scored.value.length) return `${name} เริ่มเรียนแล้ว และยังไม่มีผลการประเมินในขณะนี้`;
+  const progress =
+    done >= 7 ? 'เรียนครบทั้ง 7 บทเรียนของหลักสูตรแล้ว' : `เรียนไปแล้ว ${done} จาก 7 บทเรียน`;
+  const level = `ภาพรวมอยู่ในระดับ "${levelOf(props.child.overallAverage)}"`;
+  const best = strengths.value.map((s) => s.label);
+  const bestText = best.length ? ` โดยโดดเด่นด้าน${best.join('และ')}` : '';
+  return `${name} ${progress} ${level}${bestText}`;
+});
+
+/* ---------- teacher comments (latest two, parent-facing text first) ---------- */
+const notes = computed(() => {
+  const withText = props.child.records
     .map((r) => ({
       id: r.evaluationId,
       session: r.sessionNumber,
       date: r.sessionDate,
+      order: sheetDateValue(r.sessionDate),
       text: (r.aiMessage || r.comment || '').trim(),
     }))
-    .filter((n) => n.text),
-);
+    .filter((n) => n.text)
+    .sort((a, b) => (a.session ?? 0) - (b.session ?? 0) || a.order - b.order);
+  return withText.slice(-2);
+});
 </script>
 
 <style>
@@ -300,7 +368,7 @@ const notes = computed(() =>
 @media print {
   @page {
     size: A4;
-    margin: 12mm;
+    margin: 14mm 15mm;
   }
   body.bb-printing > *:not(.bb-print-sheet) {
     display: none !important;
@@ -322,263 +390,289 @@ const notes = computed(() =>
 }
 
 .bb-print-sheet {
-  color: #1e293b;
-  font-size: 11.5px;
-  line-height: 1.45;
+  --rp-accent: #006c0c;
+  --rp-ink: #1f2933;
+  --rp-muted: #6b7280;
+  --rp-line: #e5e7eb;
+  --rp-soft: #f4f7f4;
+  font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+  color: var(--rp-ink);
+  font-size: 12px;
+  line-height: 1.5;
 }
-.bb-print-sheet h1,
 .bb-print-sheet h2,
-.bb-print-sheet p {
+.bb-print-sheet p,
+.bb-print-sheet ul {
   margin: 0;
 }
-.bb-print-sheet .sheet-header {
+.bb-print-sheet .rp-muted {
+  color: var(--rp-muted);
+  font-size: 10.5px;
+}
+
+/* Header */
+.bb-print-sheet .rp-header {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding-bottom: 10px;
-  border-bottom: 3px solid #006c0c;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid var(--rp-accent);
 }
-.bb-print-sheet .sheet-logo {
-  height: 46px;
+.bb-print-sheet .rp-logo {
+  height: 40px;
 }
-.bb-print-sheet .sheet-title {
+.bb-print-sheet .rp-header-text {
   flex: 1;
 }
-.bb-print-sheet .sheet-title h1 {
-  font-size: 20px;
-  font-weight: 800;
-  color: #006c0c;
+.bb-print-sheet .rp-doc-title {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
 }
-.bb-print-sheet .sheet-title p {
-  color: #64748b;
+.bb-print-sheet .rp-doc-sub {
+  color: var(--rp-muted);
+  font-size: 11px;
 }
-.bb-print-sheet .sheet-issued {
+.bb-print-sheet .rp-date {
   text-align: right;
-  color: #64748b;
-  font-size: 10.5px;
+  font-size: 11.5px;
 }
 
-.bb-print-sheet .sheet-student {
+/* Student */
+.bb-print-sheet .rp-student {
   display: grid;
-  grid-template-columns: 1.4fr 1.4fr 1.2fr 1fr;
-  gap: 10px;
-  margin: 12px 0;
-  padding: 10px 12px;
-  background: #f1f8f2;
-  border-radius: 8px;
+  grid-template-columns: 1fr auto auto;
+  gap: 28px;
+  align-items: end;
+  padding: 12px 0 10px;
 }
-.bb-print-sheet .label {
-  font-size: 10px;
-  color: #64748b;
-}
-.bb-print-sheet .value {
+.bb-print-sheet .rp-name {
+  font-size: 22px;
   font-weight: 700;
+  line-height: 1.25;
 }
-.bb-print-sheet .value--name {
-  font-size: 14px;
-  color: #006c0c;
+.bb-print-sheet .rp-course {
+  color: var(--rp-muted);
 }
-.bb-print-sheet .value--score {
-  font-size: 16px;
-  color: #006c0c;
+.bb-print-sheet .rp-stat {
+  text-align: right;
 }
-.bb-print-sheet .value small {
-  font-weight: 400;
-  color: #64748b;
-}
-.bb-print-sheet .pill {
-  display: inline-block;
-  margin-left: 4px;
-  padding: 0 6px;
-  border-radius: 999px;
-  font-size: 9.5px;
+.bb-print-sheet .rp-stat-value {
   font-weight: 600;
 }
-.bb-print-sheet .pill--done {
-  background: #dcfce7;
-  color: #166534;
+.bb-print-sheet .rp-dots {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin: 5px 0 3px;
 }
-.bb-print-sheet .pill--progress {
-  background: #fef3c7;
-  color: #92400e;
+.bb-print-sheet .rp-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid #c7cdd3;
+}
+.bb-print-sheet .rp-dot--on {
+  background: var(--rp-accent);
+  border-color: var(--rp-accent);
+}
+.bb-print-sheet .rp-overall {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--rp-accent);
+}
+.bb-print-sheet .rp-overall small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--rp-muted);
 }
 
-.bb-print-sheet .sheet-skills {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 16px;
-  align-items: center;
+.bb-print-sheet .rp-summary {
+  padding: 10px 14px;
+  background: var(--rp-soft);
+  border-left: 3px solid var(--rp-accent);
+  border-radius: 2px;
+  font-size: 12.5px;
+}
+
+/* Sections */
+.bb-print-sheet .rp-section {
+  margin-top: 13px;
   break-inside: avoid;
 }
-.bb-print-sheet .radar svg {
-  width: 100%;
-  height: auto;
-  overflow: visible;
+.bb-print-sheet .rp-h2 {
+  /* Quasar's global h2 sets a 3.75rem line-height and letter-spacing; reset them */
+  line-height: 1.4;
+  letter-spacing: normal;
+  font-size: 13px;
+  font-weight: 700;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--rp-line);
 }
-.bb-print-sheet .radar-ring {
-  fill: none;
-  stroke: #e2e8f0;
-  stroke-width: 1;
-}
-.bb-print-sheet .radar-axis {
-  stroke: #e2e8f0;
-  stroke-width: 1;
-}
-.bb-print-sheet .radar-overall {
-  fill: none;
-  stroke: #bc0100;
-  stroke-width: 1.5;
-  stroke-dasharray: 4 3;
-}
-.bb-print-sheet .radar-child {
-  fill: rgb(0 108 12 / 22%);
-  stroke: #006c0c;
-  stroke-width: 2;
-}
-.bb-print-sheet .radar-dot {
-  fill: #006c0c;
-}
-.bb-print-sheet .radar-label {
-  font-size: 11px;
-  font-weight: 600;
-  fill: #334155;
-}
-.bb-print-sheet .radar-legend {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  font-size: 10px;
-  color: #475569;
-}
-.bb-print-sheet .swatch {
-  display: inline-block;
-  width: 14px;
-  height: 0;
-  margin-right: 4px;
-  vertical-align: middle;
-  border-top: 2px solid #006c0c;
-}
-.bb-print-sheet .swatch--overall {
-  border-top: 2px dashed #bc0100;
+.bb-print-sheet .rp-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
 }
 
-.bb-print-sheet table {
+/* Skills */
+.bb-print-sheet .rp-skills {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 20px;
+  align-items: center;
+}
+.bb-print-sheet .rp-radar {
+  width: 100%;
+  height: auto;
+}
+.bb-print-sheet .rp-radar-ring {
+  fill: none;
+  stroke: var(--rp-line);
+  stroke-width: 0.8;
+}
+.bb-print-sheet .rp-radar-ring--outer {
+  stroke: #d1d5db;
+}
+.bb-print-sheet .rp-radar-axis {
+  stroke: var(--rp-line);
+  stroke-width: 0.8;
+}
+.bb-print-sheet .rp-radar-shape {
+  fill: rgb(0 108 12 / 16%);
+  stroke: var(--rp-accent);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+.bb-print-sheet .rp-radar-point {
+  fill: var(--rp-accent);
+}
+.bb-print-sheet .rp-radar-label {
+  font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+  font-size: 10.5px;
+  fill: #374151;
+}
+.bb-print-sheet .rp-skill-table {
   width: 100%;
   border-collapse: collapse;
 }
-.bb-print-sheet th {
-  text-align: left;
-  font-weight: 600;
-  color: #475569;
-  background: #f8fafc;
-  border-bottom: 1px solid #cbd5e1;
-  padding: 5px 6px;
+.bb-print-sheet .rp-skill-table td {
+  padding: 3.5px 0;
+  border-bottom: 1px solid #f0f1f3;
+  vertical-align: middle;
 }
-.bb-print-sheet td {
-  padding: 5px 6px;
-  border-bottom: 1px solid #e2e8f0;
+.bb-print-sheet .rp-skill-name {
+  width: 34%;
 }
-.bb-print-sheet .num {
-  text-align: center;
+.bb-print-sheet .rp-skill-bar {
+  padding-right: 12px !important;
 }
-.bb-print-sheet .strong {
-  font-weight: 700;
-  color: #006c0c;
-}
-.bb-print-sheet .nowrap {
-  white-space: nowrap;
-}
-.bb-print-sheet .empty {
-  text-align: center;
-  color: #94a3b8;
-}
-.bb-print-sheet .bar-col {
-  width: 38%;
-}
-.bb-print-sheet .bar {
-  height: 7px;
-  border-radius: 4px;
-  background: #e2e8f0;
+.bb-print-sheet .rp-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #eceff1;
   overflow: hidden;
 }
-.bb-print-sheet .bar-fill {
+.bb-print-sheet .rp-bar-fill {
   height: 100%;
-  border-radius: 4px;
+  border-radius: 3px;
+  background: var(--rp-accent);
 }
-.bb-print-sheet .tag {
-  margin-left: 4px;
-  padding: 0 5px;
-  border-radius: 4px;
-  font-size: 9px;
+.bb-print-sheet .rp-skill-score {
+  width: 34px;
+  text-align: right;
   font-weight: 700;
 }
-.bb-print-sheet .tag--top {
-  background: #dcfce7;
-  color: #166534;
+.bb-print-sheet .rp-skill-level {
+  width: 82px;
+  text-align: right;
+  color: var(--rp-muted);
 }
-.bb-print-sheet .tag--grow {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.bb-print-sheet .sheet-summary {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin: 12px 0;
-  break-inside: avoid;
-}
-.bb-print-sheet .summary-box {
-  padding: 8px 10px;
-  border-radius: 8px;
-}
-.bb-print-sheet .summary-box--top {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-}
-.bb-print-sheet .summary-box--grow {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-}
-.bb-print-sheet .summary-head {
-  font-size: 10px;
-  font-weight: 700;
-  color: #475569;
-}
-.bb-print-sheet .summary-skill {
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.bb-print-sheet h2 {
-  font-size: 13px;
-  font-weight: 700;
-  color: #006c0c;
-  margin: 14px 0 6px;
-}
-.bb-print-sheet .session-table {
-  font-size: 10.5px;
-  break-inside: avoid;
-}
-.bb-print-sheet .note {
-  padding: 6px 0;
-  border-bottom: 1px solid #e2e8f0;
-  break-inside: avoid;
-}
-.bb-print-sheet .note-head {
-  font-weight: 700;
-  font-size: 10.5px;
-  color: #475569;
-}
-.bb-print-sheet .note p {
-  white-space: pre-line;
-}
-.bb-print-sheet .sheet-footer {
-  margin-top: 16px;
-  padding-top: 6px;
-  border-top: 1px solid #e2e8f0;
-  text-align: center;
+.bb-print-sheet .rp-scale {
+  margin-top: 6px;
   font-size: 9.5px;
-  color: #94a3b8;
+  color: var(--rp-muted);
+  text-align: right;
+}
+
+/* Lists */
+.bb-print-sheet .rp-list {
+  padding-left: 16px;
+}
+.bb-print-sheet .rp-list li {
+  margin-bottom: 4px;
+}
+
+/* Sessions */
+.bb-print-sheet .rp-session-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: center;
+}
+.bb-print-sheet .rp-session-table th {
+  font-weight: 400;
+  font-size: 10.5px;
+  color: var(--rp-muted);
+  padding: 3px 0;
+}
+.bb-print-sheet .rp-session-table td {
+  font-weight: 700;
+  padding: 6px 0;
+  border: 1px solid var(--rp-line);
+}
+.bb-print-sheet .rp-session-table td.rp-empty {
+  font-weight: 400;
+  color: #c0c6cc;
+}
+.bb-print-sheet .rp-trend {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--rp-muted);
+}
+
+/* Notes */
+.bb-print-sheet .rp-note + .rp-note {
+  margin-top: 8px;
+}
+.bb-print-sheet .rp-note-head {
+  font-size: 10.5px;
+  color: var(--rp-muted);
+}
+.bb-print-sheet .rp-note-text {
+  white-space: pre-line;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Footer */
+.bb-print-sheet .rp-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 60px;
+  margin-top: 22px;
+  break-inside: avoid;
+}
+.bb-print-sheet .rp-sign {
+  flex: 1;
+  max-width: 220px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--rp-muted);
+}
+.bb-print-sheet .rp-sign-line {
+  height: 26px;
+  border-bottom: 1px dotted #9ca3af;
+  margin-bottom: 4px;
+}
+.bb-print-sheet .rp-brand {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 9px;
+  color: #9ca3af;
 }
 </style>
