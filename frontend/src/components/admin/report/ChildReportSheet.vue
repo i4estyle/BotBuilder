@@ -16,33 +16,34 @@
       </header>
 
       <!-- Student -->
-      <section class="rp-student">
-        <div class="rp-student-main">
-          <div class="rp-muted">ชื่อผู้เรียน</div>
-          <div class="rp-name">{{ displayName }}</div>
-          <div v-if="child.courseTitle" class="rp-course">{{ child.courseTitle }}</div>
-        </div>
-        <div class="rp-stat">
-          <div class="rp-muted">ความก้าวหน้า</div>
-          <div class="rp-dots" :aria-label="`${sessionsDone} จาก 7 บทเรียน`">
-            <span
-              v-for="n in 7"
-              :key="n"
-              class="rp-dot"
-              :class="{ 'rp-dot--on': sessionAverage(n) !== null }"
-            ></span>
-          </div>
-          <div class="rp-stat-value">{{ sessionsDone }} / 7 บทเรียน</div>
-        </div>
-        <div class="rp-stat">
-          <div class="rp-muted">ผลการเรียนโดยรวม</div>
-          <div class="rp-overall">
-            {{ child.overallAverage > 0 ? child.overallAverage.toFixed(2) : '–' }}
-            <small>/ 5</small>
-          </div>
-          <div class="rp-stat-value">{{ levelOf(child.overallAverage) }}</div>
-        </div>
-      </section>
+      <table class="rp-info">
+        <tbody>
+          <tr>
+            <th>ชื่อผู้เรียน</th>
+            <td>{{ displayName }}</td>
+            <th>หลักสูตร</th>
+            <td>{{ child.courseTitle || '–' }}</td>
+          </tr>
+          <tr>
+            <th>จำนวนบทเรียน</th>
+            <td>
+              {{ sessionsDone }} จาก 7 บทเรียน
+              <span class="rp-info-note">{{
+                sessionsDone >= 7 ? '(ครบหลักสูตร)' : '(อยู่ระหว่างเรียน)'
+              }}</span>
+            </td>
+            <th>ผลการเรียนโดยรวม</th>
+            <td>
+              <template v-if="child.overallAverage > 0">
+                {{ child.overallAverage.toFixed(2) }} จาก 5.00 · ระดับ{{
+                  levelOf(child.overallAverage)
+                }}
+              </template>
+              <template v-else>ยังไม่มีผลการประเมิน</template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <!-- Summary sentence -->
       <p class="rp-summary">{{ summarySentence }}</p>
@@ -394,7 +395,6 @@ const notes = computed(() => {
   --rp-ink: #1f2933;
   --rp-muted: #6b7280;
   --rp-line: #e5e7eb;
-  --rp-soft: #f4f7f4;
   font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
   color: var(--rp-ink);
   font-size: 12px;
@@ -438,62 +438,36 @@ const notes = computed(() => {
   font-size: 11.5px;
 }
 
-/* Student */
-.bb-print-sheet .rp-student {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 28px;
-  align-items: end;
-  padding: 12px 0 10px;
+/* Student information: a plain bordered form-style table */
+.bb-print-sheet .rp-info {
+  width: 100%;
+  margin-top: 14px;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
-.bb-print-sheet .rp-name {
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.25;
+.bb-print-sheet .rp-info th,
+.bb-print-sheet .rp-info td {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  text-align: left;
+  vertical-align: middle;
 }
-.bb-print-sheet .rp-course {
-  color: var(--rp-muted);
-}
-.bb-print-sheet .rp-stat {
-  text-align: right;
-}
-.bb-print-sheet .rp-stat-value {
+.bb-print-sheet .rp-info th {
+  width: 19%;
   font-weight: 600;
+  color: #374151;
+  background: #f7f8f9;
 }
-.bb-print-sheet .rp-dots {
-  display: flex;
-  justify-content: flex-end;
-  gap: 4px;
-  margin: 5px 0 3px;
+.bb-print-sheet .rp-info td {
+  width: 31%;
 }
-.bb-print-sheet .rp-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 1px solid #c7cdd3;
-}
-.bb-print-sheet .rp-dot--on {
-  background: var(--rp-accent);
-  border-color: var(--rp-accent);
-}
-.bb-print-sheet .rp-overall {
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--rp-accent);
-}
-.bb-print-sheet .rp-overall small {
-  font-size: 12px;
-  font-weight: 400;
+.bb-print-sheet .rp-info-note {
   color: var(--rp-muted);
 }
 
 .bb-print-sheet .rp-summary {
-  padding: 10px 14px;
-  background: var(--rp-soft);
-  border-left: 3px solid var(--rp-accent);
-  border-radius: 2px;
-  font-size: 12.5px;
+  margin-top: 10px;
+  text-indent: 2em;
 }
 
 /* Sections */
