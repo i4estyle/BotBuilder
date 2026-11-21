@@ -88,8 +88,8 @@
 
           <h2>7. ติดต่อเรา</h2>
           <p>
-            หากมีคำถามเกี่ยวกับนโยบายนี้ ติดต่อได้ที่
-            <a :href="`mailto:${contactEmail}`">{{ contactEmail }}</a>
+            หากมีคำถามเกี่ยวกับนโยบายนี้ ติดต่อเราได้ตามช่องทางที่แสดงในหน้า
+            <RouterLink to="/about-us">เกี่ยวกับเรา</RouterLink>
           </p>
 
           <h2>8. การเปลี่ยนแปลงนโยบาย</h2>
@@ -106,6 +106,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { RouterLink } from 'vue-router';
 import PageHero from '@/components/landing/PageHero.vue';
 import SiteFooter from '@/components/landing/SiteFooter.vue';
 import SiteHeader from '@/components/landing/SiteHeader.vue';
@@ -113,7 +114,6 @@ import { useWebsiteEditor } from '@/composables/use-website-editor';
 
 const lastUpdated = '21 พฤศจิกายน 2569';
 const siteHost = 'www.botbuilderthailand.com';
-const contactEmail = 'hello@botbuilder.co.th';
 
 const { editorLocale, fetchPageData } = useWebsiteEditor();
 
