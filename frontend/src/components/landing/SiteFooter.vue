@@ -31,6 +31,7 @@
         footerData.promotion || 'โปรโมชั่น'
       }}</RouterLink>
       <a href="mailto:hello@botbuilder.co.th">hello@botbuilder.co.th</a>
+      <RouterLink to="/privacy-policy">นโยบายความเป็นส่วนตัว</RouterLink>
     </div>
     <p class="site-footer__copyright" :style="getStyleOverride('footer.copyright')">
       {{ footerData.copyright || '© 2024 Bot Builder Academy. Built for future engineers.' }}

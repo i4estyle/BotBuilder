@@ -59,6 +59,14 @@ const routes: RouteRecordRaw[] = [
           seo: publicSeo('/about-us'),
         },
       },
+      {
+        path: 'privacy-policy',
+        name: 'privacy-policy',
+        component: () => import('@/pages/PrivacyPolicyPage.vue'),
+        meta: {
+          seo: publicSeo('/privacy-policy'),
+        },
+      },
     ],
   },
   {

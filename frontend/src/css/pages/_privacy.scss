@@ -1,0 +1,36 @@
+.privacy-policy__body {
+  max-width: 760px;
+  margin: 0 auto;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.8;
+
+  h2 {
+    margin: 40px 0 12px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--green);
+  }
+
+  h3 {
+    margin: 20px 0 8px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  p,
+  ul {
+    margin: 0 0 12px;
+  }
+
+  ul {
+    padding-left: 1.4em;
+  }
+
+  a {
+    color: var(--green);
+    word-break: break-word;
+  }
+}

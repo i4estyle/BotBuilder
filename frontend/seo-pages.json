@@ -26,6 +26,11 @@
       "path": "/about-us",
       "title": "เกี่ยวกับ BotBuilder Thailand | สถาบันหุ่นยนต์เด็ก",
       "description": "รู้จัก BotBuilder Thailand สถาบันพัฒนาทักษะเด็กด้านหุ่นยนต์ Coding และ STEM พร้อมสาขาบางแสนและศรีราชา"
+    },
+    {
+      "path": "/privacy-policy",
+      "title": "นโยบายความเป็นส่วนตัว | BotBuilder Thailand",
+      "description": "นโยบายความเป็นส่วนตัวของ BotBuilder Thailand อธิบายการเก็บ ใช้ และคุ้มครองข้อมูลส่วนบุคคลของผู้ใช้งานเว็บไซต์"
     }
   ]
 }

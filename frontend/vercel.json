@@ -140,9 +140,12 @@
       "destination": "/about-us/index.html"
     },
     {
+      "source": "/privacy-policy",
+      "destination": "/privacy-policy/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
 }
-
