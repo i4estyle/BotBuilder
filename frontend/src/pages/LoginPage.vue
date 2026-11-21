@@ -45,16 +45,17 @@
         />
         <div v-if="googleClientId" class="login-card__oauth">
           <div class="login-card__divider"><span>หรือ</span></div>
-          <q-btn
-            outline
-            no-caps
-            icon="img:https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-            label="เข้าสู่ระบบด้วย Google"
-            :disable="loading || googleLoading"
-            :loading="googleLoading"
+          <!-- Google renders its official button into this element. -->
+          <div
+            ref="googleButton"
             class="login-card__google"
-            @click="signInWithGoogle"
+            :class="{ 'login-card__google--busy': googleLoading || loading }"
           />
+          <q-linear-progress v-if="googleLoading" indeterminate color="primary" />
+          <q-skeleton v-if="!googleReady && !googleUnavailable" type="QBtn" height="40px" />
+          <p v-if="googleUnavailable" class="login-card__google-error">
+            โหลดปุ่ม Google Sign-In ไม่สำเร็จ กรุณารีเฟรชหน้า หรือเข้าสู่ระบบด้วยรหัสผ่าน
+          </p>
         </div>
         <p class="login-card__switch">
           <RouterLink to="/admin/forgot-password">ลืมรหัสผ่าน?</RouterLink>
@@ -65,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import logo from '@/assets/landing/logo.png';
@@ -79,6 +80,9 @@ const password = ref('');
 const showPassword = ref(false);
 const loading = ref(false);
 const googleLoading = ref(false);
+const googleReady = ref(false);
+const googleUnavailable = ref(false);
+const googleButton = ref<HTMLElement | null>(null);
 const errorMessage = ref('');
 const required = (value: string) => !!value || 'กรุณากรอกข้อมูล';
 
@@ -97,14 +101,21 @@ interface GoogleAccountsId {
   initialize(config: {
     client_id: string;
     callback: (response: GoogleCredentialResponse) => void;
+    ux_mode?: 'popup' | 'redirect';
   }): void;
-  prompt(listener?: (notification: GooglePromptMomentNotification) => void): void;
-}
-interface GooglePromptMomentNotification {
-  isNotDisplayed?(): boolean;
-  isSkippedMoment(): boolean;
-  isDismissedMoment(): boolean;
-  getDismissedReason(): string;
+  renderButton(
+    parent: HTMLElement,
+    options: {
+      type?: 'standard' | 'icon';
+      theme?: 'outline' | 'filled_blue' | 'filled_black';
+      size?: 'large' | 'medium' | 'small';
+      text?: 'signin_with' | 'signup_with' | 'continue_with' | 'signin';
+      shape?: 'rectangular' | 'pill' | 'circle' | 'square';
+      logo_alignment?: 'left' | 'center';
+      width?: number;
+      locale?: string;
+    },
+  ): void;
 }
 declare global {
   interface Window {
@@ -136,44 +147,49 @@ function loadGoogleIdentity(): Promise<void> {
   });
 }
 
-async function signInWithGoogle(): Promise<void> {
+/**
+ * Renders Google's own "Sign in with Google" button. It opens a popup on click, so
+ * unlike One Tap (`prompt()`) it isn't silently suppressed after a dismissal or
+ * when the browser blocks third-party sign-in.
+ */
+async function renderGoogleButton(): Promise<void> {
   if (!googleClientId) return;
-  googleLoading.value = true;
-  errorMessage.value = '';
   try {
     await loadGoogleIdentity();
-    window.google?.accounts.id.initialize({
+    const container = googleButton.value;
+    const accounts = window.google?.accounts.id;
+    if (!container || !accounts) return;
+    accounts.initialize({
       client_id: googleClientId,
+      ux_mode: 'popup',
       callback: ({ credential }) => {
         void completeGoogleSignIn(credential);
       },
     });
-    window.google?.accounts.id.prompt((notification) => {
-      // One Tap can be suppressed (cooldown after a dismissal, blocked third-party
-      // sign-in) or closed without a credential; the callback then never fires, so
-      // release the button instead of spinning forever.
-      const closedWithoutCredential =
-        notification.isDismissedMoment() &&
-        notification.getDismissedReason() !== 'credential_returned';
-      if (
-        notification.isNotDisplayed?.() ||
-        notification.isSkippedMoment() ||
-        closedWithoutCredential
-      ) {
-        googleLoading.value = false;
-        if (!closedWithoutCredential) {
-          errorMessage.value =
-            'เบราว์เซอร์ไม่แสดงหน้าต่าง Google Sign-In กรุณาลองใหม่ หรือเข้าสู่ระบบด้วยรหัสผ่าน';
-        }
-      }
+    accounts.renderButton(container, {
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      text: 'signin_with',
+      shape: 'rectangular',
+      logo_alignment: 'center',
+      // Google caps the width at 400px.
+      width: Math.min(Math.max(container.clientWidth, 200), 400),
+      locale: 'th',
     });
+    googleReady.value = true;
   } catch {
-    errorMessage.value = 'ไม่สามารถเปิด Google Sign-In ได้ กรุณาลองใหม่';
-    googleLoading.value = false;
+    googleUnavailable.value = true;
   }
 }
 
+onMounted(() => {
+  void renderGoogleButton();
+});
+
 async function completeGoogleSignIn(credential: string): Promise<void> {
+  googleLoading.value = true;
+  errorMessage.value = '';
   try {
     await auth.loginWithGoogle(credential);
     await router.replace(redirectTarget());

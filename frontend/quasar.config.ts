@@ -32,6 +32,13 @@ export default defineConfig(() => {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {
+      // Quasar app-vite v3 only exposes `QCLI_`-prefixed variables to client code by
+      // default, which silently dropped VITE_API_URL / VITE_GOOGLE_CLIENT_ID from
+      // .env files. Only public values may use this prefix.
+      env: {
+        clientPrefix: 'VITE_',
+      },
+
       target: {
         // browser: 'baseline-widely-available',
         // node: 'node22'

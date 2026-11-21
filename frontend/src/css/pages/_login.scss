@@ -98,12 +98,23 @@
     }
   }
 
+  // Container for Google's rendered "Sign in with Google" button (an iframe).
   &__google {
-    height: 44px;
-    border-radius: 10px;
-    color: #374151;
-    border-color: #d1d5db;
-    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+
+    &--busy {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+
+  &__google-error {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #b3261e;
+    text-align: center;
   }
   &__switch {
     font-size: 0.9rem;
