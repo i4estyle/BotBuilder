@@ -31,7 +31,10 @@ export const ghostBlockType = ref<'text' | 'image' | 'icon' | 'shape' | null>(nu
 export const activeSectionId = ref<string>('');
 export const selectedBlockId = ref<string>('');
 export const viewportMode = ref<ViewportMode>('desktop');
-export const editMode = ref<EditMode>('edit');
+// Public pages share this state, so editing must be opted into by the admin editor page.
+export const editMode = ref<EditMode>('view');
+// True when the editor holds changes that have not been saved to the backend yet.
+export const isDirty = ref(false);
 export const isMobileNavOpen = ref(false);
 
 export const themeSettings = reactive<ThemeSettings>({

@@ -1,7 +1,7 @@
 <template>
   <q-page class="landing-page resources-page">
     <main>
-      <template v-for="item in navSections" :key="item.id">
+      <template v-for="item in visibleNavSections" :key="item.id">
         <SiteHeader v-if="item.id === 'header'" />
         <section v-else-if="item.id === 'resourcesHero'" style="position: relative">
           <PageHero
@@ -37,25 +37,14 @@
           </div>
           <AdminSectionBlockLayer section-id="resourcesList" />
         </section>
-        <section
-          v-else-if="item.isCustomPage"
+        <CustomSection
+          v-else-if="item.isCustomPage && getCustomBlock(item.id)"
           :id="item.id"
-          class="section custom-section"
+          :block="getCustomBlock(item.id)!"
           data-reveal
         >
-          <SectionHeading :title="item.title" />
-          <div v-if="getCustomBlock(item.id)?.type === 'text'" class="custom-section__text">
-            <p>{{ getCustomBlock(item.id)?.content }}</p>
-          </div>
-          <div v-else-if="getCustomBlock(item.id)?.type === 'image'" class="custom-section__image">
-            <img
-              :src="resolveAssetUrl(getCustomBlock(item.id)?.image || '')"
-              :alt="item.title"
-              style="max-width: 100%; border-radius: 12px"
-            />
-          </div>
           <AdminSectionBlockLayer :section-id="item.id" />
-        </section>
+        </CustomSection>
         <SiteFooter v-else-if="item.id === 'footer'" />
       </template>
     </main>
@@ -65,17 +54,16 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, watch } from 'vue';
 import PageHero from '@/components/landing/PageHero.vue';
-import SectionHeading from '@/components/landing/SectionHeading.vue';
 import SiteFooter from '@/components/landing/SiteFooter.vue';
 import SiteHeader from '@/components/landing/SiteHeader.vue';
+import CustomSection from '@/components/landing/CustomSection.vue';
 import AdminSectionBlockLayer from '@/components/admin/sections/common/admin-section-block-layer.vue';
 import { useWebsiteEditor } from '@/composables/use-website-editor';
-import { resolveAssetUrl } from '@/utils/asset-helper';
 
 const {
   resourcesPage: resourcesPageData,
   customBlocks,
-  navSections,
+  visibleNavSections,
   editorLocale,
   fetchPageData,
   getStyleOverride,

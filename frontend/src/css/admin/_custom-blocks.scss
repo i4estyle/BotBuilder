@@ -70,3 +70,150 @@
   border-radius: 8px;
   border: 1px solid #e2e8f0;
 }
+
+// ---- User-created sections: editor UI ----
+
+.admin-preview-scroll-wrapper--mobile .custom-section__split {
+  grid-template-columns: 1fr;
+  gap: 28px;
+
+  &--reverse .custom-section__split-media {
+    order: 0;
+  }
+}
+
+.admin-preview-empty {
+  margin: 48px auto;
+  max-width: 420px;
+  padding: 24px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 16px;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.admin-sidebar-add-section-wrap {
+  padding: 12px 12px 0;
+}
+
+.admin-sidebar-add-section-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1.5px dashed #94a3b8;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #334155;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 180ms ease;
+
+  &:hover {
+    border-color: #16a34a;
+    background: #f0fdf4;
+    color: #15803d;
+  }
+}
+
+.admin-nav-tree-item {
+  &--hidden {
+    opacity: 0.55;
+
+    .admin-nav-tree-item__label {
+      text-decoration: line-through;
+    }
+  }
+
+  &__tag {
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 10px;
+    font-weight: 700;
+    vertical-align: middle;
+  }
+}
+
+.admin-toolbar__save-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #16a34a;
+
+  &--dirty {
+    color: #d97706;
+  }
+}
+
+.admin-add-section-modal {
+  width: 560px;
+
+  &__templates {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  &__template {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #334155;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: all 150ms ease;
+
+    strong {
+      font-size: 14px;
+    }
+
+    span {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    &:hover {
+      border-color: #86efac;
+    }
+
+    &--selected {
+      border-color: #16a34a;
+      background: #f0fdf4;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+      color: #15803d;
+    }
+  }
+
+  &__note {
+    display: flex;
+    gap: 6px;
+    margin: 4px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #64748b;
+  }
+}
+
+.admin-edit-toggle {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}

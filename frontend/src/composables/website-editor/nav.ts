@@ -9,7 +9,8 @@ import {
   contentState,
 } from './state';
 import { saveHistorySnapshot } from './history';
-import type { ActivePage, EditorLocale, CustomBlock } from './types';
+import { createCustomSection, getCustomSectionIcon } from './custom-sections';
+import type { ActivePage, CustomBlockItem, CustomSectionLayout } from './types';
 
 export function setActivePage(page: ActivePage): void {
   activePage.value = page;
@@ -58,73 +59,82 @@ export function saveCurrentStateToMap(): void {
   if (contentState.aboutPage) Object.assign(current.aboutPage, contentState.aboutPage);
 }
 
-export function setEditorLocale(newLocale: EditorLocale): void {
-  if (editorLocale.value === newLocale) return;
-  saveCurrentStateToMap();
-  editorLocale.value = newLocale;
-  syncActiveContentToTarget(contentStateMap[newLocale]);
-  const sections = getFallbackNavSections(activePage.value, newLocale);
-  navSections.splice(0, navSections.length, ...sections);
+/** Sections that must always stay on the page (site navigation). */
+export const LOCKED_SECTION_IDS = new Set(['header', 'footer']);
+
+function createCustomSectionId(): string {
+  return `custom-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-export function addNewPageSection(): void {
+/**
+ * Adds a user-created section to the current page and returns its id.
+ * When `afterSectionId` is omitted the section is placed just above the footer.
+ */
+export function addCustomSection(layout: CustomSectionLayout, afterSectionId?: string): string {
   saveHistorySnapshot();
-  const pageId = `page-${Date.now()}`;
-  const customPageCount = navSections.filter((s) => s.isCustomPage).length + 1;
-  const newTitle = `หน้าใหม่ ${customPageCount}`;
+  const id = createCustomSectionId();
+  const block = createCustomSection(id, layout);
+  customBlocks.push(block);
 
-  customBlocks.push({
-    id: pageId,
-    type: 'text',
-    title: newTitle,
-    content:
-      'นี่คือหน้าใหม่ที่เพิ่มเข้ามา สามารถคลิกพิมพ์แก้ไขข้อความ หรือเพิ่มรูปภาพและองค์ประกอบต่าง ๆ ได้อย่างอิสระ',
-  });
-
-  navSections.push({
-    id: pageId,
-    title: newTitle,
-    icon: 'article',
-    color: 'green',
-    isCustomPage: true,
-  });
-
-  activeSectionId.value = pageId;
-}
-
-export function insertCustomBlockAt(targetIndex: number, blockType: 'text' | 'image'): void {
-  saveHistorySnapshot();
-  const pageId = `page-${Date.now()}`;
-  const customPageCount = navSections.filter((s) => s.isCustomPage).length + 1;
-  const newTitle =
-    blockType === 'text' ? `บล็อกข้อความ ${customPageCount}` : `บล็อกรูปภาพ ${customPageCount}`;
-
-  const blockObj: CustomBlock = {
-    id: pageId,
-    type: blockType,
-    title: newTitle,
-  };
-  if (blockType === 'text') {
-    blockObj.content = 'พิมพ์ข้อความเนื้อหาใหม่ตรงนี้ สามารถแก้ไขได้โดยตรงบนหน้าจอ...';
+  let insertPos = navSections.length;
+  const afterIndex = afterSectionId ? navSections.findIndex((s) => s.id === afterSectionId) : -1;
+  if (afterIndex >= 0) {
+    insertPos = afterIndex + 1;
   } else {
-    blockObj.image =
-      'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80';
+    const footerIndex = navSections.findIndex((s) => s.id === 'footer');
+    if (footerIndex >= 0) insertPos = footerIndex;
   }
-
-  customBlocks.push(blockObj);
-
-  const insertPos =
-    targetIndex >= 0 && targetIndex <= navSections.length ? targetIndex : navSections.length;
+  // Never place anything above the header or below the footer.
+  const headerIndex = navSections.findIndex((s) => s.id === 'header');
+  if (headerIndex >= 0 && insertPos <= headerIndex) insertPos = headerIndex + 1;
+  const footerIndex = navSections.findIndex((s) => s.id === 'footer');
+  if (footerIndex >= 0 && insertPos > footerIndex) insertPos = footerIndex;
 
   navSections.splice(insertPos, 0, {
-    id: pageId,
-    title: newTitle,
-    icon: blockType === 'text' ? 'text_fields' : 'image',
+    id,
+    title: block.title,
+    icon: getCustomSectionIcon(layout),
     color: 'green',
     isCustomPage: true,
   });
 
-  activeSectionId.value = pageId;
+  activeSectionId.value = id;
+  return id;
+}
+
+export function duplicateCustomSection(id: string): string {
+  const source = customBlocks.find((b) => b.id === id);
+  const navIndex = navSections.findIndex((s) => s.id === id);
+  const navItem = navSections[navIndex];
+  if (!source || !navItem) return '';
+  saveHistorySnapshot();
+  const newId = createCustomSectionId();
+  const copy: CustomBlockItem = JSON.parse(JSON.stringify(source));
+  copy.id = newId;
+  copy.title = `${source.title} (สำเนา)`;
+  customBlocks.push(copy);
+  navSections.splice(navIndex + 1, 0, { ...navItem, id: newId, title: copy.title, hidden: false });
+  activeSectionId.value = newId;
+  return newId;
+}
+
+export function toggleSectionHidden(id: string): void {
+  if (LOCKED_SECTION_IDS.has(id)) return;
+  const item = navSections.find((s) => s.id === id);
+  if (!item) return;
+  saveHistorySnapshot();
+  item.hidden = !item.hidden;
+  if (item.hidden && activeSectionId.value === id) {
+    activeSectionId.value = '';
+  }
+}
+
+/** Keeps the sidebar label in sync when a custom section title is edited inline. */
+export function syncCustomSectionTitle(id: string, title: string): void {
+  const item = navSections.find((s) => s.id === id);
+  if (item && item.isCustomPage && title.trim()) {
+    item.title = title.trim();
+  }
 }
 
 export function updateSectionTitle(id: string, newTitle: string): void {
@@ -179,15 +189,24 @@ export function reorderNavSections(fromIndex: number, toIndex: number): void {
   ) {
     return;
   }
-  saveHistorySnapshot();
   const item = navSections[fromIndex];
-  if (item) {
-    navSections.splice(fromIndex, 1);
-    navSections.splice(toIndex, 0, item);
-  }
+  // Header and footer stay pinned to the top and bottom of the page.
+  if (!item || LOCKED_SECTION_IDS.has(item.id)) return;
+  const headerIndex = navSections.findIndex((s) => s.id === 'header');
+  const footerIndex = navSections.findIndex((s) => s.id === 'footer');
+  let target = toIndex;
+  if (headerIndex >= 0 && target <= headerIndex) target = headerIndex + 1;
+  if (footerIndex >= 0 && target >= footerIndex) target = footerIndex - 1;
+  if (target === fromIndex) return;
+  saveHistorySnapshot();
+  navSections.splice(fromIndex, 1);
+  navSections.splice(target, 0, item);
 }
 
+/** Permanently removes a user-created section. Built-in sections can only be hidden. */
 export function removeSection(id: string): void {
+  const navItem = navSections.find((s) => s.id === id);
+  if (!navItem?.isCustomPage) return;
   saveHistorySnapshot();
   const index = customBlocks.findIndex((b) => b.id === id);
   if (index !== -1) {

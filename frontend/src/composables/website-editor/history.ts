@@ -4,26 +4,45 @@ import {
   activePage,
   customBlocks,
   sectionBlocks,
+  navSections,
   historyStack,
   redoStack,
   maxHistory,
 } from './state';
+import { styleOverrides } from './style-overrides';
 import type { InlineDomState } from './types';
 
 const inlineEditableSelector =
   '.admin-inline-editable, .admin-image-hover-trigger, .admin-icon-clickable';
 
-export function captureInlineDomStates(): InlineDomState[] {
+export function getInlineEditableElements(): HTMLElement[] {
   if (typeof document === 'undefined') return [];
-
   return Array.from(
     document.querySelectorAll<HTMLElement>(`.admin-preview-container ${inlineEditableSelector}`),
-  ).map((el, index) => {
+  );
+}
+
+/** Section id of the preview section that contains an inline-editable element. */
+export function getInlineSectionId(el: HTMLElement): string {
+  return el.closest<HTMLElement>('[id^="preview-section-"]')?.id || '';
+}
+
+export function captureInlineDomStates(): InlineDomState[] {
+  const localCounters = new Map<string, number>();
+
+  return getInlineEditableElements().map((el, index) => {
     const img = el.querySelector<HTMLImageElement>('img') || (el as HTMLImageElement);
     const qIcon = el.querySelector<HTMLElement>('.q-icon') || el;
+    // Keyed by section so that adding, removing or reordering sections does not
+    // shift saved states onto the wrong elements.
+    const sectionId = getInlineSectionId(el);
+    const localIndex = localCounters.get(sectionId) ?? 0;
+    localCounters.set(sectionId, localIndex + 1);
 
     return {
       index,
+      sectionId,
+      localIndex,
       text: el.isContentEditable ? el.innerText : undefined,
       imageSrc: img instanceof HTMLImageElement ? img.src : undefined,
       iconName: qIcon?.getAttribute('name'),
@@ -58,8 +77,15 @@ export function getFullSnapshotString(): string {
     aboutPage: contentState.aboutPage,
     customBlocks,
     sectionBlocks,
+    navSections,
+    styleOverrides,
     inlineDomStates: captureInlineDomStates(),
   });
+}
+
+export function clearHistory(): void {
+  historyStack.value = [];
+  redoStack.value = [];
 }
 
 export function saveHistorySnapshot(): void {
@@ -104,6 +130,13 @@ export function applySnapshot(snapshotStr: string): InlineDomState[] {
     }
     if (Array.isArray(data.sectionBlocks)) {
       sectionBlocks.splice(0, sectionBlocks.length, ...data.sectionBlocks);
+    }
+    if (Array.isArray(data.navSections)) {
+      navSections.splice(0, navSections.length, ...data.navSections);
+    }
+    if (data.styleOverrides && typeof data.styleOverrides === 'object') {
+      for (const key of Object.keys(styleOverrides)) delete styleOverrides[key];
+      Object.assign(styleOverrides, data.styleOverrides);
     }
     activePage.value = data.activePage || activePage.value;
     return Array.isArray(data.inlineDomStates) ? data.inlineDomStates : [];

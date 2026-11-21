@@ -41,12 +41,16 @@ export class PageSectionsController {
   }
 
   @Get('list')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'List all raw section records' })
   async findAll(): Promise<PageSection[]> {
     return this.pageSectionsService.findAll();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get single section record by ID' })
   async findOne(
     @Param('id', HashidParamPipe) id: number,

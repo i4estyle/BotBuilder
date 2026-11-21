@@ -183,21 +183,29 @@ export interface AboutPageState {
   imageAlt: string;
 }
 
-export interface CustomBlock {
-  id: string;
-  type: 'text' | 'image';
+export type CustomSectionLayout = 'text' | 'image' | 'imageText' | 'cards' | 'cta';
+export type CustomSectionBackground = 'white' | 'soft' | 'brand';
+
+export interface CustomSectionCard {
+  icon: string;
   title: string;
-  content?: string;
-  image?: string;
+  text: string;
 }
 
 export interface CustomBlockItem {
   id: string;
-  type: 'text' | 'image';
+  type: CustomSectionLayout;
   title: string;
   content?: string;
   image?: string;
+  imagePosition?: 'left' | 'right';
+  items?: CustomSectionCard[];
+  buttonLabel?: string;
+  buttonUrl?: string;
+  background?: CustomSectionBackground;
 }
+
+export type CustomBlock = CustomBlockItem;
 
 export interface SectionBlockItem {
   id: string;
@@ -233,6 +241,7 @@ export interface SectionNavItem {
   icon: string;
   color: 'green' | 'red' | 'dark';
   isCustomPage?: boolean;
+  hidden?: boolean;
 }
 
 export interface ThemeSettings {
@@ -243,6 +252,8 @@ export interface ThemeSettings {
 
 export interface InlineDomState {
   index: number;
+  sectionId?: string;
+  localIndex?: number;
   text?: string | undefined;
   imageSrc?: string | undefined;
   iconName?: string | null;
@@ -292,7 +303,6 @@ export interface BulkSavePayload {
   pageName: string;
   locale: string;
   sections?: unknown;
-  contentStateMap?: unknown;
   navSections?: SectionNavItem[];
   themeSettings?: ThemeSettings;
   customBlocks?: CustomBlockItem[];

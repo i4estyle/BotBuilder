@@ -38,7 +38,7 @@
       :key="block.id"
       class="admin-free-block"
       :class="{
-        'admin-free-block--selected': selectedBlockId === block.id,
+        'admin-free-block--selected': isBlockSelected(block.id),
         'admin-free-block--dragging': draggingBlockId === block.id,
       }"
       :style="blockStyle(block)"
@@ -47,8 +47,9 @@
       <div class="admin-free-block__content">
         <p v-if="block.type === 'text'" class="admin-free-block__text" :style="textStyle(block)">
           <span
-            contenteditable="true"
-            class="admin-inline-editable admin-free-block__text-inner"
+            :contenteditable="isEditing || undefined"
+            class="admin-free-block__text-inner"
+            :class="{ 'admin-inline-editable': isEditing }"
             @blur="(e) => onTextBlur(e, block)"
             >{{ block.content }}</span
           >
@@ -62,7 +63,7 @@
             style="pointer-events: none; -webkit-user-drag: none; user-select: none"
           />
           <button
-            v-if="selectedBlockId === block.id"
+            v-if="isBlockSelected(block.id)"
             class="admin-free-block__img-upload-btn"
             @pointerdown.stop
             @click.stop="triggerImageUpload(block)"
@@ -93,7 +94,7 @@
 
       <!-- Floating Text Toolbar -->
       <div
-        v-if="selectedBlockId === block.id && block.type === 'text'"
+        v-if="isBlockSelected(block.id) && block.type === 'text'"
         class="admin-text-toolbar"
         @pointerdown.stop
       >
@@ -153,7 +154,7 @@
 
       <!-- Floating Icon Toolbar -->
       <div
-        v-if="selectedBlockId === block.id && block.type === 'icon'"
+        v-if="isBlockSelected(block.id) && block.type === 'icon'"
         class="admin-text-toolbar"
         @pointerdown.stop
       >
@@ -178,7 +179,7 @@
 
       <!-- Floating Shape Toolbar -->
       <div
-        v-if="selectedBlockId === block.id && block.type === 'shape'"
+        v-if="isBlockSelected(block.id) && block.type === 'shape'"
         class="admin-text-toolbar"
         @pointerdown.stop
       >
@@ -242,7 +243,7 @@
         </label>
       </div>
 
-      <div v-if="selectedBlockId === block.id" class="admin-free-block__actions">
+      <div v-if="isBlockSelected(block.id)" class="admin-free-block__actions">
         <button
           class="admin-free-block__btn admin-free-block__btn--confirm"
           @pointerdown.stop
@@ -261,7 +262,7 @@
         </button>
       </div>
 
-      <template v-if="selectedBlockId === block.id">
+      <template v-if="isBlockSelected(block.id)">
         <span
           class="admin-free-block__resize-handle admin-free-block__resize-handle--se"
           @pointerdown.stop="onResizePointerDown($event, block, 'se')"
@@ -286,7 +287,9 @@
 <script setup lang="ts">
 import { computed, ref, onBeforeUnmount } from 'vue';
 import { useWebsiteEditor, type SectionBlockItem } from '@/composables/use-website-editor';
+import { Notify } from 'quasar';
 import { resolveAssetUrl } from '@/utils/asset-helper';
+import { uploadImageFile } from '@/utils/upload-helper';
 
 const props = defineProps<{
   sectionId: string;
@@ -310,6 +313,13 @@ const layerRef = ref<HTMLElement | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const blocks = computed((): SectionBlockItem[] => getSectionBlocks(props.sectionId));
+
+// Free blocks are also rendered on the public site; only the admin editor may edit them.
+const isEditing = computed((): boolean => editMode.value === 'edit');
+
+function isBlockSelected(blockId: string): boolean {
+  return isEditing.value && selectedBlockId.value === blockId;
+}
 
 const draggingBlockId = ref<string>('');
 let dragStartX = 0;
@@ -389,7 +399,7 @@ function getLayerRect(): DOMRect | null {
 }
 
 function onLayerPointerDown(event: PointerEvent): void {
-  if (ghostBlockType.value) {
+  if (isEditing.value && ghostBlockType.value) {
     event.stopPropagation();
     const rect = layerRef.value?.getBoundingClientRect();
     if (rect && rect.width > 0 && rect.height > 0) {
@@ -670,11 +680,27 @@ function triggerImageUpload(block: SectionBlockItem): void {
   }
 }
 
-function onFilePicked(event: Event): void {
+async function onFilePicked(event: Event): Promise<void> {
   const target = event.target as HTMLInputElement;
-  if (target.files && target.files[0] && activeImageBlock) {
+  const file = target.files?.[0];
+  const block = activeImageBlock;
+  if (!file || !block) return;
+  try {
+    // Upload first: a local blob: URL would be saved to the database and break after reload.
+    const uploadedUrl = await uploadImageFile(file);
     saveHistorySnapshot();
-    activeImageBlock.image = URL.createObjectURL(target.files[0]);
+    block.image = uploadedUrl;
+  } catch (err: unknown) {
+    console.error('Failed to upload image:', err);
+    Notify.create({
+      type: 'negative',
+      icon: 'error',
+      message: 'อัปโหลดรูปภาพไม่สำเร็จ',
+      caption: 'กรุณาตรวจสอบการเชื่อมต่อหรือขนาดไฟล์ แล้วลองใหม่อีกครั้ง',
+      position: 'top',
+    });
+  } finally {
+    target.value = '';
   }
 }
 

@@ -55,7 +55,7 @@
                   : '',
         ]"
       >
-        <template v-for="item in navSections" :key="item.id">
+        <template v-for="item in visibleNavSections" :key="item.id">
           <PreviewSectionHeader
             v-if="item.id === 'header'"
             :is-active="activeSectionId === 'header'"
@@ -187,8 +187,12 @@
             :block-id="item.id"
             :is-active="activeSectionId === item.id"
             @select="selectSection"
+            @open-icon-picker="openIconPicker"
           />
         </template>
+        <div v-if="visibleNavSections.length === 0" class="admin-preview-empty">
+          ทุกส่วนของหน้านี้ถูกซ่อนอยู่ เปิดการแสดงผลได้จากแถบโครงสร้างหน้าด้านซ้าย
+        </div>
       </div>
     </div>
 
@@ -408,6 +412,7 @@ import {
   onUnmounted,
   type CSSProperties,
 } from 'vue';
+import { Notify } from 'quasar';
 import AdminImageCropper from '@/components/admin/modals/admin-image-cropper.vue';
 import PreviewSectionHeader from '@/components/admin/sections/preview/home/preview-section-header.vue';
 import PreviewSectionHero from '@/components/admin/sections/preview/home/preview-section-hero.vue';
@@ -435,7 +440,12 @@ import PreviewSectionAboutHero from '@/components/admin/sections/preview/about/p
 import PreviewSectionAboutMission from '@/components/admin/sections/preview/about/preview-section-about-mission.vue';
 import PreviewSectionFooter from '@/components/admin/sections/preview/home/preview-section-footer.vue';
 import PreviewSectionCustomBlock from '@/components/admin/sections/preview/custom/preview-section-custom-block.vue';
-import { useWebsiteEditor, type InlineDomState } from '@/composables/use-website-editor';
+import {
+  useWebsiteEditor,
+  getInlineEditableElements,
+  getInlineSectionId,
+  type InlineDomState,
+} from '@/composables/use-website-editor';
 import { uploadImageFile } from '@/utils/upload-helper';
 
 const {
@@ -449,7 +459,7 @@ const {
   coursesPage: coursesPageData,
   aboutPage: aboutPageData,
   customBlocks,
-  navSections,
+  visibleNavSections,
   activeSectionId,
   viewportMode,
   availableIcons,
@@ -457,6 +467,7 @@ const {
   getDefaultImageSrcs,
   saveHistorySnapshot,
   setStyleOverride,
+  markDirty,
 } = useWebsiteEditor();
 
 function getCustomBlock(id: string) {
@@ -544,6 +555,7 @@ function selectNewIcon(iconName: string): void {
   if (activeIconCallback) {
     saveHistorySnapshot();
     activeIconCallback(iconName);
+    markDirty();
   }
   showIconPicker.value = false;
 }
@@ -619,28 +631,42 @@ function onFilePicked(event: Event): void {
   }
 }
 
+function releaseCropImage(): void {
+  if (cropImageSrc.value.startsWith('blob:')) URL.revokeObjectURL(cropImageSrc.value);
+  cropImageSrc.value = '';
+}
+
 async function onCropConfirm(croppedDataUrl: string): Promise<void> {
   if (activeImageCallback) {
     saveHistorySnapshot();
     try {
       const uploadedUrl = await uploadImageFile(croppedDataUrl);
       activeImageCallback(uploadedUrl);
+      markDirty();
     } catch (err: unknown) {
+      // Never fall back to embedding the base64 image in page content: it bloats every
+      // save and the public site. Ask the admin to retry instead.
       console.error('Failed to upload image:', err);
-      activeImageCallback(croppedDataUrl);
+      Notify.create({
+        type: 'negative',
+        icon: 'error',
+        message: 'อัปโหลดรูปภาพไม่สำเร็จ',
+        caption: 'กรุณาตรวจสอบการเชื่อมต่อหรือขนาดไฟล์ แล้วลองใหม่อีกครั้ง',
+        position: 'top',
+      });
     }
   }
   showCropDialog.value = false;
   activeImageCallback = null;
   activeImageKey.value = '';
-  cropImageSrc.value = '';
+  releaseCropImage();
 }
 
 function onCropCancel(): void {
   showCropDialog.value = false;
   activeImageCallback = null;
   activeImageKey.value = '';
-  cropImageSrc.value = '';
+  releaseCropImage();
 }
 
 const activeInlineEl = ref<HTMLElement | null>(null);
@@ -1284,10 +1310,11 @@ function clearInlineDomOverrides(): void {
 
 function applyInlineDomStates(states: InlineDomState[]): void {
   activeInlineEl.value = null;
-  const elements = Array.from(
-    document.querySelectorAll<HTMLElement>(`.admin-preview-container ${inlineEditableSelector}`),
-  );
+  const elements = getInlineEditableElements();
 
+  // Index elements by their section so saved states land on the same element even after
+  // sections were added, hidden or reordered.
+  const bySection = new Map<string, HTMLElement[]>();
   elements.forEach((el) => {
     el.style.display = '';
     el.style.transform = '';
@@ -1299,10 +1326,17 @@ function applyInlineDomStates(states: InlineDomState[]): void {
     el.style.fontStyle = '';
     el.style.removeProperty('--admin-inline-active-color');
     el.style.removeProperty('--admin-inline-active-font-size');
+    const sectionId = getInlineSectionId(el);
+    const list = bySection.get(sectionId) || [];
+    list.push(el);
+    bySection.set(sectionId, list);
   });
 
   states.forEach((state) => {
-    const el = elements[state.index];
+    const el =
+      state.sectionId !== undefined && state.localIndex !== undefined
+        ? bySection.get(state.sectionId)?.[state.localIndex]
+        : elements[state.index];
     if (!el) return;
 
     if (typeof state.text === 'string' && el.isContentEditable) {

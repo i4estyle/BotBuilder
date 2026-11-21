@@ -6,8 +6,15 @@ export * from './website-editor/nav';
 export * from './website-editor/content-mutations';
 export * from './website-editor/free-blocks';
 export * from './website-editor/style-overrides';
+export * from './website-editor/custom-sections';
 
-import type { ActivePage } from './website-editor/types';
+import { computed, effectScope, nextTick, watch } from 'vue';
+import type {
+  ActivePage,
+  EditorLocale,
+  PageDataResponse,
+  SectionNavItem,
+} from './website-editor/types';
 
 import {
   createInitialState,
@@ -34,6 +41,7 @@ import {
   ghostBlockType,
   isLoading,
   isSaving,
+  isDirty,
   error,
   isMobileNavOpen,
 } from './website-editor/state';
@@ -53,13 +61,17 @@ import {
   undo,
   redo,
   captureInlineDomStates,
+  clearHistory,
 } from './website-editor/history';
 import {
   setActivePage,
   saveCurrentStateToMap,
   syncActiveContentToTarget,
-  addNewPageSection,
-  insertCustomBlockAt,
+  addCustomSection,
+  duplicateCustomSection,
+  toggleSectionHidden,
+  syncCustomSectionTitle,
+  LOCKED_SECTION_IDS,
   updateSectionTitle,
   updateSectionIcon,
   moveSectionUp,
@@ -108,13 +120,71 @@ import {
 } from './website-editor/free-blocks';
 import { applyHomeNavigationPolicy } from './website-editor/home-navigation-policy';
 import { pageSectionsApiService } from '@/services/page-sections-api.service';
-import type { EditorLocale } from './website-editor/types';
 import { APP_CONTENT_READY_EVENT } from '@/constants/loading-constants';
 
 const liveSyncChannel =
   typeof window !== 'undefined' && 'BroadcastChannel' in window
     ? new BroadcastChannel('botbuilder-live-sync')
     : null;
+
+/**
+ * Content keys owned by each page. Saving sends only these (plus the shared header and
+ * footer), so saving one page can never overwrite another page with stale in-memory data.
+ */
+const SHARED_SECTION_KEYS = ['header', 'footer'];
+const PAGE_SECTION_KEYS: Record<ActivePage, string[]> = {
+  home: [
+    'hero',
+    'benefits',
+    'activityFormats',
+    'gallery',
+    'activityGallery',
+    'quiz',
+    'branches',
+    'cta',
+  ],
+  promotions: ['promotionsPage'],
+  courses: ['coursesPage'],
+  resources: ['resourcesPage'],
+  about: ['aboutPage'],
+};
+
+function pickPageSections(
+  page: ActivePage,
+  state: ReturnType<typeof createInitialState>,
+): Record<string, unknown> {
+  const source = state as unknown as Record<string, unknown>;
+  const keys = [...SHARED_SECTION_KEYS, ...(PAGE_SECTION_KEYS[page] || [])];
+  return Object.fromEntries(keys.filter((key) => key in source).map((key) => [key, source[key]]));
+}
+
+const RETIRED_SECTION_IDS = new Set(['benefits', 'gallery', 'learningJourney', 'activityGallery']);
+
+// Dirty tracking: any change the admin makes after a load or save marks the editor dirty.
+let dirtyTrackingSuspended = 0;
+let dirtyWatcherStarted = false;
+
+function startDirtyTracking(): void {
+  if (dirtyWatcherStarted) return;
+  dirtyWatcherStarted = true;
+  // Detached scope: the editor state is module-level, so the watcher must outlive whichever
+  // component happened to call useWebsiteEditor() first (e.g. a public page).
+  effectScope(true).run(() => {
+    watch(
+      () => [contentState, navSections, customBlocks, sectionBlocks, styleOverrides, themeSettings],
+      () => {
+        if (dirtyTrackingSuspended === 0 && editMode.value === 'edit') {
+          isDirty.value = true;
+        }
+      },
+      { deep: true },
+    );
+  });
+}
+
+function markDirty(): void {
+  if (editMode.value === 'edit') isDirty.value = true;
+}
 
 function syncStateObjects(
   target: ReturnType<typeof createInitialState>,
@@ -187,85 +257,105 @@ function syncStateObjects(
     Object.assign(target.aboutPage, source.aboutPage);
 }
 
+function applyPageData(
+  targetPage: ActivePage,
+  targetLocale: EditorLocale,
+  data: PageDataResponse,
+  initialSections: SectionNavItem[],
+): void {
+  if (data.sections) {
+    syncStateObjects(contentStateMap[targetLocale], data.sections);
+    if (editorLocale.value === targetLocale) {
+      syncActiveContentToTarget(contentStateMap[targetLocale]);
+    }
+  }
+  if (data.customBlocks && Array.isArray(data.customBlocks)) {
+    customBlocks.splice(0, customBlocks.length, ...data.customBlocks);
+  }
+  if (data.navSections && Array.isArray(data.navSections) && data.navSections.length > 0) {
+    const customIds = new Set(customBlocks.map((block) => block.id));
+    navSections.splice(
+      0,
+      navSections.length,
+      ...data.navSections.filter(
+        (section) =>
+          !RETIRED_SECTION_IDS.has(section.id) &&
+          // Drop orphaned custom entries whose content no longer exists.
+          (!section.isCustomPage || customIds.has(section.id)),
+      ),
+    );
+    // Existing saved navigation predates newer built-in landing sections.
+    // Keep the editor's saved order, while making those sections visible after an upgrade.
+    const existingIds = new Set(navSections.map((section) => section.id));
+    const missingSections = initialSections.filter((section) => !existingIds.has(section.id));
+    if (missingSections.length) {
+      const footerIndex = navSections.findIndex((section) => section.id === 'footer');
+      navSections.splice(footerIndex < 0 ? navSections.length : footerIndex, 0, ...missingSections);
+    }
+    applyHomeNavigationPolicy(targetPage, navSections);
+  }
+  if (data.themeSettings) {
+    Object.assign(themeSettings, data.themeSettings);
+  }
+  if (data.sectionBlocks && Array.isArray(data.sectionBlocks)) {
+    sectionBlocks.splice(0, sectionBlocks.length, ...data.sectionBlocks);
+  }
+  if (data.styleOverrides && typeof data.styleOverrides === 'object') {
+    clearStyleOverrides();
+    Object.assign(styleOverrides, data.styleOverrides);
+  }
+  if (data.inlineDomStates && Array.isArray(data.inlineDomStates)) {
+    setTimeout(() => {
+      window.dispatchEvent(
+        new CustomEvent('editor-state-restored', {
+          detail: { inlineDomStates: data.inlineDomStates },
+        }),
+      );
+    }, 100);
+  }
+}
+
 export function useWebsiteEditor() {
+  startDirtyTracking();
+
   const fetchPageData = async (pageName?: string, locale?: string): Promise<void> => {
     const targetPage: ActivePage = (pageName as ActivePage) || activePage.value || 'home';
     const targetLocale = (locale || editorLocale.value || 'th-TH') as EditorLocale;
     isLoading.value = true;
     error.value = null;
-
-    if (activePage.value !== targetPage) {
-      activePage.value = targetPage;
-    }
-    const initialSections = getFallbackNavSections(targetPage, targetLocale);
-    navSections.splice(0, navSections.length, ...initialSections);
-    applyHomeNavigationPolicy(targetPage, navSections);
-    syncActiveContentToTarget(contentStateMap[targetLocale]);
+    dirtyTrackingSuspended++;
 
     try {
-      const data = await pageSectionsApiService.getPageData(targetPage, targetLocale);
-      if (data.sections) {
-        syncStateObjects(contentStateMap[targetLocale], data.sections);
-        if (editorLocale.value === targetLocale) {
-          syncActiveContentToTarget(contentStateMap[targetLocale]);
-        }
+      if (activePage.value !== targetPage) {
+        activePage.value = targetPage;
       }
-      if (data.navSections && Array.isArray(data.navSections) && data.navSections.length > 0) {
-        const retiredSectionIds = new Set([
-          'benefits',
-          'gallery',
-          'learningJourney',
-          'activityGallery',
-        ]);
-        navSections.splice(
-          0,
-          navSections.length,
-          ...data.navSections.filter((section) => !retiredSectionIds.has(section.id)),
-        );
-        // Existing saved navigation predates newer built-in landing sections.
-        // Keep the editor's saved order, while making those sections visible after an upgrade.
-        const existingIds = new Set(navSections.map((section) => section.id));
-        const missingSections = initialSections.filter((section) => !existingIds.has(section.id));
-        if (missingSections.length) {
-          const footerIndex = navSections.findIndex((section) => section.id === 'footer');
-          navSections.splice(
-            footerIndex < 0 ? navSections.length : footerIndex,
-            0,
-            ...missingSections,
-          );
-        }
-        applyHomeNavigationPolicy(targetPage, navSections);
-      }
-      if (data.themeSettings) {
-        Object.assign(themeSettings, data.themeSettings);
-      }
-      if (data.customBlocks && Array.isArray(data.customBlocks)) {
-        customBlocks.splice(0, customBlocks.length, ...data.customBlocks);
-      }
-      if (data.sectionBlocks && Array.isArray(data.sectionBlocks)) {
-        sectionBlocks.splice(0, sectionBlocks.length, ...data.sectionBlocks);
-      }
-      if (data.styleOverrides && typeof data.styleOverrides === 'object') {
-        clearPageStyleOverrides(true);
-        Object.assign(styleOverrides, data.styleOverrides);
-      }
-      if (data.inlineDomStates && Array.isArray(data.inlineDomStates)) {
-        setTimeout(() => {
-          window.dispatchEvent(
-            new CustomEvent('editor-state-restored', {
-              detail: { inlineDomStates: data.inlineDomStates },
-            }),
-          );
-        }, 100);
-      }
-    } catch (err: unknown) {
-      error.value =
-        err instanceof Error ? err.message : 'Database unavailable, using fallback mock';
-      const fallback = getFallbackNavSections(targetPage, targetLocale);
-      navSections.splice(0, navSections.length, ...fallback);
+      const initialSections = getFallbackNavSections(targetPage, targetLocale);
+      navSections.splice(0, navSections.length, ...initialSections);
+      applyHomeNavigationPolicy(targetPage, navSections);
       syncActiveContentToTarget(contentStateMap[targetLocale]);
+      // Page-scoped data must not leak from the previously opened page into this one,
+      // otherwise it would be saved under the wrong page.
+      customBlocks.splice(0, customBlocks.length);
+      sectionBlocks.splice(0, sectionBlocks.length);
+      clearPageStyleOverrides(true);
+
+      try {
+        const data = await pageSectionsApiService.getPageData(targetPage, targetLocale);
+        applyPageData(targetPage, targetLocale, data, initialSections);
+      } catch (err: unknown) {
+        error.value =
+          err instanceof Error ? err.message : 'Database unavailable, using fallback mock';
+        const fallback = getFallbackNavSections(targetPage, targetLocale);
+        navSections.splice(0, navSections.length, ...fallback);
+        syncActiveContentToTarget(contentStateMap[targetLocale]);
+      }
     } finally {
+      clearHistory();
       isLoading.value = false;
+      // Let the deep watcher see the programmatic changes before tracking resumes.
+      await nextTick();
+      dirtyTrackingSuspended--;
+      isDirty.value = false;
       window.dispatchEvent(
         new CustomEvent(APP_CONTENT_READY_EVENT, {
           detail: { pageName: targetPage, locale: targetLocale },
@@ -279,7 +369,11 @@ export function useWebsiteEditor() {
     saveCurrentStateToMap();
     editorLocale.value = newLocale;
     syncActiveContentToTarget(contentStateMap[newLocale]);
-    localStorage.setItem('botbuilder-locale', newLocale);
+    try {
+      localStorage.setItem('botbuilder-locale', newLocale);
+    } catch {
+      // Storage can be unavailable (private mode); the locale still applies for this session.
+    }
     await fetchPageData(activePage.value, newLocale);
   };
 
@@ -287,46 +381,33 @@ export function useWebsiteEditor() {
     saveCurrentStateToMap();
     isSaving.value = true;
     error.value = null;
+    const pageName: ActivePage = activePage.value || 'home';
+    const locale = editorLocale.value;
 
     try {
-      const capturedInlineStates = captureInlineDomStates();
       await pageSectionsApiService.bulkSave({
-        pageName: activePage.value || 'home',
-        locale: editorLocale.value,
-        sections: contentStateMap[editorLocale.value],
-        contentStateMap,
+        pageName,
+        locale,
+        sections: pickPageSections(pageName, contentStateMap[locale]),
         navSections,
         themeSettings,
         customBlocks,
         sectionBlocks,
-        inlineDomStates: capturedInlineStates,
+        inlineDomStates: captureInlineDomStates(),
         styleOverrides,
       });
-
-      localStorage.setItem(
-        'botbuilder-admin-website-draft',
-        JSON.stringify({
-          savedAt: new Date().toISOString(),
-          editorLocale: editorLocale.value,
-          contentStateMap,
-          navSections,
-          themeSettings,
-          styleOverrides,
-        }),
-      );
+      isDirty.value = false;
 
       liveSyncChannel?.postMessage({
         type: 'content-saved',
-        pageName: activePage.value || 'home',
-        locale: editorLocale.value,
+        pageName,
+        locale,
         timestamp: Date.now(),
       });
 
       if (typeof window !== 'undefined') {
         window.dispatchEvent(
-          new CustomEvent('website-content-saved', {
-            detail: { pageName: activePage.value || 'home', locale: editorLocale.value },
-          }),
+          new CustomEvent('website-content-saved', { detail: { pageName, locale } }),
         );
       }
 
@@ -339,6 +420,7 @@ export function useWebsiteEditor() {
     }
   };
 
+  /** Restores the current page (in the current language) to its default content. */
   const resetAll = (): void => {
     saveHistorySnapshot();
     const freshTh = createInitialState();
@@ -350,17 +432,21 @@ export function useWebsiteEditor() {
     sectionBlocks.splice(0, sectionBlocks.length);
     clearStyleOverrides();
     setActivePage(activePage.value);
+    applyHomeNavigationPolicy(activePage.value, navSections);
     themeSettings.primaryColor = '#c00000';
     themeSettings.accentColor = '#1c871e';
     activeSectionId.value = '';
     selectedBlockId.value = '';
     window.dispatchEvent(new CustomEvent('editor-state-reset'));
+    markDirty();
   };
 
   const selectActivePage = async (page: ActivePage): Promise<void> => {
     setActivePage(page);
     await fetchPageData(page, editorLocale.value);
   };
+
+  const visibleNavSections = computed(() => navSections.filter((section) => !section.hidden));
 
   const toggleMobileNav = (): void => {
     isMobileNavOpen.value = !isMobileNavOpen.value;
@@ -388,6 +474,7 @@ export function useWebsiteEditor() {
     customBlocks,
     sectionBlocks,
     navSections,
+    visibleNavSections,
     activeSectionId,
     selectedBlockId,
     viewportMode,
@@ -406,6 +493,8 @@ export function useWebsiteEditor() {
     ghostBlockType,
     isLoading,
     isSaving,
+    isDirty,
+    markDirty,
     error,
     fetchPageData,
     saveToBackend,
@@ -418,8 +507,11 @@ export function useWebsiteEditor() {
     addCustomTextBlock,
     addCustomImageBlock,
     addCustomIconBlock,
-    addNewPageSection,
-    insertCustomBlockAt,
+    addCustomSection,
+    duplicateCustomSection,
+    toggleSectionHidden,
+    syncCustomSectionTitle,
+    lockedSectionIds: LOCKED_SECTION_IDS,
     addBlockToSection,
     removeSectionBlock,
     getSectionBlocks,

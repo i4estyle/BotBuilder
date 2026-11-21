@@ -1,21 +1,16 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsObject,
-  IsOptional,
-  IsArray,
-} from 'class-validator';
+import { IsIn, IsObject, IsOptional, IsArray } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+const PAGE_NAMES = ['home', 'promotions', 'courses', 'resources', 'about'];
+const LOCALES = ['th-TH', 'en-US'];
+
 export class BulkSavePageSectionsDto {
-  @ApiProperty({ example: 'home' })
-  @IsString()
-  @IsNotEmpty()
+  @ApiProperty({ example: 'home', enum: PAGE_NAMES })
+  @IsIn(PAGE_NAMES)
   pageName!: string;
 
-  @ApiProperty({ example: 'th-TH' })
-  @IsString()
-  @IsNotEmpty()
+  @ApiProperty({ example: 'th-TH', enum: LOCALES })
+  @IsIn(LOCALES)
   locale!: string;
 
   @ApiProperty({
@@ -31,7 +26,8 @@ export class BulkSavePageSectionsDto {
 
   @ApiPropertyOptional({
     description:
-      'Optional map of full content state by locale key e.g. th-TH, en-US',
+      'Deprecated and ignored: only `sections` for the given page and locale is saved',
+    deprecated: true,
   })
   @IsObject()
   @IsOptional()

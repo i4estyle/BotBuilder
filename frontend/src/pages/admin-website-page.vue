@@ -10,8 +10,14 @@
 
     <AdminQuizModal v-model="showQuizModal" />
 
+    <AdminAddSectionModal v-model="showAddSectionModal" />
+
     <div class="admin-page__workspace">
-      <AdminSidebarNav @open-quiz="openQuizModal" @open-edit-section="openEditSectionModal" />
+      <AdminSidebarNav
+        @open-quiz="openQuizModal"
+        @open-edit-section="openEditSectionModal"
+        @open-add-section="showAddSectionModal = true"
+      />
 
       <section class="admin-page__preview-pane">
         <AdminPreviewFrame />
@@ -39,6 +45,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
+import { onBeforeRouteLeave } from 'vue-router';
+import AdminAddSectionModal from '@/components/admin/modals/admin-add-section-modal.vue';
+import { confirmDiscardChanges } from '@/utils/confirm-dialog';
 import AdminEditorToolbar from '@/components/admin/layout/admin-editor-toolbar.vue';
 import AdminSidebarNav from '@/components/admin/layout/admin-sidebar-nav.vue';
 import AdminPreviewFrame from '@/components/admin/layout/admin-preview-frame.vue';
@@ -55,11 +64,16 @@ const {
   isLoading,
   isMobileNavOpen,
   toggleMobileNav,
+  editMode,
+  isDirty,
+  activeSectionId,
+  selectedBlockId,
 } = useWebsiteEditor();
 
 const showEditSectionModal = ref(false);
 const editingSection = ref<SectionNavItem | null>(null);
 const showQuizModal = ref(false);
+const showAddSectionModal = ref(false);
 
 function openEditSectionModal(item: SectionNavItem): void {
   editingSection.value = item;
@@ -82,12 +96,33 @@ function handleEscape(e: KeyboardEvent): void {
   }
 }
 
+function handleBeforeUnload(e: BeforeUnloadEvent): void {
+  if (!isDirty.value) return;
+  e.preventDefault();
+  // Required by some browsers to show the native "leave site?" prompt.
+  e.returnValue = '';
+}
+
+onBeforeRouteLeave(async () => {
+  if (isDirty.value && !(await confirmDiscardChanges())) return false;
+  return true;
+});
+
 onMounted(async () => {
   window.addEventListener('keydown', handleEscape);
+  window.addEventListener('beforeunload', handleBeforeUnload);
+  editMode.value = 'edit';
   await fetchPageData(activePage.value, editorLocale.value);
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleEscape);
+  window.removeEventListener('beforeunload', handleBeforeUnload);
+  // The public site shares this state; leave it read-only and clean.
+  editMode.value = 'view';
+  isDirty.value = false;
+  activeSectionId.value = '';
+  selectedBlockId.value = '';
+  cancelPlacingBlock();
 });
 </script>

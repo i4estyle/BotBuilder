@@ -14,7 +14,7 @@
           :key="pageItem.id"
           class="admin-page-switcher-btn"
           :class="{ 'admin-page-switcher-btn--active': activePage === pageItem.id }"
-          @click="setActivePage(pageItem.id)"
+          @click="switchPage(pageItem.id)"
         >
           <q-icon :name="pageItem.icon" size="14px" />
           <span>{{ pageItem.title }}</span>
@@ -31,6 +31,7 @@
         :class="[
           { 'admin-nav-tree-item--active': activeSectionId === item.id },
           { 'admin-nav-tree-item--drag-over': dragOverNavIndex === index },
+          { 'admin-nav-tree-item--hidden': item.hidden },
           `admin-nav-tree-item--${item.color}`,
         ]"
         @click="navigateToSection(item.id)"
@@ -56,9 +57,23 @@
 
         <span class="admin-nav-tree-item__label">
           {{ item.title }}
+          <span v-if="item.isCustomPage" class="admin-nav-tree-item__tag">ใหม่</span>
         </span>
 
         <button
+          v-if="!lockedSectionIds.has(item.id)"
+          type="button"
+          class="admin-nav-tree-item__action-btn"
+          :aria-label="item.hidden ? 'แสดง section นี้' : 'ซ่อน section นี้'"
+          @click.stop="toggleSectionHidden(item.id)"
+        >
+          <q-icon :name="item.hidden ? 'visibility_off' : 'visibility'" size="13px" />
+          <q-tooltip>{{ item.hidden ? 'ซ่อนอยู่ — คลิกเพื่อแสดง' : 'ซ่อนจากเว็บไซต์' }}</q-tooltip>
+        </button>
+
+        <button
+          type="button"
+          aria-label="แก้ไข"
           class="admin-nav-tree-item__action-btn"
           @click.stop="$emit('openEditSection', item)"
         >
@@ -66,6 +81,13 @@
           <q-tooltip>แก้ไข</q-tooltip>
         </button>
       </div>
+    </div>
+
+    <div class="admin-sidebar-add-section-wrap">
+      <button type="button" class="admin-sidebar-add-section-btn" @click="$emit('openAddSection')">
+        <q-icon name="add" size="18px" />
+        <span>เพิ่ม Section ใหม่</span>
+      </button>
     </div>
 
     <div class="admin-sidebar-quiz-button-wrap">
@@ -85,6 +107,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { confirmDiscardChanges } from '@/utils/confirm-dialog';
 import {
   useWebsiteEditor,
   type SectionNavItem,
@@ -94,6 +117,7 @@ import {
 defineEmits<{
   (e: 'openQuiz'): void;
   (e: 'openEditSection', item: SectionNavItem): void;
+  (e: 'openAddSection'): void;
 }>();
 
 const {
@@ -102,7 +126,10 @@ const {
   activeSectionId,
   navSections,
   reorderNavSections,
+  toggleSectionHidden,
+  lockedSectionIds,
   isMobileNavOpen,
+  isDirty,
 } = useWebsiteEditor();
 
 const pagesList: Array<{ id: ActivePage; title: string; icon: string }> = [
@@ -165,6 +192,15 @@ function onNavDragEnd(): void {
 }
 
 function navigateToSection(sectionId: string): void {
+  const item = navSections.find((s) => s.id === sectionId);
+  // Hidden sections are not rendered in the preview, so there is nothing to scroll to.
+  if (item?.hidden) return;
   activeSectionId.value = sectionId;
+}
+
+async function switchPage(page: ActivePage): Promise<void> {
+  if (page === activePage.value) return;
+  if (isDirty.value && !(await confirmDiscardChanges())) return;
+  await setActivePage(page);
 }
 </script>

@@ -49,6 +49,8 @@ const SECTION_PAGE_MAP: Record<string, string> = {
   aboutPage: 'about',
 };
 
+const SHARED_SECTION_KEYS: string[] = ['header', 'footer'];
+
 const ALL_PAGES: string[] = [
   'home',
   'promotions',
@@ -215,21 +217,9 @@ export class PageSectionsService {
 
         const entitiesToSave = new Map<string, PageSection>();
 
-        if (dto.contentStateMap) {
-          for (const [locKey, locSections] of Object.entries(
-            dto.contentStateMap,
-          )) {
-            this.collectSectionsMap(
-              transactionalEntityManager,
-              recordMap,
-              entitiesToSave,
-              pageName,
-              locKey,
-              locSections,
-            );
-          }
-        }
-
+        // Only the requested page + locale is written. Other pages and the other language
+        // are never touched, so a client holding stale/default state for them cannot
+        // overwrite saved content (and trigger deletion of their images).
         if (dto.sections) {
           this.collectSectionsMap(
             transactionalEntityManager,
@@ -384,41 +374,46 @@ export class PageSectionsService {
     manager: EntityManager,
     recordMap: Map<string, PageSection>,
     entitiesToSave: Map<string, PageSection>,
-    defaultPageName: string,
+    pageName: string,
     locale: string,
     sectionsMap: Record<string, Record<string, unknown>>,
   ): void {
-    for (const page of ALL_PAGES) {
-      let sortOrder = 0;
-      for (const [sectionKey, content] of Object.entries(sectionsMap)) {
-        const targetPageName = SECTION_PAGE_MAP[sectionKey] || defaultPageName;
-        const isSharedSection = ['header', 'cta', 'footer'].includes(
-          sectionKey,
-        );
-
-        if (targetPageName === page || isSharedSection) {
-          const mapKey = `${page}:${locale}:${sectionKey}`;
-          let existing = entitiesToSave.get(mapKey) || recordMap.get(mapKey);
-
-          if (existing) {
-            existing.content = content;
-            existing.sortOrder = sortOrder;
-            existing.isActive = true;
-          } else {
-            existing = manager.create(PageSection, {
-              pageName: page,
-              locale,
-              sectionKey,
-              content,
-              sortOrder,
-              isActive: true,
-            });
-            recordMap.set(mapKey, existing);
-          }
-          entitiesToSave.set(mapKey, existing);
-          sortOrder++;
-        }
+    let sortOrder = 0;
+    for (const [sectionKey, content] of Object.entries(sectionsMap)) {
+      if (!content || typeof content !== 'object' || Array.isArray(content)) {
+        continue;
       }
+      const isSharedSection = SHARED_SECTION_KEYS.includes(sectionKey);
+      const ownerPage = SECTION_PAGE_MAP[sectionKey] || pageName;
+      // Ignore content that belongs to another page.
+      if (!isSharedSection && ownerPage !== pageName) {
+        continue;
+      }
+
+      // Shared header/footer are mirrored to every page so they stay identical site-wide.
+      const targetPages = isSharedSection ? ALL_PAGES : [pageName];
+      for (const page of targetPages) {
+        const mapKey = `${page}:${locale}:${sectionKey}`;
+        let existing = entitiesToSave.get(mapKey) || recordMap.get(mapKey);
+
+        if (existing) {
+          existing.content = content;
+          existing.sortOrder = sortOrder;
+          existing.isActive = true;
+        } else {
+          existing = manager.create(PageSection, {
+            pageName: page,
+            locale,
+            sectionKey,
+            content,
+            sortOrder,
+            isActive: true,
+          });
+          recordMap.set(mapKey, existing);
+        }
+        entitiesToSave.set(mapKey, existing);
+      }
+      sortOrder++;
     }
   }
 

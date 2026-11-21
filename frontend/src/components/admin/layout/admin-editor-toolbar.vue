@@ -18,6 +18,14 @@
 
       <div class="admin-toolbar__title-group">
         <h1 class="admin-toolbar__title">จัดการเว็บไซต์</h1>
+        <span
+          class="admin-toolbar__save-state"
+          :class="{ 'admin-toolbar__save-state--dirty': isDirty }"
+          role="status"
+        >
+          <q-icon :name="isDirty ? 'edit_note' : 'cloud_done'" size="14px" />
+          {{ isDirty ? 'ยังไม่ได้บันทึก' : 'บันทึกแล้ว' }}
+        </span>
       </div>
     </div>
 
@@ -125,7 +133,7 @@
           label="คืนค่าเริ่มต้น"
           class="admin-toolbar__commit-btn admin-toolbar__commit-btn--reset"
           no-caps
-          @click="resetAll"
+          @click="handleReset"
         >
           <q-tooltip>คืนค่าเริ่มต้น</q-tooltip>
         </q-btn>
@@ -135,6 +143,7 @@
           label="บันทึกทั้งหมด"
           class="admin-toolbar__commit-btn admin-toolbar__commit-btn--save"
           :loading="isSaving"
+          :disable="isLoading"
           no-caps
           @click="handleSaveAll"
         >
@@ -150,6 +159,7 @@ import { onMounted, onUnmounted } from 'vue';
 import { Notify, useQuasar } from 'quasar';
 import { useWebsiteEditor, type EditorLocale } from '@/composables/use-website-editor';
 import { useAdminDrawer } from '@/composables/use-admin-drawer';
+import { confirmAction, confirmDiscardChanges } from '@/utils/confirm-dialog';
 
 const $q = useQuasar();
 const { isDrawerMini, toggleDrawer } = useAdminDrawer();
@@ -165,14 +175,35 @@ const {
   resetAll,
   saveToBackend,
   isSaving,
+  isLoading,
+  isDirty,
+  error,
 } = useWebsiteEditor();
 
 async function changeEditorLanguage(value: EditorLocale): Promise<void> {
+  if (value === editorLocale.value) return;
+  // Each language is loaded and saved separately, so unsaved edits would be lost.
+  if (isDirty.value && !(await confirmDiscardChanges())) return;
   await setEditorLocale(value);
 }
 
+async function handleReset(): Promise<void> {
+  const ok = await confirmAction({
+    title: 'คืนค่าเริ่มต้นหน้านี้?',
+    message:
+      'เนื้อหาของหน้านี้จะถูกแทนที่ด้วยค่าเริ่มต้น และ Section ที่สร้างเองจะถูกลบออก ' +
+      'ยังสามารถกด "ย้อนกลับ" ได้ และจะมีผลบนเว็บไซต์จริงเมื่อกด "บันทึกทั้งหมด" เท่านั้น',
+    okLabel: 'คืนค่าเริ่มต้น',
+    danger: true,
+  });
+  if (ok) resetAll();
+}
+
 async function handleSaveAll(): Promise<void> {
-  if (isSaving.value) return;
+  if (isSaving.value || isLoading.value) return;
+  // Commit any inline text that is still being typed (it is saved on blur).
+  const active = document.activeElement;
+  if (active instanceof HTMLElement && active.isContentEditable) active.blur();
   const success = await saveToBackend();
   if (success) {
     Notify.create({
@@ -189,7 +220,9 @@ async function handleSaveAll(): Promise<void> {
       type: 'negative',
       icon: 'error',
       message: 'เกิดข้อผิดพลาดในการบันทึก',
-      caption: 'กรุณาตรวจสอบการเชื่อมต่อแล้วลองใหม่อีกครั้ง',
+      caption: error.value?.includes('401')
+        ? 'เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่ (การแก้ไขยังอยู่ในหน้านี้)'
+        : 'กรุณาตรวจสอบการเชื่อมต่อแล้วลองใหม่อีกครั้ง',
       position: 'top',
       timeout: 3000,
       progress: true,
@@ -197,7 +230,17 @@ async function handleSaveAll(): Promise<void> {
   }
 }
 
+function isFormField(target: EventTarget | null): boolean {
+  return (
+    target instanceof HTMLElement &&
+    (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')
+  );
+}
+
 function handleKeydown(event: KeyboardEvent): void {
+  const key = event.key.toLowerCase();
+  // Let text fields (dialog inputs etc.) keep their native undo/redo.
+  if ((key === 'z' || key === 'y') && isFormField(event.target)) return;
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'b') {
     event.preventDefault();
     toggleDrawer($q.screen.lt.lg);
