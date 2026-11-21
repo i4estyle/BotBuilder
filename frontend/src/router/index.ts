@@ -8,6 +8,7 @@ import {
 
 import routes from './routes';
 import { useAuthStore } from '@/stores/auth-store';
+import { registerAuthHandlers } from '@/services/api-client';
 
 /*
  * If not building with SSR mode, you can
@@ -50,6 +51,18 @@ export default defineRouter((/* { store, ssrContext } */) => {
     }
 
     return true;
+  });
+
+  // The session expired for good (refresh failed): drop it and, if the admin is on a
+  // protected page, send them to the login page instead of leaving a broken screen.
+  registerAuthHandlers({
+    onUnauthorized: () => {
+      useAuthStore().clearSession();
+      const current = Router.currentRoute.value;
+      if (current.meta.requiresAuth) {
+        void Router.replace({ path: '/admin/login', query: { redirect: current.fullPath } });
+      }
+    },
   });
 
   return Router;

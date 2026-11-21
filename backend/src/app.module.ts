@@ -49,18 +49,12 @@ function databaseSslOptions(
     }),
     ThrottlerModule.forRoot({
       errorMessage: 'ThrottlerException: Too Many Requests (HTTP 429)',
-      getTracker: (req: Record<string, unknown>): string => {
-        const headers = req.headers as
-          Record<string, string | string[] | undefined> | undefined;
-        const xForwardedFor = headers?.['x-forwarded-for'];
-        if (typeof xForwardedFor === 'string' && xForwardedFor.length > 0) {
-          return xForwardedFor.split(',')[0].trim();
-        }
-        if (Array.isArray(xForwardedFor) && xForwardedFor.length > 0) {
-          return xForwardedFor[0].trim();
-        }
-        return typeof req.ip === 'string' ? req.ip : '127.0.0.1';
-      },
+      // Use Express's req.ip, which honours `trust proxy` (set in main.ts) and
+      // only trusts the hop added by our own proxy. Reading the first
+      // X-Forwarded-For value directly lets any client spoof it per request
+      // and bypass the login/forgot-password rate limits.
+      getTracker: (req: Record<string, unknown>): string =>
+        typeof req.ip === 'string' ? req.ip : '127.0.0.1',
       throttlers: [
         {
           name: 'default',

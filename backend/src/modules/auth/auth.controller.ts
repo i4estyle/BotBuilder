@@ -50,6 +50,7 @@ export class AuthController {
     return result;
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('google')
   @ApiOperation({ summary: 'Log in as an administrator with Google' })
   async loginWithGoogle(
@@ -146,13 +147,18 @@ export class AuthController {
     return result;
   }
 
+  /**
+   * Identified by the refresh cookie rather than the access token, so logging
+   * out still revokes the session after the short-lived access token expired.
+   */
   @Post('logout')
-  @UseGuards(JwtAuthGuard)
+  @HttpCode(204)
   async logout(
-    @CurrentUser() admin: AuthenticatedAdmin,
+    @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<void> {
-    await this.authService.logout(admin.adminId);
+    const token = this.readRefreshCookie(request);
+    if (token) await this.authService.logoutByRefreshToken(token);
     const isProd = process.env.NODE_ENV === 'production';
     response.clearCookie('bb_refresh_token', {
       path: '/api/auth',
@@ -204,12 +210,22 @@ export class AuthController {
   }
 
   private getRefreshCookie(request: Request): string {
+    const cookie = this.readRefreshCookie(request);
+    if (!cookie) throw new UnauthorizedException('Refresh token is required');
+    return cookie;
+  }
+
+  private readRefreshCookie(request: Request): string | null {
     const cookie = request.headers.cookie
       ?.split(';')
       .map((part) => part.trim())
       .find((part) => part.startsWith('bb_refresh_token='))
       ?.slice('bb_refresh_token='.length);
-    if (!cookie) throw new UnauthorizedException('Refresh token is required');
-    return decodeURIComponent(cookie);
+    if (!cookie) return null;
+    try {
+      return decodeURIComponent(cookie);
+    } catch {
+      return null;
+    }
   }
 }

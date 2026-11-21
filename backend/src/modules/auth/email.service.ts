@@ -30,7 +30,9 @@ export class AuthEmailService {
     const rawAppUrl =
       this.config.get<string>('FRONTEND_URL') ?? 'http://localhost:9000';
     const baseUrl = rawAppUrl.split(',')[0].trim().replace(/\/$/, '');
-    const link = `${baseUrl}/#/${route}?token=${encodeURIComponent(token)}`;
+    // The SPA uses history-mode routing (quasar.config vueRouterMode: 'history'),
+    // so the link must not contain a `#/` segment or the token never reaches the route.
+    const link = `${baseUrl}/${route}?token=${encodeURIComponent(token)}`;
     const host = this.config.get<string>('SMTP_HOST');
     const from = this.config.get<string>('SMTP_FROM');
     if (!host || !from) {

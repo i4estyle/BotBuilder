@@ -82,6 +82,14 @@ const googleLoading = ref(false);
 const errorMessage = ref('');
 const required = (value: string) => !!value || 'กรุณากรอกข้อมูล';
 
+/** Only follow in-app paths from ?redirect=, never protocol-relative or absolute URLs. */
+function redirectTarget(): string {
+  const raw = route.query.redirect;
+  return typeof raw === 'string' && raw.startsWith('/') && !raw.startsWith('//')
+    ? raw
+    : '/admin';
+}
+
 interface GoogleCredentialResponse {
   credential: string;
 }
@@ -90,7 +98,13 @@ interface GoogleAccountsId {
     client_id: string;
     callback: (response: GoogleCredentialResponse) => void;
   }): void;
-  prompt(): void;
+  prompt(listener?: (notification: GooglePromptMomentNotification) => void): void;
+}
+interface GooglePromptMomentNotification {
+  isNotDisplayed?(): boolean;
+  isSkippedMoment(): boolean;
+  isDismissedMoment(): boolean;
+  getDismissedReason(): string;
 }
 declare global {
   interface Window {
@@ -134,7 +148,25 @@ async function signInWithGoogle(): Promise<void> {
         void completeGoogleSignIn(credential);
       },
     });
-    window.google?.accounts.id.prompt();
+    window.google?.accounts.id.prompt((notification) => {
+      // One Tap can be suppressed (cooldown after a dismissal, blocked third-party
+      // sign-in) or closed without a credential; the callback then never fires, so
+      // release the button instead of spinning forever.
+      const closedWithoutCredential =
+        notification.isDismissedMoment() &&
+        notification.getDismissedReason() !== 'credential_returned';
+      if (
+        notification.isNotDisplayed?.() ||
+        notification.isSkippedMoment() ||
+        closedWithoutCredential
+      ) {
+        googleLoading.value = false;
+        if (!closedWithoutCredential) {
+          errorMessage.value =
+            'เบราว์เซอร์ไม่แสดงหน้าต่าง Google Sign-In กรุณาลองใหม่ หรือเข้าสู่ระบบด้วยรหัสผ่าน';
+        }
+      }
+    });
   } catch {
     errorMessage.value = 'ไม่สามารถเปิด Google Sign-In ได้ กรุณาลองใหม่';
     googleLoading.value = false;
@@ -144,7 +176,7 @@ async function signInWithGoogle(): Promise<void> {
 async function completeGoogleSignIn(credential: string): Promise<void> {
   try {
     await auth.loginWithGoogle(credential);
-    await router.replace((route.query.redirect as string) || '/admin');
+    await router.replace(redirectTarget());
   } catch (error) {
     errorMessage.value =
       axios.isAxiosError(error) && error.response?.status === 401
@@ -161,7 +193,7 @@ async function submit(): Promise<void> {
   errorMessage.value = '';
   try {
     await auth.login(loginName.value, password.value);
-    await router.replace((route.query.redirect as string) || '/admin');
+    await router.replace(redirectTarget());
   } catch (error) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 429) {

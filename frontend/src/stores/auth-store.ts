@@ -1,6 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import { authApiService, type AuthAdmin } from '@/services/auth-api.service';
-import { AUTH_TOKEN_STORAGE_KEY, registerUnauthorizedHandler } from '@/services/api-client';
+import { AUTH_TOKEN_STORAGE_KEY, registerAuthHandlers } from '@/services/api-client';
 
 const USER_STORAGE_KEY = 'bb_auth_user';
 
@@ -36,10 +36,15 @@ export const useAuthStore = defineStore('auth', {
     },
     async logout(): Promise<void> {
       try {
-        if (this.token) await authApiService.logout();
+        // Always call the API: it revokes the session via the refresh cookie,
+        // even when the in-memory access token is missing or expired.
+        await authApiService.logout();
       } catch {
         /* Local cleanup must still happen. */
       }
+      this.clearSession();
+    },
+    clearSession(): void {
       this.token = null;
       this.user = null;
       localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
@@ -49,15 +54,9 @@ export const useAuthStore = defineStore('auth', {
       if (this.initialized) return;
       try {
         const { accessToken, admin } = await authApiService.refresh();
-        this.token = accessToken;
-        this.user = admin;
-        localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, accessToken);
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(admin));
+        this.saveSession(accessToken, admin);
       } catch {
-        this.token = null;
-        this.user = null;
-        localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
-        localStorage.removeItem(USER_STORAGE_KEY);
+        this.clearSession();
       } finally {
         this.initialized = true;
       }
@@ -65,12 +64,9 @@ export const useAuthStore = defineStore('auth', {
   },
 });
 
-registerUnauthorizedHandler(() => {
-  const auth = useAuthStore();
-  auth.token = null;
-  auth.user = null;
-  localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
-  localStorage.removeItem(USER_STORAGE_KEY);
+// Keep the store in sync when the API client silently refreshes an expired access token.
+registerAuthHandlers({
+  onRefreshed: ({ accessToken, admin }) => useAuthStore().saveSession(accessToken, admin),
 });
 
 if (import.meta.hot) {

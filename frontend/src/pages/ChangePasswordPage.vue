@@ -30,6 +30,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 import { authApiService } from '@/services/auth-api.service';
 import { useAuthStore } from '@/stores/auth-store';
 const router = useRouter(),
@@ -52,8 +53,11 @@ async function submit() {
     success.value = true;
     message.value = 'เปลี่ยนรหัสผ่านแล้ว';
     setTimeout(() => void router.replace('/admin/login'), 1000);
-  } catch {
-    message.value = 'รหัสผ่านปัจจุบันไม่ถูกต้อง';
+  } catch (error) {
+    message.value =
+      axios.isAxiosError(error) && error.response?.status === 400
+        ? 'รหัสผ่านปัจจุบันไม่ถูกต้อง'
+        : 'เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
   } finally {
     loading.value = false;
   }

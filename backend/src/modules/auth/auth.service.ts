@@ -35,6 +35,10 @@ export interface AdminSummary extends AuthenticatedAdmin {
   lastLoginAt: Date | null;
 }
 
+/** bcrypt hash (cost 10) of a random string; compared against when no account matches. */
+const DUMMY_PASSWORD_HASH =
+  '$2b$10$w3rVhmMrCfBcNh2RkTc39.yMVwO90CYr/8u5WI/Ro5n9viCEu85eG';
+
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
@@ -55,10 +59,15 @@ export class AuthService {
         loginName: dto.loginName,
       })
       .getOne();
+    // Always run bcrypt so response time doesn't reveal whether the account exists.
+    const passwordMatches = await bcrypt.compare(
+      dto.password,
+      admin?.passwordHash ?? DUMMY_PASSWORD_HASH,
+    );
     if (
       !admin?.passwordHash ||
       admin.status !== UserStatus.ACTIVE ||
-      !(await bcrypt.compare(dto.password, admin.passwordHash))
+      !passwordMatches
     )
       throw new UnauthorizedException('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
     await this.recordLogin(admin.adminId);
@@ -239,17 +248,33 @@ export class AuthService {
     await this.revokeTokens(adminId);
   }
 
+  /** Signs out the admin who owns a still-valid refresh token; unknown or spent tokens are ignored. */
+  async logoutByRefreshToken(refreshToken: string): Promise<void> {
+    const stored = await this.findUsableToken(
+      refreshToken,
+      AuthTokenPurpose.REFRESH,
+    );
+    if (stored) await this.logout(stored.adminId);
+  }
+
   async requestPasswordReset(email: string): Promise<void> {
     const admin = await this.admins.findOneBy({ email: email.toLowerCase() });
-    if (admin?.status === UserStatus.ACTIVE)
-      await this.email.sendPasswordReset(
-        admin.email,
-        await this.createToken(
-          admin.adminId,
-          AuthTokenPurpose.PASSWORD_RESET,
-          60 * 60 * 1000,
-        ),
+    if (admin?.status !== UserStatus.ACTIVE) return;
+    const token = await this.createToken(
+      admin.adminId,
+      AuthTokenPurpose.PASSWORD_RESET,
+      60 * 60 * 1000,
+    );
+    try {
+      await this.email.sendPasswordReset(admin.email, token);
+    } catch (error) {
+      // Swallow so the response matches the "no such account" case and
+      // doesn't reveal which emails belong to an administrator.
+      this.logger.error(
+        `Password reset email to admin ${admin.adminId} failed`,
+        error instanceof Error ? error.stack : String(error),
       );
+    }
   }
 
   async resetPassword(token: string, password: string): Promise<void> {
@@ -278,7 +303,9 @@ export class AuthService {
       !admin?.passwordHash ||
       !(await bcrypt.compare(currentPassword, admin.passwordHash))
     )
-      throw new UnauthorizedException('รหัสผ่านปัจจุบันไม่ถูกต้อง');
+      // 400, not 401: the session itself is valid, and a 401 makes the
+      // frontend treat it as expired and sign the admin out.
+      throw new BadRequestException('รหัสผ่านปัจจุบันไม่ถูกต้อง');
     await this.updatePassword(adminId, newPassword);
   }
 
