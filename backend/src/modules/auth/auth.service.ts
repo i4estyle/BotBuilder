@@ -42,6 +42,8 @@ const DUMMY_PASSWORD_HASH =
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
+  /** Shared so Google's signing certificates are cached between sign-ins. */
+  private readonly googleClient = new google.auth.OAuth2();
 
   constructor(
     @InjectRepository(Admin) private readonly admins: Repository<Admin>,
@@ -85,7 +87,7 @@ export class AuthService {
 
     let email: string | undefined;
     try {
-      const ticket = await new google.auth.OAuth2().verifyIdToken({
+      const ticket = await this.googleClient.verifyIdToken({
         idToken: credential,
         audience: clientId,
       });

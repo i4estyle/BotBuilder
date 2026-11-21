@@ -194,10 +194,13 @@ async function completeGoogleSignIn(credential: string): Promise<void> {
     await auth.loginWithGoogle(credential);
     await router.replace(redirectTarget());
   } catch (error) {
+    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
     errorMessage.value =
-      axios.isAxiosError(error) && error.response?.status === 401
+      status === 401
         ? 'บัญชี Google นี้ไม่มีสิทธิ์เข้าระบบผู้ดูแล'
-        : 'ไม่สามารถเข้าสู่ระบบด้วย Google ได้ กรุณาลองใหม่';
+        : status === 429
+          ? 'พยายามเข้าสู่ระบบบ่อยเกินไป กรุณารอสักครู่แล้วลองใหม่'
+          : 'ไม่สามารถเข้าสู่ระบบด้วย Google ได้ กรุณาลองใหม่';
   } finally {
     googleLoading.value = false;
   }
