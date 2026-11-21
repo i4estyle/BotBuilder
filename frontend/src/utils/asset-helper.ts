@@ -64,7 +64,7 @@ export function resolveAssetUrl(src: string | undefined | null): string {
     }
   }
   if (cleanPath.startsWith('/uploads/')) {
-    const rawBackendUrl = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000';
+    const rawBackendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     const backendUrl = rawBackendUrl.replace(/\/$/, '');
     return `${backendUrl}${cleanPath}`;
   }
